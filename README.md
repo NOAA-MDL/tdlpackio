@@ -14,7 +14,18 @@ Before we describe the TDLPACK data format, one first needs to know that a TDLPA
 
 ### Sequential Files
 
+This is a Fortran unformatted, variable record length file.  The TDLPACK record is contained within a Fortran record.  The TDLPACK record preceeded by 8-bytes that contains the record length in bytes of the TDLPACK record.  A TDLPACK sequental file can also contain 2 other type of records: station call letter record; trailer record.  Station call letters in MOS2K of of type CHARACTER*8.
+
+Station call letter record is of the following format in bytes:
+* 1 - 4: Size of the station call letters in bytes (number of station * 8)
+* 5 - _n_: station call letters
+
+Trailer record is of the following format:
+* PUT FORMAT HERE
+
 ### Random Access Files
+
+This is a Fortran direct access, fixed record length file.  
 
 ## TDLPACK Format
 
