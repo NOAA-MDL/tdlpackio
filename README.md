@@ -12,4 +12,4 @@ With its rich ecosystem of community supported scientific and numerical computin
 
 The following will attempt to briefly explain the TDLPACK format.  Please read the official documentation [here](https://www.weather.gov/media/mdl/TDL_OfficeNote00-1.pdf).
 
-Before we describe the TDLPACK data format, one first needs to know that a TDLPACK record can be contained in 2 types of files: Fortran unformatted (variable record length); Fortran direct-access (fixed record length).  In MOS2K world, these are known as sequential and random-access files, respectively.
+Before we describe the TDLPACK data format, one first needs to know that a TDLPACK record can be reside in two types of files: Fortran unformatted (variable record length); Fortran direct-access (fixed record length).  In MOS2K world, these are known as sequential and random-access files, respectively.
