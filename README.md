@@ -16,4 +16,13 @@ Before we describe the TDLPACK data format, one first needs to know that a TDLPA
 
 TDLPACK is GRIB-like in that it contains an initial 4-character string to identify the data format "TDLP"; indentification sections (Indicator, Product, and Grid); Data section; and an End Section that contains "7777".  A more detailed description of TDLPACK sections can be found in the chapter 5 of the official documentation.
 
-A TDLPACK record can contain 2 types of data: vector data (i.e. most likely data at "stations"); 2-D projected gridded data (i.e. data at regularly spaced gridpoints.  TDLPACK only supports the following map projections: Northern Hemispheric Lambert Conformal Conic, Northern Polar Stereograhic, and Mercator.
+* Section 0 - Inidictator Section
+* Section 1 - Product Definition Section
+* Section 2 - Grid Definition Section
+* Section 3 - Bitmap Section (technically available, but never supported)
+* Section 4 - Data Section
+* Section 5 - End Section
+
+A TDLPACK record can contain 2 types of data: vector data (i.e. most likely data at "stations"); 2-D projected gridded data (i.e. data at regularly spaced gridpoints).  TDLPACK only supports the following map projections: Northern Hemispheric Lambert Conformal Conic, Northern Polar Stereograhic, and Mercator. A bit in 
+
+
