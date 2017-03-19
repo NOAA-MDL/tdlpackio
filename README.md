@@ -25,7 +25,7 @@ Trailer record is of the following format:
 
 ### Random Access Files
 
-This is a Fortran direct access, fixed record length file.  
+This is a Fortran direct access, fixed record length file.  One can think of these files like a book in that there is a table of contents that point to where specific TDLPACK records exist within the file.  Here, a TDLPACK record is considered a logical record because it can span multiple (Fortran) physical records.  A TDLPACK random access file can also contain a station call letter record and is the same format as discussed above, however, accessing this record is different.
 
 ## TDLPACK Format
 
