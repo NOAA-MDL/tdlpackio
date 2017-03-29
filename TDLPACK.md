@@ -19,7 +19,7 @@ Trailer record is of the following format:
 
 This is a Fortran direct access, fixed record length file.  One can think of these files like a book in that there is a table of contents that point to where specific TDLPACK records exist within the file.  Here, a TDLPACK record is considered a logical record because it can span multiple (Fortran) physical records.  A TDLPACK random access file can also contain a station call letter record and is the same format as discussed above, however, accessing this record is different.
 
-## TDLPACK Format
+## TDLPACK Data Format
 
 The following will attempt to briefly explain the TDLPACK format.  Please read the official documentation [here](https://www.weather.gov/media/mdl/TDL_OfficeNote00-1.pdf).  TDLPACK is a big-endian binary data format and is GRIB-like in that it contains an initial 4-character string to identify the data format "TDLP"; indentification sections (Indicator, Product, and Grid); Data section; and an End Section that contains "7777".  A more detailed description of TDLPACK sections can be found in the chapter 5 of the official documentation.
 
