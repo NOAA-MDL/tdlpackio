@@ -24,9 +24,9 @@ This is a Fortran direct access, fixed record length file.  One can think of the
 
 The following will attempt to briefly explain the TDLPACK format.  Please read the official documentation [here](https://www.weather.gov/media/mdl/TDL_OfficeNote00-1.pdf).  TDLPACK is a big-endian binary data format and is GRIB-like in that it contains an initial 4-character string to identify the data format "TDLP"; indentification sections (Indicator, Product, and Grid); Data section; and an End Section that contains "7777".  A more detailed description of TDLPACK sections can be found in the chapter 5 of the official documentation.  TDLPACK contains the following sections:
 
-* Section 0 - Inidictator Section
+* Section 0 - Indictator Section
 * Section 1 - Product Definition Section
-* Section 2 - Grid Definition Section
+* Section 2 - Grid Definition Section (NOTE: Not available when data are vector)
 * Section 3 - Bitmap Section (defined, but never supported in code)
 * Section 4 - Data Section
 * Section 5 - End Section
