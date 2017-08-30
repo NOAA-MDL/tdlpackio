@@ -9,15 +9,16 @@ Before we describe the TDLPACK data format, one first needs to know the differen
 This is a Fortran unformatted, variable record length file.  The TDLPACK record is contained within a Fortran record.  The TDLPACK record preceeded by 8-bytes that contains the record length in bytes of the TDLPACK record.  A TDLPACK sequental file can also contain 2 other type of records: station call letter record; trailer record.  Station call letters in MOS2K of of type CHARACTER*8.
 
 Station call letter record is of the following format in bytes:
-* 1 - 4: Size of the station call letters in bytes (number of stations * 8)
-* 5 - _n_: station call letters
+* 1 - 8: Size of the station call letters in bytes (number of stations * 8)
+* 9 - _n_: Station Call Letters
 
-Trailer record is of the following format:
-* PUT FORMAT HERE
+Trailer record is of the following format in bytes:
+* 1 - 8: Record length
+* 9 - _n_:  Trailer record consisting of date/time information
 
 ### Random Access Files
 
-This is a Fortran direct access, fixed record length file.  One can think of these files like a book in that there is a table of contents that point to where specific TDLPACK records exist within the file.  Here, a TDLPACK record is considered a logical record because it can span multiple (Fortran) physical records.  A TDLPACK random access file can also contain a station call letter record and is the same format as discussed above, however, accessing this record is different.
+This is a Fortran direct access, fixed record length file.  One can think of these files like a book in that there is a table of contents (i.e. key records) that point to where specific TDLPACK records (i.e. data records) exist within the file.  Also, there exists a Master Key Record at the beginning of the file.  In a Random Access File, a TDLPACK record is considered a logical record because it can span multiple (Fortran) physical records.  A TDLPACK random access file can also contain a station call letter record and is the same format as discussed above, however, accessing this record is different.
 
 ## TDLPACK Data Format
 
