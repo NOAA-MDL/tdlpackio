@@ -8,5 +8,5 @@ A brief introduction to TDLPACK files and data format can be found [here](TDLPAC
 
 ## Motivation
 
-Python has a rich ecosystem of community supported scientific and numerical computing libraries and has become a viable environment to perform production quality work on large datasets.
+Provide a Python interface to MDL's TDLPACK files.
 
