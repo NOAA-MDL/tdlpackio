@@ -31,4 +31,10 @@ The following will attempt to briefly explain the TDLPACK format.  Please read t
 * Section 4 - Data Section
 * Section 5 - End Section
 
-A TDLPACK record can contain 2 types of data: vector data (i.e. most likely data at "stations"); 2-D projected gridded data (i.e. data at regularly spaced gridpoints).  TDLPACK only supports the following map projections: Northern Hemispheric Lambert Conformal Conic, Northern Polar Stereograhic, and Mercator.
+A TDLPACK record can contain 2 types of data: vector data (i.e. most likely data at "stations"); gridded data (i.e. data at regularly spaced projected gridpoints).  TDLPACK only supports the following map projections:
+
+* Lambert Conformal Conic
+* Polar Stereograhic
+* Mercator
+
+There is no support for geographic grids (i.e. latitude-longitude grids).
