@@ -26,7 +26,7 @@ The following will attempt to briefly explain the TDLPACK format.  Please read t
 
 * Section 0 - Indictator Section
 * Section 1 - Product Definition Section
-* Section 2 - Grid Definition Section (NOTE: Not available when data are vector)
+* Section 2 - Grid Definition Section (**NOTE**: Not present when data are vector)
 * Section 3 - Bitmap Section (defined, but never supported in code)
 * Section 4 - Data Section
 * Section 5 - End Section
