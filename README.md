@@ -8,5 +8,5 @@ A brief introduction to TDLPACK files and data format can be found [here](TDLPAC
 
 ## Motivation
 
-Provide a Python interface to MDL's TDLPACK files.
+Provide a Python interface for reading and writing TDLPACK files.
 
