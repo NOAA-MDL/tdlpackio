@@ -1,6 +1,5 @@
 from numpy.distutils.core import setup, Extension
 
-                #sources       = ['_tdlpack.pyf','stripack.f90'])
 ext = Extension(name  = '_tdlpack',
                 sources = ['tdlpack/_tdlpack.pyf','tdlpack/bswap.f','tdlpack/ckfilend.f','tdlpack/ckraend.f',
                            'tdlpack/cksysend.f','tdlpack/closefile.f','tdlpack/openfile.f',
