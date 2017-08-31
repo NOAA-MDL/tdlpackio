@@ -1,5 +1,11 @@
+# ---------------------------------------------------------------------------------------- 
+# Import modules
+# ---------------------------------------------------------------------------------------- 
 from numpy.distutils.core import setup, Extension
 
+# ---------------------------------------------------------------------------------------- 
+# Define Extension object
+# ---------------------------------------------------------------------------------------- 
 ext = Extension(name  = '_tdlpack',
                 sources = ['tdlpack/_tdlpack.pyf','tdlpack/bswap.f','tdlpack/ckfilend.f','tdlpack/ckraend.f',
                            'tdlpack/cksysend.f','tdlpack/closefile.f','tdlpack/openfile.f',
@@ -10,6 +16,9 @@ ext = Extension(name  = '_tdlpack',
                            'tdlpack/unpklx.f','tdlpack/unpkoo.f','tdlpack/unpkpo.f',
                            'tdlpack/unpkps.f','tdlpack/writep.f'])
 
+# ---------------------------------------------------------------------------------------- 
+# Build pytdlpack
+# ---------------------------------------------------------------------------------------- 
 if __name__ == "__main__":
     setup(name = 'pytdlpack',
           author            = "Eric Engle",
