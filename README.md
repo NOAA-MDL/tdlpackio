@@ -10,3 +10,15 @@ A brief introduction to TDLPACK files and data format can be found [here](TDLPAC
 
 Provide a Python interface for reading and writing TDLPACK files.
 
+## Installation
+
+To install ([numpy](http://numpy.org) and fortran compiler (preferably 
+[gfortran](https://gcc.gnu.org/wiki/GFortran)) required):
+
+* ``python setup.py build``
+   - If you change the fortran compiler, you may have to add the 
+flags `config_fc --fcompiler=<compiler name>` when setup.py is run
+(see docs for [numpy.distutils] (http://docs.scipy.org/doc/numpy-dev/f2py/distutils.html)).
+* ``python setup.py install``
+
+* to run test, execute ``python <SOME TEST SCRIPT HERE>``
