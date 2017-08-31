@@ -1,0 +1,115 @@
+      SUBROUTINE PKS4LX(KFILDO,IPACK,NDX,LOC,IPOS,IC,NXY,NBIT,
+     1                  L3264B,IER)
+C
+C        MAY   1997   GLAHN   TDL   HP
+C        APRIL 2000   DALLAVALLE   MODIFIED FORMAT STATEMENTS TO
+C                                  CONFORM TO FORTRAN 90 STANDARDS
+C                                  ON THE IBM SP
+C
+C        PURPOSE 
+C            TO PACK NXY VALUES INTO IPACK( ).  THE PACKED VALUES
+C            ARE TAKEN FROM IC( ) WITH NO REFERENCE VALUE OR 
+C            SCALING CONSIDERED.  PKS4LX ELIMINATES THE CALLING OF
+C            PKBG, AND RATHER INCORPORATES IT INTO THE LOOP.
+C            SINCE THIS IS A HIGHLY USED ROUTINE, ALL REASONABLE
+C            ATTEMPTS AT EFFICIENCY MUST BE PURSUED.  THIS IS FOR
+C            SIMPLE PACKING, THE COUTERPART OF PKC4LX FOR COMPLEX
+C            PACKING.
+C
+C        DATA SET USE 
+C           KFILDO - UNIT NUMBER FOR OUTPUT (PRINT) FILE. (OUTPUT) 
+C
+C        VARIABLES 
+C              KFILDO = UNIT NUMBER FOR OUTPUT (PRINT) FILE.  (INPUT) 
+C            IPACK(J) = THE ARRAY HOLDING THE ACTUAL PACKED MESSAGE
+C                       (J=1,MAX OF NDX).  (INPUT/OUTPUT)
+C                 NDX = DIMENSION OF IPACK( ).  (INPUT)
+C                 LOC = HOLDS WORD POSITION IN IPACK OF NEXT VALUE TO
+C                       PACK.  (INPUT/OUTPUT)
+C                IPOS = HOLDS BIT POSITION IN IPACK(LOC) OF THE FIRST
+C                       BIT OF THE NEXT VALUE TO PACK.  (INPUT/OUTPUT)
+C               IC(K) = DATA TO PACK (K=1,NXY).  (INPUT)
+C                 NXY = DIMENSION OF IC( ).  THE NUMBER OF VALUES 
+C                       TO BE PACKED.  (INPUT)
+C                NBIT = THE NUMBER OF BITS TO PACK FOR EACH VALUE.
+C                       (INPUT)
+C              L3264B = INTEGER WORD LENGTH OF MACHINE BEING USED.
+C                       (INPUT)
+C                 IER = ERROR RETURN.  (OUTPUT)
+C                       1 = NDX IS NOT LARGE ENOUGH TO ACCOMMODATE THE BITS
+C                           NECESSARY TO PACK NXY VALUES STARTING
+C                           AT THE VALUES LOC AND IPOS.
+C                       2 = IPOS NOT IN THE RANGE 1-L3264B.
+C                       3 = IBIT NOT IN THE RANGE 0-32.
+C
+C        NON SYSTEM SUBROUTINES CALLED 
+C           NONE
+C
+      DIMENSION IPACK(NDX)
+      DIMENSION IC(NXY)
+C
+C        SET ERROR RETURN.
+C
+      IER=0
+C
+C        CHECK LEGITIMATE VALUES OF LOC AND IPOS, AND WHETHER
+C        NDX IS SUFFICIENT FOR ALL NXY VALUES.
+C
+         IF(IPOS.LE.0.OR.IPOS.GT.L3264B)THEN
+            IER=2
+            WRITE(KFILDO,101)IPOS,IER
+ 101        FORMAT(/,' IPOS = ',I6,' NOT IN THE RANGE 1 TO L3264B',
+     1               ' IN PKS4LX.  RETURN FROM PKS4LX WITH IER = ',I4)
+            GO TO 900 
+         ENDIF
+C
+         IF(NBIT.LT.0.OR.NBIT.GT.32)THEN
+            IER=3
+            WRITE(KFILDO,102)NBIT,IER
+ 102        FORMAT(/,' NBIT = ',I6,
+     1               ' NOT IN THE RANGE 0 TO 32 IN PKS4LX.',
+     2               ' RETURN FROM PKS4LX WITH IER = ',I4)
+            GO TO 900
+         ENDIF
+C
+         IF(NBIT*NXY.GT.(L3264B+1-IPOS)+(NDX-LOC)*L3264B)THEN
+            IER=1
+            WRITE(KFILDO,103)NXY,NBIT,LOC,IPOS,NDX,IER
+ 103        FORMAT(/,' NXY = ',I9,' AND NBIT = ',I6,
+     1               ' REQUIRE MORE BITS THAN ARE',
+     2               ' AVAILABLE IN IPACK( ), WITH LOC =',I8,
+     3               ', IPOS =',I4,', AND NDX =',I8,'.',/,
+     4               ' RETURN FROM PKS4LX WITH IER =',I4)
+            GO TO 900
+         ENDIF
+C 
+      IF(NBIT.EQ.0)GO TO 900
+C        WHEN NBIT = 0, NO VALUES ARE PACKED.
+C     
+      DO 300 K=1,NXY 
+C
+      NEWIPOS=IPOS+NBIT
+C
+      IF(NEWIPOS.LE.L3264B+1)THEN
+         CALL MVBITS(IC(K),0,NBIT,IPACK(LOC),L3264B+1-NEWIPOS)
+C
+         IF(NEWIPOS.LE.L3264B)THEN
+            IPOS=NEWIPOS
+         ELSE
+            IPOS=1
+            LOC=LOC+1
+         ENDIF
+C
+      ELSE
+         NBIT1=L3264B+1-IPOS
+         NBIT2=NBIT-NBIT1
+         CALL MVBITS(IC(K),NBIT2,NBIT1,IPACK(LOC),0)
+         LOC=LOC+1
+         CALL MVBITS(IC(K),0,NBIT2,IPACK(LOC),L3264B-NBIT2)
+         IPOS=NBIT2+1
+      ENDIF
+C
+ 300  CONTINUE
+C
+ 900  RETURN
+      END
