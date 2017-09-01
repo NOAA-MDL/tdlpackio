@@ -14,7 +14,7 @@ import _tdlpack
 # ---------------------------------------------------------------------------------------- 
 _l3264b = 32   # Bit size of integer "words"
 _nd5 = 5242880 # Max size of IPACK, 20MB record in 4-byte units
-_nd7 = 54      # Size of IS() array20MB record in 4-byte units
+_nd7 = 54      # Size of IS() array
 
 # ---------------------------------------------------------------------------------------- 
 # Scalars and Arrays for TDLPACK unpacking/packing
