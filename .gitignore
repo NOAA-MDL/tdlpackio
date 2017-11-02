@@ -3,3 +3,4 @@ tdlpack/*.o
 *.o
 *.so
 *.pyc
+.DS_Store
