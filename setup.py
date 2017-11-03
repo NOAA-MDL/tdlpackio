@@ -13,7 +13,7 @@ import os
 ext = Extension(name  = '_tdlpack',
                 sources = ['tdlpack/_tdlpack.pyf','tdlpack/bswap.f','tdlpack/ckfilend.f','tdlpack/ckraend.f',
                            'tdlpack/cksysend.f','tdlpack/closefile.f','tdlpack/openfile.f',
-                           'tdlpack/pack.f','tdlpack/packgp.f','tdlpack/pkbg.f',
+                           'tdlpack/pack.f','tdlpack/pack1d.f','tdlpack/pack2d.f','tdlpack/packgp.f','tdlpack/pkbg.f',
                            'tdlpack/pkc4lx.f','tdlpack/pkms00.f','tdlpack/pkms97.f',
                            'tdlpack/pkms99.f','tdlpack/pks4lx.f','tdlpack/readfile.f',
                            'tdlpack/reduce.f','tdlpack/unpack.f','tdlpack/unpkbg.f',
