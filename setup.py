@@ -4,9 +4,6 @@
 from numpy.distutils.core import setup, Extension
 import os
 
-#GFORTRAN FFLAGS "-O3 -fautomatic -finit-integer=zero -finit-real=zero -fbacktrace"
-#INTEL FFLAGS    "-O3 -auto -zero -g -traceback"
-
 # ---------------------------------------------------------------------------------------- 
 # Define Extension object
 # ---------------------------------------------------------------------------------------- 
