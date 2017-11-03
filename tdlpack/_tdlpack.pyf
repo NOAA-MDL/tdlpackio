@@ -123,6 +123,28 @@ python module _tdlpack ! in
             integer :: jbit
             integer :: kbit
         end subroutine packgp
+        subroutine packxx(kfildo,ic,ia,nxy,minpk,ifirst,ifod,second) ! in :_tdlpack:packxx.f
+            integer :: kfildo
+            integer dimension(nxy) :: ic
+            integer dimension(nxy),depend(nxy) :: ia
+            integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
+            integer :: minpk
+            integer :: ifirst
+            integer :: ifod
+            logical :: second
+        end subroutine packxx
+        subroutine packyy(kfildo,ic,ia,ipack,nxy,missp,minpk,ifirst,ifod,second) ! in :_tdlpack:packyy.f
+            integer :: kfildo
+            integer dimension(nxy) :: ic
+            integer dimension(nxy),depend(nxy) :: ia
+            integer dimension(nxy),depend(nxy) :: ipack
+            integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
+            integer :: missp
+            integer :: minpk
+            integer :: ifirst
+            integer :: ifod
+            logical :: second
+        end subroutine packyy
         subroutine pkbg(kfildo,ipack,nd5,loc,ipos,nvalue,nbit,l3264b,ier,e__er) ! in :_tdlpack:pkbg.f
             integer :: kfildo
             integer dimension(nd5) :: ipack
