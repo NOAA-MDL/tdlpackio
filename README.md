@@ -17,13 +17,16 @@ Provide a Python interface for reading and writing TDLPACK files.
 
 ## Build and Installation
 
-To install ([numpy](http://numpy.org) and fortran compiler (preferably 
-[gfortran](https://gcc.gnu.org/wiki/GFortran)) required):
+Note that building on macOS requires setting ``CC=clang``. Python setuptools and f2py seems to have trouble using the GNU C compiler on macOS.
 
 ### Build
 * macOS: ``CC=clang python setup.py build_ext --fcompiler=gnu95 build``
 * Linux: ``python setup.py build``
 
 ### Install
-* ``sudo python setup.py install`` to install in a system area, or,
+
+System area:
+* ``sudo python setup.py install``
+
+Local area:
 * ``python setup.py --prefix=<INSTALL_DIR> install``
