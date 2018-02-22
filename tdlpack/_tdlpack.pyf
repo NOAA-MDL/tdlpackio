@@ -101,9 +101,9 @@ python module _tdlpack ! in
             integer, optional,check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
             integer :: minpk
             integer :: lx
-            integer :: ioctet
+            integer intent(out) :: ioctet
             integer :: l3264b
-            integer :: ier
+            integer intent(out) :: ier
         end subroutine pack2d
         subroutine packgp(kfildo,ic,nxy,minpk,inc,missp,misss,jmin,jmax,lbit,nov,ndg,lx,ibit,jbit,kbit) ! in :_tdlpack:packgp.f
             integer :: kfildo

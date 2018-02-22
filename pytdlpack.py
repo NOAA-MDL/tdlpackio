@@ -20,8 +20,11 @@ _nd7 = 54      # Size of IS() array
 # Scalars and Arrays for TDLPACK unpacking/packing
 # ---------------------------------------------------------------------------------------- 
 _ier = 0
+_lx = 0
+_minpk = 14
 _misspx = 0
 _misssx = 0
+_nplain = 32
 _iwork = np.zeros((_nd5),dtype=np.int32,order='F')
 _is0 = np.zeros((_nd7),dtype=np.int32,order='F')
 _is1 = np.zeros((_nd7),dtype=np.int32,order='F')
@@ -133,6 +136,8 @@ class TdlpackFile(object):
         """
         ret = _tdlpack.closefile(self.lun)
         self.lun = -1
+        self.current_record = 0
+        self.IOStatus = 'closed'
 
     def read(self):
        """ Read a record from a TDLPACK file.
@@ -197,6 +202,7 @@ class TdlpackFile(object):
             if ier != 0: raise IOError("Error writing to TDLPACK file.")
         elif type(record) is TdlpackRecord or type(record) is TdlpackTrailer:
             # Write to output
+            ier = 0
             ier = _tdlpack.writefile(self.lun,record.ioctet,record.ipack)
             if ier != 0: raise IOError("Error writing to TDLPACK file")
         else:
@@ -226,6 +232,7 @@ class TdlpackRecord(object):
             nx (int): Number of gridpoints in the x-direction.
             ny (int): Number of gridpoints in the y-direction.
             orientLon (float): Orientation longitude.
+            plain (string): Plain Language description of data.
             stdLat (float): Standard latitude.
     """
 
@@ -241,6 +248,39 @@ class TdlpackRecord(object):
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
+
+    # Class Method: pack handles packing a TDLPACK record
+    def pack(self):
+        """ Pack TDLPACK Record using _tdlpack.pack1d() and _tdlpack.pack2d() """
+
+        # Initialize
+        ier = 0
+        ioctet = 0
+        xmissp = self.primaryMissingValue
+        xmisss = self.secondaryMissingValue
+        ipack = np.zeros((_nd5),dtype=np.int32,order='F')
+        
+        # "Pack" Plain Langauge into self.is1[ ].
+        self.is1[21] = _nplain
+        for n,s in enumerate(self.plain):
+            self.is1[22+n] = ord(s)
+
+        # Pack data using TDLPACK pack1d or pack2d accordingly.
+        if self.datatype == "vector":
+            ic = np.zeros((self.nsta),dtype=np.int32)
+            _tdlpack.pack1d(6,self.data,ic,self.is0,self.is1,self.is2,self.is4,xmissp,xmisss,ipack,_minpk,_lx,ioctet,\
+                            _l3264b,ier)
+        elif self.datatype == "grid":
+            ia = np.zeros((self.nx,self.ny),dtype=np.int32,order='F')
+            ic = np.zeros((self.nx*self.ny),dtype=np.int32,order='F') 
+            ioctet,ier = _tdlpack.pack2d(6,self.data,ia,ic,self.is0,self.is1,self.is2,self.is4,xmissp,xmisss,ipack,_minpk,_lx,_l3264b)
+
+        # Here we want to put copies of ipack and ioctet into the TDLPACK object.
+        self.ipack = np.copy(ipack)
+        self.ioctet = ioctet
+
+        # Since we have packed data, delete data from object
+        if self.data is not None: del self.data
 
     # Class Method: unpack handles unpacking a TDLPACK record
     def unpack(self, unpack_data = True):
@@ -271,15 +311,24 @@ class TdlpackRecord(object):
             self.meshLength = self.is2[7]/1000000.
             self.stdLat = self.is2[8]/10000.
 
-        # Shape data values array -- 1D for vector; 2D for grid.
+        # Plain language
+        self.plain = ''
+        for n in np.nditer(self.is1[22:(22+self.is1[21])]):
+            self.plain += chr(n)
+
+        # Trim/reshape data values array -- 1D for vector; 2D for grid.
         if igive == 2:
            if self.is1[1] == 0:
-               data = np.copy(_data[0:self.is4[2]])
+               self.data = np.copy(_data[0:self.is4[2]])
            elif self.is1[1] == 1:
-               data = np.copy(np.reshape(_data[0:self.is4[2]],(self.nx,self.ny,),order='F'))
+               self.data = np.copy(np.reshape(_data[0:self.is4[2]],(self.nx,self.ny,),order='F'))
+
+        # Define the missing values
+        self.primaryMissingValue = float(self.is4[3])
+        self.secondaryMissingValue = float(self.is4[4])
 
         # Return values
-        return data
+        #return data
 
     values = property(unpack)
 
@@ -331,6 +380,8 @@ def open(filename, mode="r"):
     kwargs['lun'] = _lun
     kwargs['name'] = filename
     kwargs['current_record'] = 0
+    if mode == "r": kwargs['IOStatus'] = 'opened, read-only'
+    if mode == "w": kwargs['IOStatus'] = 'opened, new file for write'
     if byteorder == -1: kwargs['byteorder'] = 'little'
     if byteorder == 1: kwargs['byteorder'] = 'big'
     if filetype == 1: kwargs['filetype'] = 'random-access'

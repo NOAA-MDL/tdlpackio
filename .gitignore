@@ -4,3 +4,4 @@ tdlpack/*.o
 *.so
 *.pyc
 .DS_Store
+.vscode
