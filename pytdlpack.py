@@ -3,6 +3,7 @@
 # ---------------------------------------------------------------------------------------- 
 # Modules
 # ---------------------------------------------------------------------------------------- 
+import copy
 import numpy as np
 import os
 import struct
@@ -256,8 +257,8 @@ class TdlpackRecord(object):
         # Initialize
         ier = 0
         ioctet = 0
-        xmissp = self.primaryMissingValue
-        xmisss = self.secondaryMissingValue
+        xmissp = np.float32(self.primaryMissingValue)
+        xmisss = np.float32(self.secondaryMissingValue)
         ipack = np.zeros((_nd5),dtype=np.int32,order='F')
         
         # "Pack" Plain Langauge into self.is1[ ].
@@ -324,8 +325,8 @@ class TdlpackRecord(object):
                self.data = np.copy(np.reshape(_data[0:self.is4[2]],(self.nx,self.ny,),order='F'))
 
         # Define the missing values
-        self.primaryMissingValue = float(self.is4[3])
-        self.secondaryMissingValue = float(self.is4[4])
+        self.primaryMissingValue = np.float32(self.is4[3])
+        self.secondaryMissingValue = np.float32(self.is4[4])
 
         # Return values
         #return data
