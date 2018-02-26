@@ -10,6 +10,8 @@
 
       integer :: i,j,ij
 
+      ier=0
+
       do j=1,ny
          do i=1,nx
             ij=(nx*(j-1))+i
@@ -34,6 +36,8 @@ C ----------------------------------------------------------------------
       integer, intent(out) :: ier
 
       integer :: i,j,ij
+
+      ier=0
 
       do j=1,ny
          do i=1,nx
