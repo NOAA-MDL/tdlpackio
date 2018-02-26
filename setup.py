@@ -16,7 +16,7 @@ ext = Extension(name  = '_tdlpack',
                            'tdlpack/pkms99.f','tdlpack/pks4lx.f','tdlpack/readfile.f',
                            'tdlpack/reduce.f','tdlpack/unpack.f','tdlpack/unpkbg.f',
                            'tdlpack/unpklx.f','tdlpack/unpkoo.f','tdlpack/unpkpo.f',
-                           'tdlpack/unpkps.f','tdlpack/writep.f'],
+                           'tdlpack/unpkps.f','tdlpack/writep.f','tdlpack/x1dto2d.f'],
                 extra_compile_args = ["-O3","-finit-integer=zero","-finit-real=zero"])
 
 # ---------------------------------------------------------------------------------------- 

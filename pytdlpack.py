@@ -322,7 +322,9 @@ class TdlpackRecord(object):
            if self.is1[1] == 0:
                self.data = np.copy(_data[0:self.is4[2]])
            elif self.is1[1] == 1:
-               self.data = np.copy(np.reshape(_data[0:self.is4[2]],(self.nx,self.ny,),order='F'))
+               self.data = np.zeros((self.nx,self.ny),dtype=np.int32,order='F')
+               self.data,ier = _tdlpack.x1dto2d(self.nx,self.ny,_data[0:self.is4[2]])
+               #self.data = np.copy(np.reshape(_data[0:self.is4[2]],(self.nx,self.ny,),order='F'))
 
         # Define the missing values
         self.primaryMissingValue = np.float32(self.is4[3])
