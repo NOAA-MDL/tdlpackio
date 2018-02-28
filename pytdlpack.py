@@ -292,43 +292,82 @@ class TdlpackRecord(object):
 
         _tdlpack.unpack(6,self.ipack,_iwork,_data,_is0,_is1,_is2,_is4,_misspx,_misssx,igive,_l3264b,_ier) 
 
+        # Set object is0 and other class vars.
         self.is0 = np.copy(_is0) 
-        self.is1 = np.copy(_is1) 
-        self.is2 = np.copy(_is2) 
-        self.is4 = np.copy(_is4) 
+        self.TdlpackSize = np.copy(_is0[1])
+        self.TdlpackVersion = np.copy(_is0[2])
+        
+        # Set object is1 and other class vars.
+        self.is1 = np.copy(_is1)
+        self.year = np.copy(_is1[2])
+        self.month = np.copy(_is1[3])
+        self.day = np.copy(_is1[4])
+        self.hour = np.copy(_is1[5])
+        self.modelNumber = np.copy(_is1[14])
+        self.modelSequenceNumber = np.copy(_is1[15])
+        self.decimalScaleFactor = np.copy(_is1[16])
+        self.binaryScaleFactor = np.copy(_is1[17])
+        self.lengthPlainLanguage = np.copy(_is1[21])
 
+        # Set Plain language
+        self.plain = ''
+        for n in np.nditer(self.is1[22:(22+self.is1[21])]):
+            self.plain += chr(n)
+        
+        # Set object vars according to datatype.
+        self.is2 = np.copy(_is2) 
         if self.is1[1] == 0:
             self.datatype = 'vector'
         elif self.is1[1] == 1:
             self.datatype = 'grid'
-            if self.is2[1] == 3: self.mapProj='lcc'
-            if self.is2[1] == 5: self.mapProj='npstere'
-            if self.is2[1] == 7: self.mapProj='merc'
+            if self.is2[1] == 3:
+               self.basemapProj = 'lcc'
+               self.mapProjNumber = 3
+            if self.is2[1] == 5:
+               self.basemapProj='npstere'
+               self.mapProjNumber = 5
+            if self.is2[1] == 7:
+               self.basemapProj='merc'
+               self.mapProjNumber = 7
             self.nx = self.is2[2]
             self.ny = self.is2[3]
-            self.llLat = self.is2[4]/10000.
-            self.llLon = self.is2[5]/10000.
-            self.orientLon = self.is2[6]/10000.
+            self.lowerLeftLatitude = self.is2[4]/10000.
+            self.lowerLeftLongitude = self.is2[5]/10000.
+            self.orientationLongitude = self.is2[6]/10000.
             self.meshLength = self.is2[7]/1000000.
-            self.stdLat = self.is2[8]/10000.
+            self.standardLatitude = self.is2[8]/10000.
 
-        # Plain language
-        self.plain = ''
-        for n in np.nditer(self.is1[22:(22+self.is1[21])]):
-            self.plain += chr(n)
+        # Set is4 object var and other relating to packing
+        self.is4 = np.copy(_is4) 
+        if self.is4[1]&8 == 0:
+            self.packingMathod = 'simplePacking'
+        elif self.is4[1]&8 == 8:
+            if self.is4[1]&4 == 0:
+                self.packingMathod = 'complexPacking'
+            elif self.is4[1]&4 == 4:
+                self.packingMathod = 'complexPackingWithSecondOrderSpatialDifferencing'
+        if self.is4[1]&2 == 0:
+            self.isPrimaryMissingValuePresent = False
+        elif self.is4[1]&2 == 2:
+            self.isPrimaryMissingValuePresent = True
+        if self.is4[1]&1 == 0:
+            self.isSecondaryMissingValuePresent = False
+        elif self.is4[1]&1 == 1:
+            self.isSecondaryMissingValuePresent = True
+        self.numberOfValuesPacked = np.int32(self.is4[2])
+        self.primaryMissingValue = np.float32(self.is4[3])
+        self.secondaryMissingValue = np.float32(self.is4[4])
 
         # Trim/reshape data values array -- 1D for vector; 2D for grid.
         if igive == 2:
+           self.overallMinimumValue = np.float32(self.is4[5])
+           self.numberOfGroupsPacked = np.int32(self.is4[6])
            if self.is1[1] == 0:
                self.data = np.copy(_data[0:self.is4[2]])
            elif self.is1[1] == 1:
                self.data = np.zeros((self.nx,self.ny),dtype=np.int32,order='F')
                self.data,ier = _tdlpack.x1dto2d(self.nx,self.ny,_data[0:self.is4[2]])
                #self.data = np.copy(np.reshape(_data[0:self.is4[2]],(self.nx,self.ny,),order='F'))
-
-        # Define the missing values
-        self.primaryMissingValue = np.float32(self.is4[3])
-        self.secondaryMissingValue = np.float32(self.is4[4])
 
         # Return values
         #return data
