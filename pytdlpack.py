@@ -31,7 +31,6 @@ _is0 = np.zeros((_nd7),dtype=np.int32,order='F')
 _is1 = np.zeros((_nd7),dtype=np.int32,order='F')
 _is2 = np.zeros((_nd7),dtype=np.int32,order='F')
 _is4 = np.zeros((_nd7),dtype=np.int32,order='F')
-_data = np.zeros((_nd5),dtype=np.float32,order='F')
 
 # ---------------------------------------------------------------------------------------- 
 # Function: unpackStations
@@ -269,8 +268,7 @@ class TdlpackRecord(object):
         # Pack data using TDLPACK pack1d or pack2d accordingly.
         if self.datatype == "vector":
             ic = np.zeros((self.nsta),dtype=np.int32)
-            _tdlpack.pack1d(6,self.data,ic,self.is0,self.is1,self.is2,self.is4,xmissp,xmisss,ipack,_minpk,_lx,ioctet,\
-                            _l3264b,ier)
+            _tdlpack.pack1d(6,self.data,ic,self.is0,self.is1,self.is2,self.is4,xmissp,xmisss,ipack,_minpk,_lx,ioctet,_l3264b,ier)
         elif self.datatype == "grid":
             ia = np.zeros((self.nx,self.ny),dtype=np.int32,order='F')
             ic = np.zeros((self.nx*self.ny),dtype=np.int32,order='F') 
@@ -287,10 +285,10 @@ class TdlpackRecord(object):
     def unpack(self, unpack_data = True):
         """ Unpack TDLPACK Record using _tdlpack.unpack() """
 
+        # Unpack TDLPACK record.
         igive = 2
         if unpack_data is False: igive = 1
-
-        _tdlpack.unpack(6,self.ipack,_iwork,_data,_is0,_is1,_is2,_is4,_misspx,_misssx,igive,_l3264b,_ier) 
+        _data,ier = _tdlpack.unpack(6,self.ipack,_iwork,_is0,_is1,_is2,_is4,_misspx,_misssx,igive,_l3264b) 
 
         # Set object is0 and other class vars.
         self.is0 = np.copy(_is0) 
@@ -365,14 +363,8 @@ class TdlpackRecord(object):
            if self.is1[1] == 0:
                self.data = np.copy(_data[0:self.is4[2]])
            elif self.is1[1] == 1:
-               self.data = np.zeros((self.nx,self.ny),dtype=np.int32,order='F')
-               self.data,ier = _tdlpack.x1dto2d(self.nx,self.ny,_data[0:self.is4[2]])
-               #self.data = np.copy(np.reshape(_data[0:self.is4[2]],(self.nx,self.ny,),order='F'))
-
-        # Return values
-        #return data
-
-    values = property(unpack)
+               #self.data,ier = _tdlpack.x1dto2d(self.nx,self.ny,_data[0:self.is4[2]])
+               self.data = np.copy(np.reshape(_data[0:self.is4[2]],(self.nx,self.ny,),order='F'),order='F')
 
 # ---------------------------------------------------------------------------------------- 
 # Class TdlpackStations

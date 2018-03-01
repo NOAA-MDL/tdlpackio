@@ -281,7 +281,7 @@ python module _tdlpack ! in
             integer :: kfildo
             integer dimension(nd5) :: ipack
             integer dimension(nd5),depend(nd5) :: iwork
-            real dimension(nd5),depend(nd5) :: data
+            real dimension(nd5),depend(nd5),intent(out) :: data
             integer, optional,check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
             integer dimension(nd7) :: is0
             integer dimension(nd7),depend(nd7) :: is1
@@ -292,7 +292,7 @@ python module _tdlpack ! in
             integer :: misssx
             integer :: igive
             integer :: l3264b
-            integer :: ier
+            integer intent(out) :: ier
         end subroutine unpack
         subroutine unpkbg(kfildo,ipack,nd5,loc,ipos,nvalue,nbit,l3264b,ier,e__er) ! in :_tdlpack:unpkbg.f
             integer :: kfildo

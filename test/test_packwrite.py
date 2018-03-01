@@ -19,18 +19,9 @@ while of.lun != -1:
     oldrec = of.read()
     if of.lun == -1: break
     oldrec.unpack()
-    print n,of.lun,oldrec.ipack[5:9],oldrec.plain
     newrec = copy.deepcopy(oldrec)
-    print oldrec
-    print newrec
     newrec.pack()
-    print newrec.is4
     nf.write(newrec)
-    print oldrec.ioctet
-    print newrec.ioctet
-    print sha1(oldrec.ipack).hexdigest()
-    print sha1(newrec.ipack).hexdigest()
-    print sha1(oldrec.ipack).hexdigest()==sha1(newrec.ipack).hexdigest()
     del oldrec
     n+=1
 
