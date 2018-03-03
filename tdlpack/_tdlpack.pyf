@@ -376,22 +376,6 @@ python module _tdlpack ! in
             integer :: l3264b
             integer :: ier
         end subroutine writep
-        subroutine x1dto2d(nx,ny,nxy,datain,dataout,ier) ! in :_tdlpack:x1dto2d.f
-            integer intent(in) :: nx
-            integer intent(in) :: ny
-            integer, optional,intent(in),check(len(datain)>=nxy),depend(datain) :: nxy=len(datain)
-            real dimension(nxy),intent(in) :: datain
-            real dimension(nx,ny),intent(out),depend(nx,ny) :: dataout
-            integer intent(out) :: ier
-        end subroutine x1dto2d
-        subroutine x2dto1d(nx,ny,nxy,datain,dataout,ier) ! in :_tdlpack:x1dto2d.f
-            integer, optional,intent(in),check(shape(datain,0)==nx),depend(datain) :: nx=shape(datain,0)
-            integer, optional,intent(in),check(shape(datain,1)==ny),depend(datain) :: ny=shape(datain,1)
-            integer intent(in) :: nxy
-            real dimension(nx,ny),intent(in) :: datain
-            real dimension(nxy),intent(out),depend(nxy) :: dataout
-            integer intent(out) :: ier
-        end subroutine x2dto1d
     end interface 
 end python module _tdlpack
 

@@ -12,7 +12,7 @@
       ier=0
       ios=0
 
-      read(lun,iostat=ios)ioctet,(ipack(n),n=1,ioctet/4)
+      read(lun,iostat=ios)ioctet,(ipack(n),n=1,int(ioctet,kind=4)/4)
 
       ier=ios
 
@@ -35,7 +35,7 @@
       ier=0
       ios=0
 
-      write(lun,iostat=ios)ioctet,(ipack(n),n=1,ioctet/4)
+      write(lun,iostat=ios)ioctet,(ipack(n),n=1,int(ioctet,kind=4)/4)
 
       ier=ios
 

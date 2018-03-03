@@ -33,70 +33,6 @@ _is2 = np.zeros((_nd7),dtype=np.int32,order='F')
 _is4 = np.zeros((_nd7),dtype=np.int32,order='F')
 
 # ---------------------------------------------------------------------------------------- 
-# Function: unpackStations
-# ---------------------------------------------------------------------------------------- 
-def unpackStations(ipack, ioctet):
-    """ Returns a TDLPACK station call letter record from integer-based IPACK
-        array.  Note that the integer word size is 4-bytes, so an 8-character CALL letter
-        will be split into 2 IPACK words. Whitespace is removed from from each station
-        call letter.
-
-        Definition:
-        unpackStations(ipack, ioctet) -> nsta, ccall
-
-        Arguments:
-        ipack -- IPACK array.
-        ioctet -- Size of IPACK array in bytes.
-
-        Returns:
-        nsta -- number of stations in record.
-        ccall -- list of stations.
-    """
-    # Station Call Letter Record
-    nsta = ioctet/8
-    ccall = []
-
-    # Unpack Station Call Letters
-    for n in range(0,(ioctet/4),2):
-       ccall.append(struct.unpack('>8s',ipack[n:n+2].byteswap())[0].strip(' '))
-    ccall = tuple(ccall) 
-
-    return nsta, ccall
-
-# ----------------------------------------------------------------------------------------
-# Function: packStations
-# ----------------------------------------------------------------------------------------
-def packStations(ccall, nsta):
-    """ Returns a packed station call letter record from a list of station call letter
-        records.  Whitespace is added to each station call letter such that the length
-        is 8-characters.
-
-        Definition:
-        packStations(ccall, nsta) -> ioctet, ipack
-
-        Arguments:
-        ccall -- list of stations.
-        nsta -- number of stations in record.
-
-        Returns:
-        ioctet -- Size of IPACK array in bytes. NOTE: This is a long (i.e. 64-bits).
-        ipack -- IPACK array.
-    """
-    # Station Call Letter Record
-    ioctet = nsta*8
-    ipack = np.ndarray((ioctet/4),dtype=np.int32,order="F")
-
-    # Unpack Station Call Letters
-    for n,c in enumerate(ccall):
-        i1 = n*2
-        i2 = i1+1
-        sta = c.ljust(8,' ')
-        ipack[i1] = np.copy(np.fromstring(sta[0:4],dtype=np.int32).byteswap())
-        ipack[i2] = np.copy(np.fromstring(sta[4:8],dtype=np.int32).byteswap())
-
-    return long(ioctet), ipack
-
-# ---------------------------------------------------------------------------------------- 
 # Class: TdlpackFile
 # ---------------------------------------------------------------------------------------- 
 class TdlpackFile(object):
@@ -168,17 +104,18 @@ class TdlpackFile(object):
            header = struct.unpack('>4s',ipack[0].byteswap())[0]
            if header == 'TDLP':
                # TDLPACK Record
+               kwargs['ioctet'] = ioctet
                kwargs['ipack'] = np.copy(ipack)
                kwargs['reference_date'] = np.copy(ipack[4])
                kwargs['id'] = np.copy(ipack[5:9])
-               kwargs['ioctet'] = ioctet
                return TdlpackRecord(**kwargs)
            else:
-               nsta, ccall = unpackStations(ipack,ioctet)
-               kwargs['nsta'] = nsta
-               kwargs['ccall'] = ccall
+               # Station Call Letter Record
+               kwargs['ioctet'] = ioctet
+               kwargs['ipack'] = np.copy(ipack)
                return TdlpackStations(**kwargs)
        elif ioctet == 24 and ipack[4] == 9999:
+           # Trailer Record
            kwargs['ioctet'] = ioctet
            kwargs['ipack'] = np.copy(ipack)
            return TdlpackTrailer(**kwargs)
@@ -197,8 +134,9 @@ class TdlpackFile(object):
             pass
         elif type(record) is TdlpackStations:
             # Pack stations, then write to output
-            ioctet, ipack = packStations(record.ccall,record.nsta)
-            ier = _tdlpack.writefile(self.lun,ioctet,ipack)
+            record.pack()
+            ier = 0
+            ier = _tdlpack.writefile(self.lun,record.ioctet,record.ipack)
             if ier != 0: raise IOError("Error writing to TDLPACK file.")
         elif type(record) is TdlpackRecord or type(record) is TdlpackTrailer:
             # Write to output
@@ -353,6 +291,7 @@ class TdlpackRecord(object):
         elif self.is4[1]&1 == 1:
             self.isSecondaryMissingValuePresent = True
         self.numberOfValuesPacked = np.int32(self.is4[2])
+        if self.datatype == 'vector': self.nsta = np.int32(self.is4[2])
         self.primaryMissingValue = np.float32(self.is4[3])
         self.secondaryMissingValue = np.float32(self.is4[4])
 
@@ -360,11 +299,11 @@ class TdlpackRecord(object):
         if igive == 2:
            self.overallMinimumValue = np.float32(self.is4[5])
            self.numberOfGroupsPacked = np.int32(self.is4[6])
-           if self.is1[1] == 0:
-               self.data = np.copy(_data[0:self.is4[2]])
-           elif self.is1[1] == 1:
-               #self.data,ier = _tdlpack.x1dto2d(self.nx,self.ny,_data[0:self.is4[2]])
-               self.data = np.copy(np.reshape(_data[0:self.is4[2]],(self.nx,self.ny,),order='F'),order='F')
+           self.data = np.copy(_data[0:self.numberOfValuesPacked])
+           #if self.is1[1] == 0:
+           #    self.data = np.copy(_data[0:self.is4[2]])
+           #elif self.is1[1] == 1:
+           #    self.data = np.copy(np.reshape(_data[0:self.is4[2]],(self.nx,self.ny,),order='F'),order='F')
 
 # ---------------------------------------------------------------------------------------- 
 # Class TdlpackStations
@@ -383,6 +322,60 @@ class TdlpackStations(object):
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
+
+    def pack(self):
+        """ Returns a packed station call letter record from a list of station call letter
+            records.  Whitespace is added to each station call letter such that the length
+            is 8-characters.
+    
+            Definition:
+            packStations(ccall, nsta) -> ioctet, ipack
+
+            Arguments:
+            ccall -- list of stations.
+            nsta -- number of stations in record.
+    
+            Returns:
+            ioctet -- Size of IPACK array in bytes. NOTE: This is a long (i.e. 64-bits).
+            ipack -- IPACK array.
+        """
+        # Station Call Letter Record
+        self.ioctet = self.nsta*8
+        self.ipack = np.ndarray((self.ioctet/4),dtype=np.int32,order='F')
+
+        # Unpack Station Call Letters
+        for n,c in enumerate(self.ccall):
+            i1 = n*2
+            i2 = i1+1
+            sta = c.ljust(8,' ')
+            self.ipack[i1] = np.copy(np.fromstring(sta[0:4],dtype=np.int32).byteswap())
+            self.ipack[i2] = np.copy(np.fromstring(sta[4:8],dtype=np.int32).byteswap())
+
+    def unpack(self):
+        """ Returns a TDLPACK station call letter record from integer-based IPACK
+            array.  Note that the integer word size is 4-bytes, so an 8-character CALL letter
+            will be split into 2 IPACK words. Whitespace is removed from from each station
+            call letter.
+
+            Definition:
+            unpackStations(ipack, ioctet) -> nsta, ccall
+
+            Arguments:
+            ipack -- IPACK array.
+            ioctet -- Size of IPACK array in bytes.
+
+            Returns:
+            nsta -- number of stations in record.
+            ccall -- list of stations.
+        """
+        # Station Call Letter Record
+        self.nsta = self.ioctet/8
+        self.ccall = []
+
+        # Unpack Station Call Letters
+        for n in range(0,(self.ioctet/4),2):
+           self.ccall.append(struct.unpack('>8s',self.ipack[n:n+2].byteswap())[0].strip(' '))
+        self.ccall = tuple(self.ccall)
         
 # ---------------------------------------------------------------------------------------- 
 # Class TdlpackTrailer
@@ -401,6 +394,12 @@ class TdlpackTrailer(object):
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
+
+    def pack(self):
+        pass
+
+    def unpack(self):
+        pass
 
 # ---------------------------------------------------------------------------------------- 
 # Function open: Call _tdlpack.openfile (Fortran)
