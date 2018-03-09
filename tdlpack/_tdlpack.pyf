@@ -248,17 +248,19 @@ python module _tdlpack ! in
             integer :: l3264b
             integer :: ier
         end subroutine pks4lx
-        subroutine readfile(lun,nd5,ipack,ioctet,ier) ! in :_tdlpack:readfile.f
+        subroutine readfile(lun,nd5,l3264b,ipack,ioctet,ier) ! in :_tdlpack:readfile.f
             integer intent(in) :: lun
             integer intent(in) :: nd5
+            integer intent(in) :: l3264b
             integer dimension(nd5),intent(out),depend(nd5) :: ipack
-            integer(kind=8) intent(out) :: ioctet
+            integer intent(out) :: ioctet
             integer intent(out) :: ier
         end subroutine readfile
-        subroutine writefile(lun,nd5,ioctet,ipack,ier) ! in :_tdlpack:readfile.f
+        subroutine writefile(lun,nd5,l3264b,ioctet,ipack,ier) ! in :_tdlpack:readfile.f
             integer intent(in) :: lun
             integer, optional,intent(in),check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
-            integer(kind=8) intent(in) :: ioctet
+            integer intent(in) :: l3264b
+            integer intent(in) :: ioctet
             integer dimension(nd5),intent(in) :: ipack
             integer intent(out) :: ier
         end subroutine writefile
@@ -376,6 +378,18 @@ python module _tdlpack ! in
             integer :: l3264b
             integer :: ier
         end subroutine writep
+        subroutine xfer1d2d(nx,ny,datain,dataout) ! in :_tdlpack:xfer1d2d.f
+            integer intent(in) :: nx
+            integer intent(in) :: ny
+            real dimension(nx*ny),intent(in),depend(nx,ny) :: datain
+            real dimension(nx,ny),intent(out),depend(nx,ny) :: dataout
+        end subroutine xfer1d2d
+        subroutine xfer2d1d(nx,ny,datain,dataout) ! in :_tdlpack:xfer1d2d.f
+            integer, optional,intent(in),check(shape(datain,0)==nx),depend(datain) :: nx=shape(datain,0)
+            integer, optional,intent(in),check(shape(datain,1)==ny),depend(datain) :: ny=shape(datain,1)
+            real dimension(nx,ny),intent(in) :: datain
+            real dimension(nx*ny),intent(out),depend(nx,ny) :: dataout
+        end subroutine xfer2d1d
     end interface 
 end python module _tdlpack
 
