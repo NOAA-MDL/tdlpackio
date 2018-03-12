@@ -91,7 +91,7 @@ class TdlpackFile(object):
        kwargs = {}
 
        # Read record from file
-       ipack, ioctet, ier = _tdlpack.readfile(self.lun,_nd5)
+       ipack, ioctet, ier = _tdlpack.readfile(self.lun,_nd5,_l3264b)
 
        # Error return of -1 signal EOF, so close the file.
        if ier == -1: self.close()
@@ -136,12 +136,16 @@ class TdlpackFile(object):
             # Pack stations, then write to output
             record.pack()
             ier = 0
-            ier = _tdlpack.writefile(self.lun,record.ioctet,record.ipack)
+            ier = _tdlpack.writefile(self.lun,_l3264b,record.ioctet,record.ipack)
             if ier != 0: raise IOError("Error writing to TDLPACK file.")
         elif type(record) is TdlpackRecord or type(record) is TdlpackTrailer:
             # Write to output
             ier = 0
-            ier = _tdlpack.writefile(self.lun,record.ioctet,record.ipack)
+            ntotby = np.int32(0)
+            ntotrc = np.int32(0)
+            nwords = record.ioctet*8/_l3264b
+            _tdlpack.writep(6,self.lun,record.ipack[0:nwords],ntotby,ntotrc,_l3264b,ier)
+            #ier = _tdlpack.writefile(self.lun,_l3264b,record.ioctet,record.ipack)
             if ier != 0: raise IOError("Error writing to TDLPACK file")
         else:
             # Raise error
@@ -204,6 +208,7 @@ class TdlpackRecord(object):
             self.is1[22+n] = ord(s)
 
         # Pack data using TDLPACK pack1d or pack2d accordingly.
+        self.is4[:] = np.int32(0)
         if self.datatype == "vector":
             ic = np.zeros((self.nsta),dtype=np.int32)
             _tdlpack.pack1d(6,self.data,ic,self.is0,self.is1,self.is2,self.is4,xmissp,xmisss,ipack,_minpk,_lx,ioctet,_l3264b,ier)
@@ -250,10 +255,11 @@ class TdlpackRecord(object):
         for n in np.nditer(self.is1[22:(22+self.is1[21])]):
             self.plain += chr(n)
         
-        # Set object vars according to datatype.
+        # Set is2 object vars according to datatype.
         self.is2 = np.copy(_is2) 
         if self.is1[1] == 0:
             self.datatype = 'vector'
+            self.is2 = 0
         elif self.is1[1] == 1:
             self.datatype = 'grid'
             if self.is2[1] == 3:
@@ -276,12 +282,12 @@ class TdlpackRecord(object):
         # Set is4 object var and other relating to packing
         self.is4 = np.copy(_is4) 
         if self.is4[1]&8 == 0:
-            self.packingMathod = 'simplePacking'
+            self.packingMethod = 'simplePacking'
         elif self.is4[1]&8 == 8:
             if self.is4[1]&4 == 0:
-                self.packingMathod = 'complexPacking'
+                self.packingMethod = 'complexPacking'
             elif self.is4[1]&4 == 4:
-                self.packingMathod = 'complexPackingWithSecondOrderSpatialDifferencing'
+                self.packingMethod = 'complexPackingWithSecondOrderSpatialDifferencing'
         if self.is4[1]&2 == 0:
             self.isPrimaryMissingValuePresent = False
         elif self.is4[1]&2 == 2:
@@ -299,11 +305,10 @@ class TdlpackRecord(object):
         if igive == 2:
            self.overallMinimumValue = np.float32(self.is4[5])
            self.numberOfGroupsPacked = np.int32(self.is4[6])
-           self.data = np.copy(_data[0:self.numberOfValuesPacked])
-           #if self.is1[1] == 0:
-           #    self.data = np.copy(_data[0:self.is4[2]])
-           #elif self.is1[1] == 1:
-           #    self.data = np.copy(np.reshape(_data[0:self.is4[2]],(self.nx,self.ny,),order='F'),order='F')
+           if self.datatype == 'vector':
+               self.data = np.copy(_data[0:self.is4[2]])
+           elif self.datatype == 'grid':
+               self.data = _tdlpack.xfer1d2d(self.nx,self.ny,_data[0:self.is4[2]])
 
 # ---------------------------------------------------------------------------------------- 
 # Class TdlpackStations
