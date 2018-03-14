@@ -58,6 +58,7 @@ if __name__ == "__main__":
                              "tdlpack/pks4lx.f",
                              "tdlpack/readfile.f",
                              "tdlpack/reduce.f",
+                             "tdlpack/trail.f",
                              "tdlpack/unpack.f",
                              "tdlpack/unpkbg.f",
                              "tdlpack/unpklx.f",
