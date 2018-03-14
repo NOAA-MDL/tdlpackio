@@ -11,25 +11,28 @@ import sys
 if __name__ == "__main__":
 
     # Define Fortran compiler flags for GNU and Intel Fortran
-    if "--fcompiler=gnu95" in sys.argv:
-        tdlpack_fortran_args = ["-O3",
-                                "-fd-lines-as-comments",
-                                "-ffixed-form",
-                                "-fautomatic",
-                                "-finit-integer=0",
-                                "-finit-real=zero",
-                                "-finit-logical=false"]
-    elif "--fcompiler=intelem" in sys.argv:
-        tdlpack_fortran_args = ["-O3",
-                                "-nofree",
-                                "-integer-size 32",
-                                "-real-size 32",
-                                "-auto",
-                                "-fpscomp logicals",
-                                "-fp-model strict",
-                                "-assume byterecl",
-                                "-axCore-AVX2",
-                                "-assume buffered_io"]
+    if "build" in sys.argv:
+        if "--fcompiler=gnu95" in sys.argv:
+            tdlpack_fortran_args = ["-O3",
+                                    "-fd-lines-as-comments",
+                                    "-ffixed-form",
+                                    "-fautomatic",
+                                    "-finit-integer=0",
+                                    "-finit-real=zero",
+                                    "-finit-logical=false"]
+        elif "--fcompiler=intelem" in sys.argv:
+            tdlpack_fortran_args = ["-O3",
+                                    "-nofree",
+                                    "-integer-size 32",
+                                    "-real-size 32",
+                                    "-auto",
+                                    "-fpscomp logicals",
+                                    "-fp-model strict",
+                                    "-assume byterecl",
+                                    "-axCore-AVX2",
+                                    "-assume buffered_io"]
+    else:
+        tdlpack_fortran_args = []
 
     # Define Extension object. For Fortran 77 source files, use "extra_f77_compile_args".
     # For Fortran 90+ source files, use "extra_f90_compile_args".

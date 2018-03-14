@@ -11,44 +11,48 @@ import sys
 import _tdlpack
 
 # ---------------------------------------------------------------------------------------- 
-# TDLPACK related parameters
+# DEFAULT TDLPACK-related parameters.
 # ---------------------------------------------------------------------------------------- 
-_l3264b = 32   # Bit size of integer "words"
-_nd5 = 5242880 # Max size of IPACK, 20MB record in 4-byte units
-_nd7 = 54      # Size of IS() array
+_default_l3264b = 32   # Bit size of integer "words"
+_default_minpk = 14    # Minimum group size when packing
+_default_nd5 = 5242880 # Max size of IPACK, 20MB record in 4-byte units
+_default_nd7 = 54      # Size of IS() arrays
 
 # ---------------------------------------------------------------------------------------- 
-# Scalars and Arrays for TDLPACK unpacking/packing
+# Initialize Scalars and Arrays
 # ---------------------------------------------------------------------------------------- 
 _ier = 0
 _lx = 0
-_minpk = 14
 _misspx = 0
 _misssx = 0
 _nplain = 32
-_iwork = np.zeros((_nd5),dtype=np.int32,order='F')
-_is0 = np.zeros((_nd7),dtype=np.int32,order='F')
-_is1 = np.zeros((_nd7),dtype=np.int32,order='F')
-_is2 = np.zeros((_nd7),dtype=np.int32,order='F')
-_is4 = np.zeros((_nd7),dtype=np.int32,order='F')
+_iwork = np.zeros((_default_nd5),dtype=np.int32,order='F')
+_is0 = np.zeros((_default_nd7),dtype=np.int32,order='F')
+_is1 = np.zeros((_default_nd7),dtype=np.int32,order='F')
+_is2 = np.zeros((_default_nd7),dtype=np.int32,order='F')
+_is4 = np.zeros((_default_nd7),dtype=np.int32,order='F')
+
+# ---------------------------------------------------------------------------------------- 
+# Set TDLPACK-related parameters from default.  These must be define as global in order
+# to update in function set_packingoptions.
+# ---------------------------------------------------------------------------------------- 
+global _l3264b
+global _minpk
+global _nd5
+global _nd7
+_l3264b = _default_l3264b
+_minpk = _default_minpk
+_nd5 = _default_nd5
+_nd7 = _default_nd7
 
 # ---------------------------------------------------------------------------------------- 
 # Class: TdlpackFile
 # ---------------------------------------------------------------------------------------- 
 class TdlpackFile(object):
-    """ Class of TdlpackFile
-
-        This class defines a file object for TDLPACK files.  Methods defined for this
-        class are read, write, and close.  Each method is a "wrapper" function to a
-        Fortran subroutine.
-
-        Attributes:
-            byteorder (str): Byte order (endianness) of the TDLPACK file.
-            current_record (int): The current record read in the file.
-            filetype (str): Type of TDLPACK file ('random-access' or 'sequential').
-            lun (int): Fortran logical unit number.
-            mode (str): File IO mode ('a', 'r', or 'w').
-            name (str): File name (absolute file path).
+    """
+    Definition of TdlpackFile which defines a file object for TDLPACK files. Methods 
+    defined for this class are read, write, and close. Each method is a "wrapper" function
+    to a Fortran subroutine.
     """
 
     def __init__(self, **kwargs):
@@ -65,10 +69,9 @@ class TdlpackFile(object):
         return ''.join(strings)
 
     def close(self):
-        """ Close a TDLPACK Sequential File.
-
-            This method calls a Fortran subroutine _tdlpack.closefile() to close
-            the lun and set to -1.
+        """
+        Close a TDLPACK Sequential File. This method calls a Fortran subroutine
+        _tdlpack.closefile() to close the lun and set to -1.
         """
         ret = _tdlpack.closefile(self.lun)
         self.lun = -1
@@ -76,76 +79,74 @@ class TdlpackFile(object):
         self.IOStatus = 'closed'
 
     def read(self):
-       """ Read a record from a TDLPACK file.
+        """
+        Read a record from a TDLPACK file. This method will call Fortran subroutine
+        _tdlpack.readfile and has the capability to instantiate and return an instance
+        of three types of objects.
 
-           This method will call Fortran subroutine _tdlpack.readfile and has the 
-           capability to instantiate and return 3 types of objects depending on 
-           what is read:
+        Returns
+        -------
+        out : {TdlpackRecord, TdlpackTrailer, or TdlpackStations}
+        """
+        # Initialize kwargs
+        kwargs = {}
 
-               TdlpackRecord
-               TdlpackTrailer
-               TdlpackStations
-       """
+        # Read record from file
+        ipack, ioctet, ier = _tdlpack.readfile(self.lun,_nd5,_l3264b)
 
-       # Initialize kwargs
-       kwargs = {}
+        # Error return of -1 signal EOF, so close the file.
+        if ier == -1: self.close()
 
-       # Read record from file
-       ipack, ioctet, ier = _tdlpack.readfile(self.lun,_nd5,_l3264b)
+        # Update number of records read.
+        self.current_record += 1
 
-       # Error return of -1 signal EOF, so close the file.
-       if ier == -1: self.close()
-
-       # Update number of records read.
-       self.current_record += 1
-
-       # Handle IPACK array accordingly.
-       if ipack[0] > 0:
-           header = struct.unpack('>4s',ipack[0].byteswap())[0]
-           if header == 'TDLP':
-               # TDLPACK Record
-               kwargs['ioctet'] = ioctet
-               kwargs['ipack'] = np.copy(ipack)
-               kwargs['reference_date'] = np.copy(ipack[4])
-               kwargs['id'] = np.copy(ipack[5:9])
-               return TdlpackRecord(**kwargs)
-           else:
-               # Station Call Letter Record
-               kwargs['ioctet'] = ioctet
-               kwargs['ipack'] = np.copy(ipack)
-               return TdlpackStations(**kwargs)
-       elif ioctet == 24 and ipack[4] == 9999:
-           # Trailer Record
-           kwargs['ioctet'] = ioctet
-           kwargs['ipack'] = np.copy(ipack)
-           return TdlpackTrailer(**kwargs)
+        # Handle IPACK array accordingly.
+        if ipack[0] > 0:
+            header = struct.unpack('>4s',ipack[0].byteswap())[0]
+            if header == 'TDLP':
+                # TDLPACK Record
+                kwargs['ioctet'] = ioctet
+                kwargs['ipack'] = np.copy(ipack)
+                kwargs['reference_date'] = np.copy(ipack[4])
+                kwargs['id'] = np.copy(ipack[5:9])
+                return TdlpackRecord(**kwargs)
+            else:
+                # Station Call Letter Record
+                kwargs['ioctet'] = ioctet
+                kwargs['ipack'] = np.copy(ipack)
+                return TdlpackStations(**kwargs)
+        elif ioctet == 24 and ipack[4] == 9999:
+            # Trailer Record
+            kwargs['ioctet'] = ioctet
+            kwargs['ipack'] = np.copy(ipack)
+            return TdlpackTrailer(**kwargs)
 
     def write(self, record):
-        """ Write a TDLPACK record to file.
+        """
+        Write a TDLPACK record to file.
 
-            This method will call Fortran subroutine _tdlpack.writefile to write a packed
-            record to file.
+        This method will call Fortran subroutine _tdlpack.writefile to write a packed
+        record to file.
 
-            Arguments:
-            record -- packed record of type TdlpackStations, TdlpackRecord, or
-                      TdlpackTrailer
+        Parameters
+        ----------
+        record : {TdlpackStations, TdlpackRecord, or TdlpackTrailer}
         """
         if record is None:
             pass
         elif type(record) is TdlpackStations:
-            # Pack stations, then write to output
+            # Pack stations, then write to output file
             record.pack()
             ier = 0
             ier = _tdlpack.writefile(self.lun,_l3264b,record.ioctet,record.ipack)
             if ier != 0: raise IOError("Error writing to TDLPACK file.")
         elif type(record) is TdlpackRecord or type(record) is TdlpackTrailer:
-            # Write to output
+            # Write to output file
             ier = 0
             ntotby = np.int32(0)
             ntotrc = np.int32(0)
             nwords = record.ioctet*8/_l3264b
             _tdlpack.writep(6,self.lun,record.ipack[0:nwords],ntotby,ntotrc,_l3264b,ier)
-            #ier = _tdlpack.writefile(self.lun,_l3264b,record.ioctet,record.ipack)
             if ier != 0: raise IOError("Error writing to TDLPACK file")
         else:
             # Raise error
@@ -155,29 +156,42 @@ class TdlpackFile(object):
 # Class TdlpackRecord
 # ---------------------------------------------------------------------------------------- 
 class TdlpackRecord(object):
-    """ Class of TdlpackRecord
-
-        This class defines a data object for TDLPACK data.  Methods defined for this
-        class are unpack and pack.  Each method is a "wrapper" function to a
-        Fortran subroutine.
-
-        Attributes:
-            datatype (str): TDLPACK data type ('grid' or 'vector').
-            is0 (numpy.ndarray): TDLPACK Section 0 (Indicator Section).
-            is1 (numpy.ndarray): TDLPACK Section 1 (Product Definition Section).
-            is2 (numpy.ndarray): TDLPACK Section 2 (Grid Definition Section). [If datatype='grid']
-            is4 (numpy.ndarray): TDLPACK Section 4 (Data Section).
-            llLat (float): Lower-left latitude.
-            llLon (float): Lower-left longitude.
-            mapProj (str): Map projection (using basemap projection strings).
-            meshLength (float): Gridpoint spacing in meters.
-            nx (int): Number of gridpoints in the x-direction.
-            ny (int): Number of gridpoints in the y-direction.
-            orientLon (float): Orientation longitude.
-            plain (string): Plain Language description of data.
-            stdLat (float): Standard latitude.
     """
+    Definition of TdlpackRecord which defines a data object for TDLPACK data. Methods
+    defined for this class are unpack and pack. Each method is a "wrapper" function to a
+    Fortran subroutine.
 
+    Attributes
+    ----------
+    datatype : str
+        TDLPACK data type ('grid' or 'vector').
+    is0 : numpy.ndarray
+        TDLPACK Section 0 (Indicator Section).
+    is1 : numpy.ndarray
+        TDLPACK Section 1 (Product Definition Section).
+    is2 : numpy.ndarray
+        TDLPACK Section 2 (Grid Definition Section). [If datatype='grid']
+    is4 : numpy.ndarray
+        TDLPACK Section 4 (Data Section).
+    llLat : np.float32
+        Lower-left latitude.
+    llLon : np.float32
+        Lower-left longitude.
+    mapProj : str
+        Map projection (using basemap projection strings).
+    meshLength : np.float32
+        Gridpoint spacing in meters.
+    nx : int
+        Number of gridpoints in the x-direction.
+    ny : int
+        Number of gridpoints in the y-direction.
+    orientLon : np.float32
+        Orientation longitude.
+    plain : str
+        Plain Language description of data.
+    stdLat: np.float32
+        Standard latitude.
+    """
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -193,8 +207,10 @@ class TdlpackRecord(object):
 
     # Class Method: pack handles packing a TDLPACK record
     def pack(self):
-        """ Pack TDLPACK Record using _tdlpack.pack1d() and _tdlpack.pack2d() """
-
+        """
+        Pack contents of object TdlpackRecord using _tdlpack.pack1d() for vector data
+        (i.e. stations) or _tdlpack.pack2d() for gridded data.
+        """
         # Initialize
         ier = 0
         ioctet = 0
@@ -226,8 +242,14 @@ class TdlpackRecord(object):
 
     # Class Method: unpack handles unpacking a TDLPACK record
     def unpack(self, unpack_data = True):
-        """ Unpack TDLPACK Record using _tdlpack.unpack() """
+        """
+        Unpack a packed TDLPACK Record using _tdlpack.unpack()
 
+        Parameters
+        ----------
+        unpack_data : bool, optional
+            Determine whether to unpack data or just TDLPACK sections (Default True). 
+        """
         # Unpack TDLPACK record.
         igive = 2
         if unpack_data is False: igive = 1
@@ -314,7 +336,12 @@ class TdlpackRecord(object):
 # Class TdlpackStations
 # ---------------------------------------------------------------------------------------- 
 class TdlpackStations(object):
-
+    """
+    Definition of TdlpackStations which defines a TDLPACK Station Call Letter record.
+    The first 4 bytes of this record contain the number of stations in bytes 
+    (number of stations * 8 bytes) then a stream of bytes representing the Station Call
+    Letters.  The width of each station call letter is 8 characters (bytes).
+    """
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -329,24 +356,12 @@ class TdlpackStations(object):
         return ''.join(strings)
 
     def pack(self):
-        """ Returns a packed station call letter record from a list of station call letter
-            records.  Whitespace is added to each station call letter such that the length
-            is 8-characters.
-    
-            Definition:
-            packStations(ccall, nsta) -> ioctet, ipack
-
-            Arguments:
-            ccall -- list of stations.
-            nsta -- number of stations in record.
-    
-            Returns:
-            ioctet -- Size of IPACK array in bytes. NOTE: This is a long (i.e. 64-bits).
-            ipack -- IPACK array.
+        """
+        Pack a Station Call Letter Record
         """
         # Station Call Letter Record
         self.ioctet = self.nsta*8
-        self.ipack = np.ndarray((self.ioctet/4),dtype=np.int32,order='F')
+        self.ipack = np.ndarray((self.ioctet/(_l3264b/8)),dtype=np.int32,order='F')
 
         # Unpack Station Call Letters
         for n,c in enumerate(self.ccall):
@@ -357,21 +372,8 @@ class TdlpackStations(object):
             self.ipack[i2] = np.copy(np.fromstring(sta[4:8],dtype=np.int32).byteswap())
 
     def unpack(self):
-        """ Returns a TDLPACK station call letter record from integer-based IPACK
-            array.  Note that the integer word size is 4-bytes, so an 8-character CALL letter
-            will be split into 2 IPACK words. Whitespace is removed from from each station
-            call letter.
-
-            Definition:
-            unpackStations(ipack, ioctet) -> nsta, ccall
-
-            Arguments:
-            ipack -- IPACK array.
-            ioctet -- Size of IPACK array in bytes.
-
-            Returns:
-            nsta -- number of stations in record.
-            ccall -- list of stations.
+        """
+        Unpack a Station Call Letter Record
         """
         # Station Call Letter Record
         self.nsta = self.ioctet/8
@@ -386,7 +388,12 @@ class TdlpackStations(object):
 # Class TdlpackTrailer
 # ---------------------------------------------------------------------------------------- 
 class TdlpackTrailer(object):
-
+    """
+    Definition of TdlpackTrailer which defines a TDLPACK trailer record.  This record is
+    used only in TDLPACK sequential files and either is the last record in a vector
+    dataset or when there are multiple Station Call Letter records, will preceed the
+    station call letter record.
+    """
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -410,7 +417,23 @@ class TdlpackTrailer(object):
 # Function open: Call _tdlpack.openfile (Fortran)
 # ---------------------------------------------------------------------------------------- 
 def open(filename, mode="r"):
-    """ Opens a TDLPACK Sequential File """
+    """
+    Open a TDLPACK Sequential File.
+
+    Parameters
+    ----------
+    filename : str
+        TDLPACK Filename
+    mode : { 'r' or 'w'}, optional
+        File IO mode (default 'r'). 
+            - 'r' : Read only access
+            - 'w' : Read and write access
+
+    Returns
+    -------
+    TdlpackFile : TdlpackFile
+        Instance of class TdlpackFile
+    """
     kwargs = {}
     filename = os.path.abspath(filename)
     _lun, byteorder, filetype = _tdlpack.openfile(filename, mode)
@@ -426,6 +449,24 @@ def open(filename, mode="r"):
     if filetype == 2: kwargs['filetype'] = 'sequential'
     
     return TdlpackFile(**kwargs)
+
+# ---------------------------------------------------------------------------------------- 
+# Function set_packingoptions: Set some parameters that would affect packing.
+# ---------------------------------------------------------------------------------------- 
+def set_packingoptions(minpk=None):
+    """
+    Set printing options.
+    These options determine the way data are packed into TDLPACK format.
+
+    Parameters
+    ----------
+    minpk : int, optional
+        Minimum number of values in a group (default 14). Methods for changing this value
+        should be the following formula: (minpk/2) + minpk.
+    """
+    global _minpk
+    if minpk is not None:
+        _minpk = minpk
 
 # ---------------------------------------------------------------------------------------- 
 # End of pytdlpack.py
