@@ -79,9 +79,9 @@ python module _tdlpack ! in
             integer, optional,check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
             integer :: minpk
             integer :: lx
-            integer :: ioctet
+            integer intent(out) :: ioctet
             integer :: l3264b
-            integer :: ier
+            integer intent(out) :: ier
         end subroutine pack1d
         subroutine pack2d(kfildo,a,ia,ic,nx,ny,is0,is1,is2,is4,nd7,xmissp,xmisss,ipack,nd5,minpk,lx,ioctet,l3264b,ier) ! in :_tdlpack:pack2d.f
             integer :: kfildo
