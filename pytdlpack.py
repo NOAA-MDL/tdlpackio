@@ -141,15 +141,16 @@ class TdlpackFile(object):
             # Pack stations, then write to output file
             record.pack()
             ier = _tdlpack.writefile(self.lun,_l3264b,record.ioctet,record.ipack)
-            if ier != 0: raise IOError("Error writing to TDLPACK file.")
+            if ier != 0: raise IOError("Error writing Station Call Letter record to TDLPACK file.")
         elif type(record) is TdlpackRecord:
             # Write to output file
             nwords = record.ioctet*8/_l3264b
             _tdlpack.writep(6,self.lun,record.ipack[0:nwords],ntotby,ntotrc,_l3264b,ier)
-            if ier != 0: raise IOError("Error writing to TDLPACK file")
+            if ier != 0: raise IOError("Error writing TDLPACK record to TDLPACK file")
         elif type(record) is TdlpackTrailer:
             # Write trailer record
             _tdlpack.trail(6,self.lun,_l3264b,np.int32(64/_l3264b),ntotby,ntotrc,ier)
+            if ier != 0: raise IOError("Error writing Trailer record to TDLPACK file")
         else:
             # Raise error
             raise TypeError("Record is not Tdlpack-based.")
@@ -229,7 +230,7 @@ class TdlpackRecord(object):
         self.is4[:] = np.int32(0)
         if self.datatype == "vector":
             ic = np.zeros((self.nsta),dtype=np.int32)
-            _tdlpack.pack1d(6,self.data,ic,self.is0,self.is1,self.is2,self.is4,xmissp,xmisss,ipack,_minpk,_lx,ioctet,_l3264b,ier)
+            ioctet,ier = _tdlpack.pack1d(6,self.data,ic,self.is0,self.is1,self.is2,self.is4,xmissp,xmisss,ipack,_minpk,_lx,_l3264b)
         elif self.datatype == "grid":
             ia = np.zeros((self.nx,self.ny),dtype=np.int32,order='F')
             ic = np.zeros((self.nx*self.ny),dtype=np.int32,order='F') 
