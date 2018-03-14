@@ -279,6 +279,15 @@ python module _tdlpack ! in
             integer dimension(31) :: ibxx2
             integer :: ier
         end subroutine reduce
+        subroutine trail(kfildo,kfilio,l3264b,l3264w,ntotby,ntotrc,ier) ! in :_tdlpack:trail.f
+            integer :: kfildo
+            integer :: kfilio
+            integer :: l3264b
+            integer :: l3264w
+            integer :: ntotby
+            integer :: ntotrc
+            integer :: ier
+        end subroutine trail
         subroutine unpack(kfildo,ipack,iwork,data,nd5,is0,is1,is2,is4,nd7,misspx,misssx,igive,l3264b,ier) ! in :_tdlpack:unpack.f
             integer :: kfildo
             integer dimension(nd5) :: ipack
