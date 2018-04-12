@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+__version__ = '0.1.0'
 
 # ---------------------------------------------------------------------------------------- 
 # Modules
@@ -54,7 +54,6 @@ class TdlpackFile(object):
     defined for this class are read, write, and close. Each method is a "wrapper" function
     to a Fortran subroutine.
     """
-
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -100,25 +99,23 @@ class TdlpackFile(object):
         # Update number of records read.
         self.current_record += 1
 
+        # Set ipack and ioctet
+        kwargs['ioctet'] = np.copy(ioctet)
+        kwargs['ipack'] = np.copy(ipack)
+
         # Handle IPACK array accordingly.
         if ipack[0] > 0:
             header = struct.unpack('>4s',ipack[0].byteswap())[0]
             if header == 'TDLP':
                 # TDLPACK Record
-                kwargs['ioctet'] = ioctet
-                kwargs['ipack'] = np.copy(ipack)
                 kwargs['reference_date'] = np.copy(ipack[4])
                 kwargs['id'] = np.copy(ipack[5:9])
                 return TdlpackRecord(**kwargs)
             else:
                 # Station Call Letter Record
-                kwargs['ioctet'] = ioctet
-                kwargs['ipack'] = np.copy(ipack)
                 return TdlpackStations(**kwargs)
         elif ioctet == 24 and ipack[4] == 9999:
             # Trailer Record
-            kwargs['ioctet'] = ioctet
-            kwargs['ipack'] = np.copy(ipack)
             return TdlpackTrailer(**kwargs)
 
     def write(self, record):
@@ -269,6 +266,7 @@ class TdlpackRecord(object):
         self.month = np.copy(_is1[3])
         self.day = np.copy(_is1[4])
         self.hour = np.copy(_is1[5])
+        self.leadTime = np.copy(_is1[12])
         self.modelNumber = np.copy(_is1[14])
         self.modelSequenceNumber = np.copy(_is1[15])
         self.decimalScaleFactor = np.copy(_is1[16])
@@ -360,7 +358,9 @@ class TdlpackStations(object):
 
     def pack(self):
         """
-        Pack a Station Call Letter Record
+        Pack a Station Call Letter Record. Following procedures in the mos2k software
+        system, the station call letter records are "packed" into an integer array
+        with word size of _l3264b bits.
         """
         # Station Call Letter Record
         self.ioctet = self.nsta*8
@@ -376,7 +376,9 @@ class TdlpackStations(object):
 
     def unpack(self):
         """
-        Unpack a Station Call Letter Record
+        Unpack a Station Call Letter Record. The integer array, ipack, returned from
+        pytdlpack.TdlpackFile.read() function is "unpacked" into strings with a width
+        of 8 characters into a tuple.
         """
         # Station Call Letter Record
         self.nsta = self.ioctet/8
