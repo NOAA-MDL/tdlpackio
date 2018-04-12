@@ -5,3 +5,7 @@ tdlpack/*.o
 *.pyc
 .DS_Store
 .vscode
+test/lib/
+test/gfspkd47.2017012600
+test/gfspkd47.2017012600.r3455
+test/hre2017010112
