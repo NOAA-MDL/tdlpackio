@@ -29,7 +29,9 @@ if __name__ == "__main__":
                                     "-fpscomp logicals",
                                     "-fp-model strict",
                                     "-assume byterecl",
-                                    "-axCore-AVX2",
+                                    "-xHost",
+                                    "-align array64byte",
+                                    "-fast-transcendentals",
                                     "-assume buffered_io"]
     else:
         tdlpack_fortran_args = []
