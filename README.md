@@ -21,7 +21,7 @@ Note that building on macOS requires setting ``CC=clang``. Python setuptools and
 
 ### Build
 * macOS: ``CC=clang python setup.py build_ext --fcompiler=gnu95 build``
-* Linux: ``python setup.py build``
+* Linux: ``python setup.py build_ext --fcompiler=[gnu95|intelem] build``
 
 ### Install
 
@@ -29,4 +29,4 @@ System area:
 * ``sudo python setup.py install``
 
 Local area:
-* ``python setup.py --prefix=<INSTALL_DIR> install``
+* ``python setup.py install --prefix=<INSTALL_DIR>``
