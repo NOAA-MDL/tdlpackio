@@ -1,26 +1,32 @@
 __version__ = '0.1.0'
 
-# ---------------------------------------------------------------------------------------- 
-# Modules
-# ---------------------------------------------------------------------------------------- 
 import copy
-import numpy as np
 import os
 import struct
 import sys
-import _tdlpack
 
-# ---------------------------------------------------------------------------------------- 
-# DEFAULT TDLPACK-related parameters.
-# ---------------------------------------------------------------------------------------- 
-_default_l3264b = 32   # Bit size of integer "words"
-_default_minpk = 14    # Minimum group size when packing
-_default_nd5 = 5242880 # Max size of IPACK, 20MB record in 4-byte units
-_default_nd7 = 54      # Size of IS() arrays
+try:
+    import numpy as np
+except ImportError:
+    raise ImportError("NumPy required")
+try:
+    import _tdlpack
+except ImportError:
+    raise ImportError("_tdlpack not found.")
 
-# ---------------------------------------------------------------------------------------- 
-# Initialize Scalars and Arrays
-# ---------------------------------------------------------------------------------------- 
+r"""TDLPACK-related Constants
+======================== =============== ==============================================
+Name                     Value           Description
+------------------------ --------------- ----------------------------------------------
+_default_l3264b          32              Integer word size in bits
+_default_minpk           14              Minimum group size when packing
+_default_nd5             5242880         Size of IPACK array in 4-byte units (20MB)
+_default_nd7             54              Size of TDLPACK Indentification Section Arrays
+"""
+_default_l3264b = 32 
+_default_minpk = 14
+_default_nd5 = 5242880
+_default_nd7 = 54
 _ier = 0
 _lx = 0
 _misspx = 0
@@ -32,10 +38,6 @@ _is1 = np.zeros((_default_nd7),dtype=np.int32,order='F')
 _is2 = np.zeros((_default_nd7),dtype=np.int32,order='F')
 _is4 = np.zeros((_default_nd7),dtype=np.int32,order='F')
 
-# ---------------------------------------------------------------------------------------- 
-# Set TDLPACK-related parameters from default.  These must be define as global in order
-# to update in function set_packingoptions.
-# ---------------------------------------------------------------------------------------- 
 global _l3264b
 global _minpk
 global _nd5
@@ -368,11 +370,9 @@ class TdlpackStations(object):
 
         # Unpack Station Call Letters
         for n,c in enumerate(self.ccall):
-            i1 = n*2
-            i2 = i1+1
             sta = c.ljust(8,' ')
-            self.ipack[i1] = np.copy(np.fromstring(sta[0:4],dtype=np.int32).byteswap())
-            self.ipack[i2] = np.copy(np.fromstring(sta[4:8],dtype=np.int32).byteswap())
+            self.ipack[n*2] = np.copy(np.fromstring(sta[0:4],dtype=np.int32).byteswap())
+            self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[4:8],dtype=np.int32).byteswap())
 
     def unpack(self):
         """
