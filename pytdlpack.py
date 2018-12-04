@@ -18,34 +18,41 @@ r"""TDLPACK-related Constants
 ======================== =============== ==============================================
 Name                     Value           Description
 ------------------------ --------------- ----------------------------------------------
-_default_l3264b          32              Integer word size in bits
-_default_minpk           14              Minimum group size when packing
-_default_nd5             5242880         Size of IPACK array in 4-byte units (20MB)
-_default_nd7             54              Size of TDLPACK Indentification Section Arrays
+DEFAULT_CCALL            8               Size of station Call letters
+DEFAULT_L3264B           32              Integer word size in bits
+DEFAULT_MINPK            14              Minimum group size when packing
+DEFAULT_ND5              5242880         Size of IPACK array in 4-byte units (20MB)
+DEFAULT_ND7              54              Size of TDLPACK Indentification Section Arrays
+DEFAULT_PMISS            9999            Primary Missing Value (integer)
 """
-_default_l3264b = 32 
-_default_minpk = 14
-_default_nd5 = 5242880
-_default_nd7 = 54
+DEFAULT_CCALL = np.int32(8)
+DEFAULT_L3264B = np.int32(32) 
+DEFAULT_MINPK = np.int32(14)
+DEFAULT_ND5 = np.int32(5242880)
+DEFAULT_ND7 = np.int32(54)
+DEFAULT_PMISS = np.int32(9999)
+FORTRAN_STDOUT_LUN = np.int32(6)
+
 _ier = 0
 _lx = 0
 _misspx = 0
 _misssx = 0
 _nplain = 32
-_iwork = np.zeros((_default_nd5),dtype=np.int32,order='F')
-_is0 = np.zeros((_default_nd7),dtype=np.int32,order='F')
-_is1 = np.zeros((_default_nd7),dtype=np.int32,order='F')
-_is2 = np.zeros((_default_nd7),dtype=np.int32,order='F')
-_is4 = np.zeros((_default_nd7),dtype=np.int32,order='F')
+
+_iwork = np.zeros((DEFAULT_ND5),dtype=np.int32,order='F')
+_is0 = np.zeros((DEFAULT_ND7),dtype=np.int32,order='F')
+_is1 = np.zeros((DEFAULT_ND7),dtype=np.int32,order='F')
+_is2 = np.zeros((DEFAULT_ND7),dtype=np.int32,order='F')
+_is4 = np.zeros((DEFAULT_ND7),dtype=np.int32,order='F')
 
 global _l3264b
 global _minpk
 global _nd5
 global _nd7
-_l3264b = _default_l3264b
-_minpk = _default_minpk
-_nd5 = _default_nd5
-_nd7 = _default_nd7
+_l3264b = DEFAULT_L3264B
+_minpk = DEFAULT_MINPK
+_nd5 = DEFAULT_ND5
+_nd7 = DEFAULT_ND7
 
 # ---------------------------------------------------------------------------------------- 
 # Class: TdlpackFile
@@ -57,6 +64,13 @@ class TdlpackFile(object):
     to a Fortran subroutine.
     """
     def __init__(self, **kwargs):
+        self.byteorder = ''
+        self.current_record = 0
+        self.filetype = ''
+        self.lun = -1
+        self.mode = ''
+        self.name = ''
+        self.IOStatus = 'closed'
         for k, v in kwargs.items():
             setattr(self, k, v)
 
@@ -75,9 +89,12 @@ class TdlpackFile(object):
         _tdlpack.closefile() to close the lun and set to -1.
         """
         ret = _tdlpack.closefile(self.lun)
-        self.lun = -1
-        self.current_record = 0
-        self.IOStatus = 'closed'
+        if ret == 0:
+            self.lun = -1
+            self.current_record = 0
+            self.IOStatus = 'closed'
+        else:
+            pass
 
     def read(self):
         """
@@ -144,11 +161,11 @@ class TdlpackFile(object):
         elif type(record) is TdlpackRecord:
             # Write to output file
             nwords = record.ioctet*8/_l3264b
-            _tdlpack.writep(6,self.lun,record.ipack[0:nwords],ntotby,ntotrc,_l3264b,ier)
+            _tdlpack.writep(FORTRAN_STDOUT_LUN,self.lun,record.ipack[0:nwords],ntotby,ntotrc,_l3264b,ier)
             if ier != 0: raise IOError("Error writing TDLPACK record to TDLPACK file")
         elif type(record) is TdlpackTrailer:
             # Write trailer record
-            _tdlpack.trail(6,self.lun,_l3264b,np.int32(64/_l3264b),ntotby,ntotrc,ier)
+            _tdlpack.trail(FORTRAN_STDOUT_LUN,self.lun,_l3264b,np.int32(64/_l3264b),ntotby,ntotrc,ier)
             if ier != 0: raise IOError("Error writing Trailer record to TDLPACK file")
         else:
             # Raise error
@@ -229,11 +246,11 @@ class TdlpackRecord(object):
         self.is4[:] = np.int32(0)
         if self.datatype == "vector":
             ic = np.zeros((self.nsta),dtype=np.int32)
-            ioctet,ier = _tdlpack.pack1d(6,self.data,ic,self.is0,self.is1,self.is2,self.is4,xmissp,xmisss,ipack,_minpk,_lx,_l3264b)
+            ioctet,ier = _tdlpack.pack1d(FORTRAN_STDOUT_LUN,self.data,ic,self.is0,self.is1,self.is2,self.is4,xmissp,xmisss,ipack,_minpk,_lx,_l3264b)
         elif self.datatype == "grid":
             ia = np.zeros((self.nx,self.ny),dtype=np.int32,order='F')
             ic = np.zeros((self.nx*self.ny),dtype=np.int32,order='F') 
-            ioctet,ier = _tdlpack.pack2d(6,self.data,ia,ic,self.is0,self.is1,self.is2,self.is4,xmissp,xmisss,ipack,_minpk,_lx,_l3264b)
+            ioctet,ier = _tdlpack.pack2d(FORTRAN_STDOUT_LUN,self.data,ia,ic,self.is0,self.is1,self.is2,self.is4,xmissp,xmisss,ipack,_minpk,_lx,_l3264b)
 
         # Here we want to put copies of ipack and ioctet into the TDLPACK object.
         self.ipack = np.copy(ipack)
@@ -253,9 +270,10 @@ class TdlpackRecord(object):
             Determine whether to unpack data or just TDLPACK sections (Default True). 
         """
         # Unpack TDLPACK record.
+        ier = 0
         igive = 2
         if unpack_data is False: igive = 1
-        _data,ier = _tdlpack.unpack(6,self.ipack,_iwork,_is0,_is1,_is2,_is4,_misspx,_misssx,igive,_l3264b) 
+        _data,ier = _tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack,_iwork,_is0,_is1,_is2,_is4,_misspx,_misssx,igive,_l3264b) 
 
         # Set object is0 and other class vars.
         self.is0 = np.copy(_is0) 
@@ -340,10 +358,10 @@ class TdlpackRecord(object):
 # ---------------------------------------------------------------------------------------- 
 class TdlpackStations(object):
     """
-    Definition of TdlpackStations which defines a TDLPACK Station Call Letter record.
-    The first 4 bytes of this record contain the number of stations in bytes 
-    (number of stations * 8 bytes) then a stream of bytes representing the Station Call
-    Letters.  The width of each station call letter is 8 characters (bytes).
+    Object TDLPACK Station Call Letter record.  When packed, the first 4 bytes of this
+    record contain the number of stations in bytes (number of stations * 8 bytes) then
+    a stream of bytes representing the Station Call Letters.  The width of each station
+    call letter is 8 characters (bytes).
     """
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -365,14 +383,15 @@ class TdlpackStations(object):
         with word size of _l3264b bits.
         """
         # Station Call Letter Record
-        self.ioctet = self.nsta*8
-        self.ipack = np.ndarray((self.ioctet/(_l3264b/8)),dtype=np.int32,order='F')
+        _ccall_half = DEFAULT_CCALL/2
+        self.ioctet = self.nsta*DEFAULT_CCALL
+        self.ipack = np.ndarray((self.ioctet/(_l3264b/DEFAULT_CCALL)),dtype=np.int32,order='F')
 
         # Unpack Station Call Letters
         for n,c in enumerate(self.ccall):
-            sta = c.ljust(8,' ')
-            self.ipack[n*2] = np.copy(np.fromstring(sta[0:4],dtype=np.int32).byteswap())
-            self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[4:8],dtype=np.int32).byteswap())
+            sta = c.ljust(DEFAULT_CCALL,' ')
+            self.ipack[n*2] = np.copy(np.fromstring(sta[0:_ccall_half],dtype=np.int32).byteswap())
+            self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[_ccall_half:DEFAULT_CCALL],dtype=np.int32).byteswap())
 
     def unpack(self):
         """
@@ -381,12 +400,13 @@ class TdlpackStations(object):
         of 8 characters into a tuple.
         """
         # Station Call Letter Record
-        self.nsta = self.ioctet/8
+        self.nsta = self.ioctet/DEFAULT_CCALL
         self.ccall = []
 
         # Unpack Station Call Letters
-        for n in range(0,(self.ioctet/4),2):
-           self.ccall.append(struct.unpack('>8s',self.ipack[n:n+2].byteswap())[0].strip(' '))
+        _unpack_string_fmt = '>'+str(DEFAULT_CCALL)+'s'
+        for n in range(0,(self.ioctet/_ccall_half),2):
+           self.ccall.append(struct.unpack(_unpack_string_fmt,self.ipack[n:n+2].byteswap())[0].strip(' '))
         self.ccall = tuple(self.ccall)
         
 # ---------------------------------------------------------------------------------------- 
@@ -431,8 +451,9 @@ def open(filename, mode="r"):
         TDLPACK Filename
     mode : { 'r' or 'w'}, optional
         File IO mode (default 'r'). 
-            - 'r' : Read only access
-            - 'w' : Read and write access
+            - 'r' : Read access
+            - 'w' : New file (write access)
+            - 'a' : Append (read/write access)
 
     Returns
     -------
@@ -446,8 +467,9 @@ def open(filename, mode="r"):
     kwargs['lun'] = _lun
     kwargs['name'] = filename
     kwargs['current_record'] = 0
-    if mode == "r": kwargs['IOStatus'] = 'opened, read-only'
-    if mode == "w": kwargs['IOStatus'] = 'opened, new file for write'
+    if mode == "r": kwargs['IOStatus'] = 'opened, read'
+    if mode == "w": kwargs['IOStatus'] = 'new, write'
+    if mode == "a": kwargs['IOStatus'] = 'opened, read/write access'
     if byteorder == -1: kwargs['byteorder'] = 'little'
     if byteorder == 1: kwargs['byteorder'] = 'big'
     if filetype == 1: kwargs['filetype'] = 'random-access'
