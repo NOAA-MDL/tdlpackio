@@ -34,12 +34,13 @@ python module _tdlpack ! in
             integer intent(in) :: lun
             integer intent(out) :: ier
         end subroutine closefile
-        subroutine openfile(file,mode,lun,byteorder,ftype) ! in :_tdlpack:openfile.f
+        subroutine openfile(file,mode,lun,byteorder,ftype,ier) ! in :_tdlpack:openfile.f
             character*(*) intent(in) :: file
             character*(*) intent(in) :: mode
             integer intent(out) :: lun
             integer intent(out) :: byteorder
             integer intent(out) :: ftype
+            integer intent(out) :: ier
         end subroutine openfile
         subroutine pack(kfildo,ic,nxy,is0,is1,is2,is4,nd7,ipack,nd5,second,ifirst,ifod,missp,misss,minpk,lx,ioctet,l3264b,ier) ! in :_tdlpack:pack.f
             integer :: kfildo
