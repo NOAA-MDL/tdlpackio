@@ -146,7 +146,7 @@ class TdlpackFile(object):
                         record = TdlpackStationRecord(**kwargs)
                         record.unpack()
                 elif _ioctet == 24 and _ipack[4] == 9999:
-                    return TdlpackTrailerRecord(**kwargs)
+                    record = TdlpackTrailerRecord(**kwargs)
 
                 self.position += 1
                 if all:
@@ -154,11 +154,10 @@ class TdlpackFile(object):
                 else:
                     break
 
-        if not self.eof:
-            if all:
-                return records
-            else:
-                return record
+        if len(records) == 0:
+            return record
+        else:
+            return records
     
     def write(self,record):
         """
@@ -348,8 +347,8 @@ class TdlpackRecord(object):
 
             self.lead_time = self.is1[10]-((self.is1[10]/1000)*1000)
             self.number_of_values = self.is4[2]
-            self.primary_missing_value = deepcopy(np.float32(_misspx))
-            self.secondary_missing_value = deepcopy(np.float32(_misssx))
+            self.primary_missing_value = deepcopy(np.float32(self.is4[3]))
+            self.secondary_missing_value = deepcopy(np.float32(self.is4[4]))
             if self.is1[1] == 0:
                 self.type = 'station'
             elif self.is1[1] == 1:
