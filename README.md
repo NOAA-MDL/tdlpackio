@@ -30,3 +30,5 @@ System area:
 
 Local area:
 * ``python setup.py install --prefix=<INSTALL_DIR>``
+
+You can also build and install using the provided ``install.sh`` script (see its usage print).
