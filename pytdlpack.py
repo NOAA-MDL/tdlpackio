@@ -64,6 +64,8 @@ class TdlpackFile(object):
     position : int
         The current record being read from file. If the file type is 'random-access', then this
         value is -1.
+    size : int
+        File size in units of bytes.
     """
     counter = 0
     def __init__(self,**kwargs):
@@ -116,7 +118,7 @@ class TdlpackFile(object):
         -------
         TdlpackStationRecord, TdlpackRecord, or TdlpackTrailerRecord
         """
-        if all: records = []
+        records = []
         while True:
             _ipack = np.array((),dtype=np.int32)
             _ioctet = np.int32(0)
@@ -144,7 +146,7 @@ class TdlpackFile(object):
                         if self.position == 0: self.data_type = 'station'
                         kwargs['number_of_stations'] = deepcopy(_ioctet/NCHAR)
                         record = TdlpackStationRecord(**kwargs)
-                        record.unpack()
+                        if unpack: record.unpack()
                 elif _ioctet == 24 and _ipack[4] == 9999:
                     record = TdlpackTrailerRecord(**kwargs)
 
@@ -154,10 +156,10 @@ class TdlpackFile(object):
                 else:
                     break
 
-        if len(records) == 0:
-            return record
-        else:
+        if len(records) > 0:
             return records
+        else:
+            if not self.eof: return record
     
     def write(self,record):
         """
@@ -187,6 +189,8 @@ class TdlpackRecord(object):
     ----------
     data : array_like
         Data values.
+    grid_length : float
+        Distance between grid points in units of meters.
     id : array_like
         ID of the TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.
     ioctet : int
@@ -203,12 +207,18 @@ class TdlpackRecord(object):
         TDLPACK Section 4 (Data Section).
     lead_time : int
         Forecast lead time in units of hours.
+    lower_left_latitude : float
+        Latitude of lower left grid point
+    lower_left_longitude : float
+        Longitude of lower left grid point
     number_of_values : int
         Number of data values.
     nx : int
         Number of points in the x-direction (West-East).
     ny : int
         Number of points in the y-direction (West-East).
+    origin_longitude : float
+        Originating longitude of projected grid.
     plain : str
         Plain language description of TDLPACK record.
     primary_missing_value : float
@@ -217,6 +227,8 @@ class TdlpackRecord(object):
         Reference date from the TDLPACK data record in YYYYMMDDHH format.
     secondary_missing_value : float
         Secondary missing value.
+    standard_latitude : float
+        Latitude at which the grid length applies.
     type : {'grid', 'station'}
         Identifies the type of data. 
     """
@@ -227,67 +239,39 @@ class TdlpackRecord(object):
 
         Parameters
         ----------
-        is1 : array_like
+        is1 : array_like, optional
             TDLPACK Identification Section 1 (Product Definition Section).
-        is2 : array_like
+        is2 : array_like, optional
             TDLPACK Identification Section 2 (Grid Definition Section).
-        is4 : array_like
+        is4 : array_like, optional
             TDLPACK Identification Section 4 (Data Section).
-        plain : str
+        plain : str, optional
             Plain language descriptor.
-        data : array_like
+        data : array_like, optional
             Data values.
-        **kwargs : dict
+        **kwargs : dict, optional
             Dictionary of class attributes (keys) and class attributes (values).
         """
         type(self).counter += 1
         self._metadata_unpacked = False
         self._data_unpacked = False
-        self.data = np.array((),dtype=np.float32)
-        self.id = np.array((),dtype=np.int32)
-        self.ioctet = np.int32(0)
-        self.ipack = np.array((),dtype=np.int32)
-        self.is0 = np.array((),dtype=np.int32)
-        self.is1 = np.array((),dtype=np.int32)
-        self.is2 = np.array((),dtype=np.int32)
-        self.is4 = np.array((),dtype=np.int32)
-        self.lead_time = np.int32(0)
-        self.number_of_values = np.int32(0)
         self.nx = None
         self.ny = None
         self.plain = ''
-        self.primary_missing_value = np.float32(0)
-        self.reference_date = np.int32(0)
-        self.secondary_missing_value = np.float32(0)
-        self.type = ''
-        if is1 is not None:
-            self.is0 = np.zeros((ND7),dtype=np.int32)
-            self.is1 = np.int32(is1)
-            self.id = np.int32(self.is1[8:12])
-            self.lead_time = self.is1[10]-((self.is1[10]/1000)*1000)
-            self.reference_date = np.int32(self.is1[7])
-            if self.is1[1] == 0:
-                self.type = 'station'
-            elif self.is1[1] == 1:
-                self.type = 'grid'
-        if is2 is not None:
-            self.is2 = np.int32(is2)
-            self.nx = self.is2[2]
-            self.ny = self.is2[3]
-        if is4 is not None:
-            self.is4 = np.int32(is4)
-            self.number_of_values = np.int32(self.is4[2])
-            self.primary_missing_value = np.float32(self.is4[3])
-            self.secondary_missing_value = np.float32(self.is4[4])
-        if plain is not None:
-            self.plain = plain[0:len(plain)]+" "*(NCHAR_PLAIN-len(plain))
-            for n,s in enumerate(self.plain):
-                self.is1[22+n] = ord(s)
-        if data is not None:
-            self.data = np.float32(data)
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-    
+        if np.any(is1) and np.any(is4) and plain and np.any(data) and len(kwargs) == 0:
+            kwargs = {}
+            kwargs['is0'] = np.zeros((ND7),dtype=np.int32)
+            kwargs['is1'] = is1.astype(np.int32)
+            kwargs['is2'] = is2.astype(np.int32)
+            kwargs['is4'] = is4.astype(np.int32)
+            kwargs['plain'] = plain
+            kwargs['data'] = data.astype(np.float32)
+            kwargs['_metadata_unpacked'] = True
+            kwargs['_data_unpacked'] = True
+        for k,v in kwargs.items():
+            setattr(self,k,v)
+        if self._metadata_unpacked: self.unpack()
+
     def __repr__(self):
         strings = []
         keys = self.__dict__.keys()
@@ -331,31 +315,52 @@ class TdlpackRecord(object):
             Set a missing value. If a missing value exists for the TDLPACK data record,
             it will be replaced with this value.
         """
-        _data_meta,_ier = _tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:ND5_META],
-                                          _iwork_meta,_is0,_is1,_is2,_is4,_misspx,
-                                          _misssx,np.int32(1),L3264B)
-        if _ier == 0:
-            self._metadata_unpacked = True
-            self.is0 = deepcopy(_is0)
-            self.is1 = deepcopy(_is1)
-            self.is2 = deepcopy(_is2)
-            self.is4 = deepcopy(_is4)
+        _ier = np.int32(0)
+        if not self._metadata_unpacked:
+            _data_meta,_ier = _tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:ND5_META],
+                              _iwork_meta,_is0,_is1,_is2,_is4,_misspx,
+                              _misssx,np.int32(1),L3264B)
+            if _ier == 0:
+                self._metadata_unpacked = True
+                self.is0 = deepcopy(_is0)
+                self.is1 = deepcopy(_is1)
+                self.is2 = deepcopy(_is2)
+                self.is4 = deepcopy(_is4)
 
-            if not self.plain:
-                for n in np.nditer(self.is1[22:(22+self.is1[21])]):
-                    self.plain += chr(n)
+        # Set attributes from is1[].
+        self.lead_time = self.is1[10]-((self.is1[10]/1000)*1000)
+        if not self.plain:
+            for n in np.nditer(self.is1[22:(22+self.is1[21])]):
+                self.plain += chr(n)
 
-            self.lead_time = self.is1[10]-((self.is1[10]/1000)*1000)
-            self.number_of_values = self.is4[2]
-            self.primary_missing_value = deepcopy(np.float32(self.is4[3]))
-            self.secondary_missing_value = deepcopy(np.float32(self.is4[4]))
-            if self.is1[1] == 0:
-                self.type = 'station'
-            elif self.is1[1] == 1:
-                self.type = 'grid'
-                self.nx = self.is2[2]
-                self.ny = self.is2[3]
-        
+        # Set attributes from is2[].
+        if self.is1[1] == 0:
+            self.type = 'station'
+            self.map_proj = None
+            self.nx = None
+            self.ny = None
+            self.lower_left_latitude = None
+            self.lower_left_longitude = None
+            self.origin_longitude = None
+            self.grid_length = None
+            self.standard_latitude = None
+            if np.sum(self.is2) > 0: self.is2 = np.zeros((ND7),dtype=np.int32)
+        elif self.is1[1] == 1:
+            self.type = 'grid'
+            self.map_proj = self.is2[1]
+            self.nx = self.is2[2]
+            self.ny = self.is2[3]
+            self.lower_left_latitude = self.is2[4]/10000.
+            self.lower_left_longitude = self.is2[5]/10000.
+            self.origin_longitude = self.is2[6]/10000.
+            self.grid_length = self.is2[7]/1000.
+            self.standard_latitude = self.is2[8]/10000.
+       
+        # Set attributes from is4[].
+        self.number_of_values = self.is4[2]
+        self.primary_missing_value = deepcopy(np.float32(self.is4[3]))
+        self.secondary_missing_value = deepcopy(np.float32(self.is4[4]))
+
         if data:
             self._data_unpacked = True
             _nd5_local = max(self.is4[2],(self.ioctet/NBYPWD))
@@ -503,5 +508,6 @@ def open(name,mode='r'):
     kwargs['mode'] = mode
     kwargs['name'] = os.path.abspath(name)
     kwargs['position'] = np.int32(0)
+    kwargs['size'] = os.path.getsize(name)
 
     return TdlpackFile(**kwargs)
