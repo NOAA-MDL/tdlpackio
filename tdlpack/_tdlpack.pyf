@@ -400,6 +400,55 @@ python module _tdlpack ! in
             real dimension(nx,ny),intent(in) :: datain
             real dimension(nx*ny),intent(out),depend(nx,ny) :: dataout
         end subroutine xfer2d1d
+        subroutine lmijll(kfildo,xi,yj,xmeshl,orient,xlat,xlatll,xlonll,alat,alon,ier) ! in :_tdlpack:lmijll.f
+            integer :: kfildo
+            real :: xi
+            real :: yj
+            real :: xmeshl
+            real :: orient
+            real :: xlat
+            real :: xlatll
+            real :: xlonll
+            real :: alat
+            real :: alon
+            integer :: ier
+        end subroutine lmijll
+        subroutine mcijll(kfildo,xi,yj,xmeshl,xlat,xlatll,xlonll,alat,alon) ! in :_tdlpack:mcijll.f
+            integer :: kfildo
+            real :: xi
+            real :: yj
+            real :: xmeshl
+            real :: xlat
+            real :: xlatll
+            real :: xlonll
+            real :: alat
+            real :: alon
+        end subroutine mcijll
+        subroutine psijll(kfildo,xi,yj,xmeshl,orient,xlat,xlatll,xlonll,alat,alon) ! in :_tdlpack:psijll.f
+            integer :: kfildo
+            real :: xi
+            real :: yj
+            real :: xmeshl
+            real :: orient
+            real :: xlat
+            real :: xlatll
+            real :: xlonll
+            real :: alat
+            real :: alon
+        end subroutine psijll
+        subroutine gridij_to_latlon(nx,ny,mproj,xmeshl,orient,xlat,xlatll,xlonll,lats,lons,ier) ! in :_tdlpack:gridij_to_latlon.f
+            integer intent(in) :: nx
+            integer intent(in) :: ny
+            integer intent(in) :: mproj
+            real intent(in) :: xmeshl
+            real intent(in) :: orient
+            real intent(in) :: xlat
+            real intent(in) :: xlatll
+            real intent(in) :: xlonll
+            real dimension(nx,ny),intent(out),depend(nx,ny) :: lats
+            real dimension(nx,ny),intent(out),depend(nx,ny) :: lons
+            integer intent(out) :: ier
+        end subroutine gridij_to_latlon
     end interface 
 end python module _tdlpack
 
