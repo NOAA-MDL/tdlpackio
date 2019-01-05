@@ -378,6 +378,27 @@ class TdlpackRecord(object):
                 self.data = np.where(self.data==self.primary_missing_value,np.float32(missing_value),self.data)
                 self.primary_missing_value = np.float32(missing_value)
     
+    def grid(self):
+        """
+        Returns latitudes and lontiude numpy.float32 arrays for the TDLPACK record. 
+        If the record is station, then return is None.
+
+        Returns
+        -------
+        lats,lons : array_like if TdlpackRecord is type = "grid", otherwise None are returned.
+        """
+        lats = None
+        lons = None
+        if self.type == 'grid':
+            _ier = np.int32(0)
+            lats = np.zeros((self.nx,self.ny),dtype=np.float32,order="F")
+            lons = np.zeros((self.nx,self.ny),dtype=np.float32,order="F")
+            lats,lons,_ier = _tdlpack.gridij_to_latlon(self.nx,self.ny,self.map_proj,
+                             self.grid_length,self.origin_longitude,
+                             self.standard_latitude,self.lower_left_latitude,
+                             self.lower_left_longitude)
+        return lats,lons
+
 class TdlpackStationRecord(object):
     """
     Defines a TDLPACK Station Call Letter Record.
