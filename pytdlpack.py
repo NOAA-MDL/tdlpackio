@@ -180,6 +180,7 @@ class TdlpackFile(object):
             _tdlpack.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,np.int32(64/L3264B),_ntotby,_ntotrc,_ier)
         if _ier == 0:
             self.position += 1
+            self.size = os.path.getsize(self.name)
 
 class TdlpackRecord(object):
     """
