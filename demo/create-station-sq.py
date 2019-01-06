@@ -7,11 +7,6 @@ import pytdlpack
 import numpy as np
 
 # ---------------------------------------------------------------------------------------- 
-# Constants
-# ---------------------------------------------------------------------------------------- 
-ND7 = 54 # Size of is* arrays
-
-# ---------------------------------------------------------------------------------------- 
 # Open new TDLPACK file. Here we use pytdlpack.open() which is a function that returns
 # an instance (i.e. an object) of class pytdlpack.TdlpackFile.
 # ---------------------------------------------------------------------------------------- 
@@ -29,8 +24,10 @@ f.write(stationrec) # write() is a method of class TdlpackFile.
 
 # ---------------------------------------------------------------------------------------- 
 # Define TDLPACK Identification Sections
+#
+# NOTE: The pytdlpack module contains constansts to use!  -- Like ND7
 # ---------------------------------------------------------------------------------------- 
-is1 = np.zeros((ND7),dtype=np.int32)
+is1 = np.zeros((pytdlpack.ND7),dtype=np.int32)
 is1[0] = 0 
 is1[1] = 0
 is1[2] = 2018
@@ -54,8 +51,8 @@ is1[19] = 0
 is1[20] = 0
 is1[21] = 32
 plain = "OBS TEMPERATURE"
-is2 = np.zeros((ND7),dtype=np.int32) # Leave is2 empty since we are not packing a gridded record.
-is4 = np.zeros((ND7),dtype=np.int32)
+is2 = np.zeros((pytdlpack.ND7),dtype=np.int32) # Leave is2 empty since we are not packing a gridded record.
+is4 = np.zeros((pytdlpack.ND7),dtype=np.int32)
 is4[0] = 0
 is4[1] = 0
 is4[2] = stationrec.number_of_stations
@@ -78,6 +75,9 @@ f.write(temprec) # The packed temperature record has been written to file.
 # ---------------------------------------------------------------------------------------- 
 f.close()
 
+# ----------------------------------------------------------------------------------------
+# Re-open file.
+# ----------------------------------------------------------------------------------------
 del f
 f = pytdlpack.open("station.sq",mode="r")
 recs = f.read(all=True)
