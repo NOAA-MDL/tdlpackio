@@ -14,6 +14,8 @@ if __name__ == "__main__":
     if "build" in sys.argv:
         if "--fcompiler=gnu95" in sys.argv:
             tdlpack_fortran_args = ["-O3",
+                                    "-g",
+                                    "-fbacktrace",
                                     "-fd-lines-as-comments",
                                     "-ffixed-form",
                                     "-fautomatic",
