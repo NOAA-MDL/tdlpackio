@@ -449,6 +449,14 @@ python module _tdlpack ! in
             real dimension(nx,ny),intent(out),depend(nx,ny) :: lons
             integer intent(out) :: ier
         end subroutine gridij_to_latlon
+        subroutine backspacefile(lun,ier) ! in :_tdlpack:fileaction.f
+            integer intent(in) :: lun
+            integer intent(out) :: ier
+        end subroutine backspacefile
+        subroutine rewindfile(lun,ier) ! in :_tdlpack:fileaction.f
+            integer intent(in) :: lun
+            integer intent(out) :: ier
+        end subroutine rewindfile
     end interface 
 end python module _tdlpack
 
