@@ -17,12 +17,14 @@ except ImportError:
     raise ImportError("_tdlpack not found.")
 
 _DEFAULT_L3264B = np.int32(32)
+_DEFAULT_MINPK = np.int32(14)
 _DEFAULT_ND5 = np.int32(5242880)
 _DEFAULT_ND7 = np.int32(54)
 
 DEFAULT_MISSING_VALUE = np.float32(9999.0)
 FORTRAN_STDOUT_LUN = np.int32(6)
 L3264B = _DEFAULT_L3264B
+MINPK = _DEFAULT_MINPK
 NCHAR = np.int32(8)
 NCHAR_PLAIN = np.int32(32)
 ND5 = _DEFAULT_ND5
@@ -32,6 +34,7 @@ NBYPWD = np.int32(L3264B/8)
 
 _ccall = []
 _ier = np.int32(0)
+_lx = np.int32(0)
 _misspx = np.int32(0)
 _misssx = np.int32(0)
 _is0 = np.zeros((ND7),dtype=np.int32)
@@ -287,8 +290,6 @@ class TdlpackRecord(object):
         Pack a TDLPACK record.
         """
         _ier = np.int32(0)
-        _minpk = np.int32(14)
-        _lx = np.int32(0)
         self.ipack = np.zeros((ND5),dtype=np.int32)
         if self.type == 'grid':
             _a = np.zeros((self.nx,self.ny),dtype=np.float32,order="F")
@@ -296,12 +297,12 @@ class TdlpackRecord(object):
             _ic = np.zeros((self.nx*self.ny),dtype=np.int32)
             self.ioctet,_ier = _tdlpack.pack2d(FORTRAN_STDOUT_LUN,self.data,_ia,_ic,self.is0,
                                self.is1,self.is2,self.is4,self.primary_missing_value,
-                               self.secondary_missing_value,self.ipack,_minpk,_lx,L3264B)
+                               self.secondary_missing_value,self.ipack,MINPK,_lx,L3264B)
         elif self.type == 'station':
             _ic = np.zeros((self.number_of_values),dtype=np.int32)
             self.ioctet,_ier = _tdlpack.pack1d(FORTRAN_STDOUT_LUN,self.data,_ic,self.is0,
                                self.is1,self.is2,self.is4,self.primary_missing_value,
-                               self.secondary_missing_value,self.ipack,_minpk,
+                               self.secondary_missing_value,self.ipack,MINPK,
                                _lx,L3264B)
     
     def unpack(self,data=False,missing_value=None):
@@ -377,6 +378,8 @@ class TdlpackRecord(object):
             if missing_value is not None:
                 self.data = np.where(self.data==self.primary_missing_value,np.float32(missing_value),self.data)
                 self.primary_missing_value = np.float32(missing_value)
+            if self.type == "grid":
+                self.data = np.reshape(self.data[0:self.number_of_values],(self.nx,self.ny),order="F")
     
     def grid(self):
         """
@@ -517,19 +520,22 @@ def open(name,mode='r'):
     _ier = np.int32(0)
     _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(os.path.abspath(name),mode)
 
-    kwargs = {}
-    if _byteorder == -1:
-        kwargs['byte_order'] = '<'
-    elif _byteorder == 1:
-        kwargs['byte_order'] = '>'
-    if _filetype == 1:
-        kwargs['format'] = 'random-access'
-    elif _filetype == 2:
-        kwargs['format'] = 'sequential'
-    kwargs['fortran_lun'] = deepcopy(_lun)
-    kwargs['mode'] = mode
-    kwargs['name'] = os.path.abspath(name)
-    kwargs['position'] = np.int32(0)
-    kwargs['size'] = os.path.getsize(name)
+    if _ier == 0:
+        kwargs = {}
+        if _byteorder == -1:
+            kwargs['byte_order'] = '<'
+        elif _byteorder == 1:
+            kwargs['byte_order'] = '>'
+        if _filetype == 1:
+            kwargs['format'] = 'random-access'
+        elif _filetype == 2:
+            kwargs['format'] = 'sequential'
+        kwargs['fortran_lun'] = deepcopy(_lun)
+        kwargs['mode'] = mode
+        kwargs['name'] = os.path.abspath(name)
+        kwargs['position'] = np.int32(0)
+        kwargs['size'] = os.path.getsize(name)
+    else:
+        raise IOError("Could not open TDLPACK file"+name+". Error return from _tdlpack.openfile = "+str(_ier))
 
     return TdlpackFile(**kwargs)
