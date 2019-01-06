@@ -9,6 +9,7 @@
       integer, intent(out) :: ier
 
       integer :: ios,itemp
+      character(len=:), allocatable :: caccess
       character(len=:), allocatable :: cstatus
       character(len=20) :: convertx
 
@@ -24,11 +25,9 @@
       ienter=ienter+1
 
       if(mode.eq."r".or.mode.eq."a")then
-         if(mode.eq."r")cstatus="old"
-         if(mode.eq."a")cstatus="append"
 
          open(unit=lun,file=file,form="unformatted",access="stream",
-     +        status=cstatus,iostat=ios)
+     +        status="old",iostat=ios)
          read(lun,iostat=ios)itemp
          close(lun)
 
@@ -38,16 +37,23 @@
          else
             call ckfilend(6,lun,file,isysend,byteorder,convertx,ier)
             ftype=2
+            cstatus="old"
+            if(mode.eq."r")caccess="sequential"
+            if(mode.eq."a")caccess="append"
             open(unit=lun,file=file,form="unformatted",
-     +           convert="big_endian",status=cstatus,iostat=ios)
+     +           convert="big_endian",status=cstatus,iostat=ios,
+     +           access=caccess)
          endif
+
       elseif(mode.eq."w".or.mode.eq."x")then
+
          if(mode.eq."w")cstatus="replace"
          if(mode.eq."x")cstatus="new"
          byteorder=1
          ftype=2
          open(unit=lun,file=file,form="unformatted",
      +        convert="big_endian",status=cstatus,iostat=ios)
+
       endif
 
       ier=ios
