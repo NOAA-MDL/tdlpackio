@@ -94,6 +94,17 @@ class TdlpackFile(object):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
 
+    def backspace(self):
+        """
+        Position file backwards by one record.
+        """
+        _ier = np.int32(0)
+        _ier = _tdlpack.backspacefile(self.fortran_lun)
+        if _ier == 0:
+            self.position -= 1
+        else:
+            raise IOError()
+
     def close(self):
         """
         Close a TDLPACK file.
@@ -121,6 +132,9 @@ class TdlpackFile(object):
         -------
         TdlpackStationRecord, TdlpackRecord, or TdlpackTrailerRecord
         """
+        if self.fortran_lun == -1:
+            raise IOError("File is not opened.")
+
         records = []
         while True:
             _ipack = np.array((),dtype=np.int32)
@@ -164,10 +178,26 @@ class TdlpackFile(object):
         else:
             if not self.eof: return record
     
+    def rewind(self):
+        """
+        Position file to the beginning.
+        """
+        _ier = np.int32(0)
+        _ier = _tdlpack.rewindfile(self.fortran_lun)
+        if _ier == 0:
+            self.position = 0
+        else:
+            raise IOError()
+
     def write(self,record):
         """
         Write a packed TDLPACK record to file.
         """
+        if self.fortran_lun == -1:
+            raise IOError("File is not opened.")
+        if self.mode == "r":
+            raise IOError("File is read-only.")
+
         _ier = np.int32(0)
         _ntotby = np.int32(0)
         _ntotrc = np.int32(0)
