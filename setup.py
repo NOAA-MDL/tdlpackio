@@ -47,6 +47,7 @@ if __name__ == "__main__":
                              "tdlpack/ckraend.f",
                              "tdlpack/cksysend.f",
                              "tdlpack/closefile.f",
+                             "tdlpack/fileaction.f",
                              "tdlpack/gridij_to_latlon.f",
                              "tdlpack/lmijll.f",
                              "tdlpack/mcijll.f",
