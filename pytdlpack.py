@@ -98,12 +98,15 @@ class TdlpackFile(object):
         """
         Position file backwards by one record.
         """
+        if self.fortran_lun == -1:
+            raise IOError("File is not opened.")
+
         _ier = np.int32(0)
         _ier = _tdlpack.backspacefile(self.fortran_lun)
         if _ier == 0:
             self.position -= 1
         else:
-            raise IOError()
+            raise IOError("Could not backspace file. ier = "+str(_ier))
 
     def close(self):
         """
@@ -116,6 +119,8 @@ class TdlpackFile(object):
             self.fortran_lun = -1
             self.position = 0
             type(self).counter -= 1
+        else:
+            raise IOError("Trouble closing file. ier = "+str(_ier))
     
     def read(self,all=False,unpack=True):
         """
@@ -130,7 +135,7 @@ class TdlpackFile(object):
         
         Returns
         -------
-        TdlpackStationRecord, TdlpackRecord, or TdlpackTrailerRecord
+        TdlpackStationRecord, TdlpackRecord, TdlpackTrailerRecord, or None
         """
         if self.fortran_lun == -1:
             raise IOError("File is not opened.")
@@ -173,6 +178,9 @@ class TdlpackFile(object):
                 else:
                     break
 
+            else:
+                raise IOError("Error reading file. ier = ",str(_ier))
+
         if len(records) > 0:
             return records
         else:
@@ -182,12 +190,15 @@ class TdlpackFile(object):
         """
         Position file to the beginning.
         """
+        if self.fortran_lun == -1:
+            raise IOError("File is not opened.")
+
         _ier = np.int32(0)
         _ier = _tdlpack.rewindfile(self.fortran_lun)
         if _ier == 0:
             self.position = 0
         else:
-            raise IOError()
+            raise IOError("Could not rewind file. ier = "+str(_ier))
 
     def write(self,record):
         """
