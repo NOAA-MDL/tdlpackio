@@ -2,6 +2,7 @@
 # Import modules
 # ---------------------------------------------------------------------------------------- 
 from numpy.distutils.core import setup, Extension
+import glob
 import os
 import sys
 
@@ -40,43 +41,11 @@ if __name__ == "__main__":
 
     # Define Extension object. For Fortran 77 source files, use "extra_f77_compile_args".
     # For Fortran 90+ source files, use "extra_f90_compile_args".
+    fortran_sources = glob.glob("tdlpack/*.f")
     ext = Extension(name  = '_tdlpack',
-                  sources = ["tdlpack/_tdlpack.pyf",
-                             "tdlpack/bswap.f",
-                             "tdlpack/ckfilend.f",
-                             "tdlpack/ckraend.f",
-                             "tdlpack/cksysend.f",
-                             "tdlpack/closefile.f",
-                             "tdlpack/fileaction.f",
-                             "tdlpack/gridij_to_latlon.f",
-                             "tdlpack/lmijll.f",
-                             "tdlpack/mcijll.f",
-                             "tdlpack/openfile.f",
-                             "tdlpack/pack.f",
-                             "tdlpack/pack1d.f",
-                             "tdlpack/pack2d.f",
-                             "tdlpack/packgp.f",
-                             "tdlpack/packxx.f",
-                             "tdlpack/packyy.f",
-                             "tdlpack/pkbg.f",
-                             "tdlpack/pkc4lx.f",
-                             "tdlpack/pkms00.f",
-                             "tdlpack/pkms97.f",
-                             "tdlpack/pkms99.f",
-                             "tdlpack/pks4lx.f",
-                             "tdlpack/psijll.f",
-                             "tdlpack/readfile.f",
-                             "tdlpack/reduce.f",
-                             "tdlpack/trail.f",
-                             "tdlpack/unpack.f",
-                             "tdlpack/unpkbg.f",
-                             "tdlpack/unpklx.f",
-                             "tdlpack/unpkoo.f",
-                             "tdlpack/unpkpo.f",
-                             "tdlpack/unpkps.f",
-                             "tdlpack/writep.f",
-                             "tdlpack/xfer1d2d.f"],
-    extra_f77_compile_args = tdlpack_fortran_args)
+                    sources = ["tdlpack/_tdlpack.pyf"]+glob.glob("tdlpack/*.f"),
+                    extra_f77_compile_args = tdlpack_fortran_args
+                    )
 
     # Run setup
     setup(name = 'pytdlpack',
