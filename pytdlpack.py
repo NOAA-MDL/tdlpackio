@@ -3,6 +3,7 @@ __version__ = '0.5.0'
 from copy import deepcopy
 from itertools import count
 
+import __builtin__
 import os
 import struct
 import sys
@@ -82,6 +83,7 @@ class TdlpackFile(object):
         self.mode = ''
         self.name = ''
         self.position = np.int32(0)
+        self.ra_master_key = None
         for k, v in kwargs.items():
             setattr(self,k,v)
 
@@ -101,19 +103,23 @@ class TdlpackFile(object):
         if self.fortran_lun == -1:
             raise IOError("File is not opened.")
 
-        _ier = np.int32(0)
-        _ier = _tdlpack.backspacefile(self.fortran_lun)
-        if _ier == 0:
-            self.position -= 1
-        else:
-            raise IOError("Could not backspace file. ier = "+str(_ier))
+        if self.format == 'sequential':
+            _ier = np.int32(0)
+            _ier = _tdlpack.backspacefile(self.fortran_lun)
+            if _ier == 0:
+                self.position -= 1
+            else:
+                raise IOError("Could not backspace file. ier = "+str(_ier))
 
     def close(self):
         """
         Close a TDLPACK file.
         """
         _ier = np.int32(0)
-        _ier = _tdlpack.closefile(self.fortran_lun)
+        if self.format == 'random-access':
+            _ier = _tdlpack.closefile(self.fortran_lun,np.int32(1))
+        elif self.format == 'sequential':
+            _ier = _tdlpack.closefile(self.fortran_lun,np.int32(2))
         if _ier == 0:
             self.eof = False
             self.fortran_lun = -1
@@ -145,7 +151,12 @@ class TdlpackFile(object):
             _ipack = np.array((),dtype=np.int32)
             _ioctet = np.int32(0)
             _ier = np.int32(0)
-            _ipack,_ioctet,_ier = _tdlpack.readfile(self.fortran_lun,ND5,L3264B)
+            if self.format == 'random-access':
+                _id = np.int32([9999,0,0,0])
+                _ioctet,_ipack,_ier = _tdlpack.readfile(self.name,self.fortran_lun,ND5,L3264B,np.int32(1),id=_id)
+                print "IER",_ier
+            elif self.format == 'sequential':
+                _ioctet,_ipack,_ier = _tdlpack.readfile(self.name,self.fortran_lun,ND5,L3264B,np.int32(2))
             if _ier == -1:
                 self.eof = True
                 break
@@ -193,12 +204,13 @@ class TdlpackFile(object):
         if self.fortran_lun == -1:
             raise IOError("File is not opened.")
 
-        _ier = np.int32(0)
-        _ier = _tdlpack.rewindfile(self.fortran_lun)
-        if _ier == 0:
-            self.position = 0
-        else:
-            raise IOError("Could not rewind file. ier = "+str(_ier))
+        if self.format == 'sequential':
+            _ier = np.int32(0)
+            _ier = _tdlpack.rewindfile(self.fortran_lun)
+            if _ier == 0:
+                self.position = 0
+            else:
+                raise IOError("Could not rewind file. ier = "+str(_ier))
 
     def write(self,record):
         """
@@ -215,11 +227,24 @@ class TdlpackFile(object):
 
         if type(record) is TdlpackStationRecord:
             if self.position == 0: self.data_type = 'station'
-            _ier = _tdlpack.writefile(self.fortran_lun,L3264B,record.ioctet,record.ipack)
+            if self.format == 'random-access':
+                _nreplace = np.int32(0)
+                _ncheck = np.int32(0)
+                _ier = _tdlpack.writefile(self.name,self.fortran_lun,L3264B,np.int32(1),record.ioctet,
+                                          record.ipack,nreplace=_nreplace,ncheck=_ncheck)
+            elif self.format == 'sequential':
+                _ier = _tdlpack.writefile(self.fortran_lun,L3264B,record.ioctet,record.ipack)
         elif type(record) is TdlpackRecord:
             if self.position == 0: self.data_type = 'grid'
             _nwords = np.int32((record.ioctet*8)/L3264B)
-            _tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,record.ipack[0:_nwords],_ntotby,_ntotrc,L3264B,_ier)
+            if self.format == 'sequential':
+                _tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,record.ipack[0:_nwords],
+                                _ntotby,_ntotrc,L3264B,_ier)
+            elif self.format == 'random-access':
+                _nreplace = np.int32(0)
+                _ncheck = np.int32(0)
+                _ier = _tdlpack.writefile(self.name,self.fortran_lun,L3264B,np.int32(1),record.ioctet,
+                                          record.ipack,nreplace=_nreplace,ncheck=_ncheck)
         elif type(record) is TdlpackTrailerRecord:
             _tdlpack.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,np.int32(64/L3264B),_ntotby,_ntotrc,_ier)
         if _ier == 0:
@@ -409,8 +434,9 @@ class TdlpackRecord(object):
             _nd5_local = max(self.is4[2],(self.ioctet/NBYPWD))
             _iwork = np.zeros((_nd5_local),dtype=np.int32)
             _data = np.zeros((_nd5_local),dtype=np.float32)
-            _data,_ier = _tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:_nd5_local],_iwork,self.is0,self.is1,self.is2,
-                                         self.is4,_misspx,_misssx,np.int32(2),L3264B)
+            _data,_ier = _tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:_nd5_local],
+                                         _iwork,self.is0,self.is1,self.is2,self.is4,
+                                         _misspx,_misssx,np.int32(2),L3264B)
             if _ier == 0:
                 _data = deepcopy(_data[0:self.number_of_values+1])
             else:
@@ -537,7 +563,7 @@ class TdlpackTrailerRecord(object):
     def unpack(self):
         pass
     
-def open(name,mode='r'):
+def open(name,mode='r',format=None,ra_template=None):
     """
     Open a TDLPACK File.
 
@@ -545,10 +571,16 @@ def open(name,mode='r'):
     ----------
     name : str
         TDLPACK File name.
-    mode : {'r', 'w', 'a', 'x'}
+    mode : {'r', 'w', 'a', 'x'}, optional
         Access mode. 'r' means read only; 'w' means write (existing file is overwritten);
         'a' means to append to the existing file; 'x' means to write to a new file (if
         the file exists, an error is raised).
+    format : {'sequential', 'random-access'}, optional
+        Type of TDLPACK File when creating a new file.  This parameter is ignored if the
+        file access mode is 'r' or 'a'.
+    ra_template : {'small', 'large'}, optional
+        How to initialize a new random-access file. The default is 'small'.  This parameter
+        is ignored for existing files, or if the file format is 'sequential'.
     
     Returns
     -------
@@ -559,7 +591,29 @@ def open(name,mode='r'):
     _filetype = np.int32(0)
     _lun = np.int32(0)
     _ier = np.int32(0)
-    _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(os.path.abspath(name),mode)
+    name = os.path.abspath(name)
+
+    if not format: format == 'sequential'
+
+    if mode == 'w' or mode == 'x':
+
+        if format == 'random-access':
+            if not ra_template: ra_template = 'small'
+            if ra_template == 'small':
+                _maxent = np.int32(300)
+                _nbytes = np.int32(2000)
+            elif ra_template == 'large':
+                _maxent = np.int32(840)
+                _nbytes = np.int32(20000)
+            _filetype = np.int32(1)
+            _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(name,mode,L3264B,_byteorder,_filetype,
+                                             ra_maxent=_maxent,ra_nbytes=_nbytes)
+        elif format == 'sequential':
+            _filetype = np.int32(2)
+            _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(name,mode,L3264B,_byteorder,_filetype)
+
+    elif mode == 'r' or mode == 'a':
+        _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(name,mode,L3264B,_byteorder,_filetype)
 
     if _ier == 0:
         kwargs = {}
@@ -569,14 +623,21 @@ def open(name,mode='r'):
             kwargs['byte_order'] = '>'
         if _filetype == 1:
             kwargs['format'] = 'random-access'
+            kwargs['ra_master_key'] = _read_ra_master_key(name)
         elif _filetype == 2:
             kwargs['format'] = 'sequential'
         kwargs['fortran_lun'] = deepcopy(_lun)
         kwargs['mode'] = mode
-        kwargs['name'] = os.path.abspath(name)
+        kwargs['name'] = name
         kwargs['position'] = np.int32(0)
         kwargs['size'] = os.path.getsize(name)
     else:
         raise IOError("Could not open TDLPACK file"+name+". Error return from _tdlpack.openfile = "+str(_ier))
 
     return TdlpackFile(**kwargs)
+
+def _read_ra_master_key(file):
+    f = __builtin__.open(file,'rb')
+    raw = f.read(24)
+    f.close()
+    return np.fromstring(raw,dtype='>i4')
