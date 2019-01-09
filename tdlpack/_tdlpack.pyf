@@ -3,44 +3,21 @@
 
 python module _tdlpack ! in 
     interface  ! in :_tdlpack
-        subroutine bswap(nval) ! in :_tdlpack:bswap.f
-            real :: nval
-        end subroutine bswap
-        subroutine ckfilend(kfildo,funit,fname,isysend,ifilend,convertx,ier) ! in :_tdlpack:ckfilend.f
-            integer :: kfildo
-            integer :: funit
-            character*60 :: fname
-            integer :: isysend
-            integer :: ifilend
-            character*20 :: convertx
-            integer :: ier
-        end subroutine ckfilend
-        subroutine ckraend(kfildo,kfilx,cfilx,isysend,ifilend,convertx,ier) ! in :_tdlpack:ckraend.f
-            integer :: kfildo
-            integer :: kfilx
-            character*60 :: cfilx
-            integer :: isysend
-            integer :: ifilend
-            character*20 :: convertx
-            integer :: ier
-        end subroutine ckraend
-        subroutine cksysend(kfildo,cprint,isysend,ier) ! in :_tdlpack:cksysend.f
-            integer :: kfildo
-            character*10 :: cprint
-            integer :: isysend
-            integer :: ier
-        end subroutine cksysend
-        subroutine closefile(lun,ier) ! in :_tdlpack:closefile.f
+        subroutine closefile(lun,ftype,ier) ! in :_tdlpack:closefile.f
             integer intent(in) :: lun
+            integer intent(in) :: ftype
             integer intent(out) :: ier
         end subroutine closefile
-        subroutine openfile(file,mode,lun,byteorder,ftype,ier) ! in :_tdlpack:openfile.f
+        subroutine openfile(file,mode,l3264b,lun,byteorder,ftype,ier,ra_maxent,ra_nbytes) ! in :_tdlpack:openfile.f
             character*(*) intent(in) :: file
             character*(*) intent(in) :: mode
+            integer intent(in) :: l3264b
             integer intent(out) :: lun
-            integer intent(out) :: byteorder
-            integer intent(out) :: ftype
+            integer intent(in,out) :: byteorder
+            integer intent(in,out) :: ftype
             integer intent(out) :: ier
+            integer, optional,intent(in) :: ra_maxent
+            integer, optional,intent(in) :: ra_nbytes
         end subroutine openfile
         subroutine pack(kfildo,ic,nxy,is0,is1,is2,is4,nd7,ipack,nd5,second,ifirst,ifod,missp,misss,minpk,lx,ioctet,l3264b,ier) ! in :_tdlpack:pack.f
             integer :: kfildo
@@ -106,180 +83,29 @@ python module _tdlpack ! in
             integer :: l3264b
             integer intent(out) :: ier
         end subroutine pack2d
-        subroutine packgp(kfildo,ic,nxy,minpk,inc,missp,misss,jmin,jmax,lbit,nov,ndg,lx,ibit,jbit,kbit) ! in :_tdlpack:packgp.f
-            integer :: kfildo
-            integer dimension(nxy) :: ic
-            integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
-            integer :: minpk
-            integer :: inc
-            integer :: missp
-            integer :: misss
-            integer dimension(ndg) :: jmin
-            integer dimension(ndg),depend(ndg) :: jmax
-            integer dimension(ndg),depend(ndg) :: lbit
-            integer dimension(ndg),depend(ndg) :: nov
-            integer, optional,check(len(jmin)>=ndg),depend(jmin) :: ndg=len(jmin)
-            integer :: lx
-            integer :: ibit
-            integer :: jbit
-            integer :: kbit
-        end subroutine packgp
-        subroutine packxx(kfildo,ic,ia,nxy,minpk,ifirst,ifod,second) ! in :_tdlpack:packxx.f
-            integer :: kfildo
-            integer dimension(nxy) :: ic
-            integer dimension(nxy),depend(nxy) :: ia
-            integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
-            integer :: minpk
-            integer :: ifirst
-            integer :: ifod
-            logical :: second
-        end subroutine packxx
-        subroutine packyy(kfildo,ic,ia,ipack,nxy,missp,minpk,ifirst,ifod,second) ! in :_tdlpack:packyy.f
-            integer :: kfildo
-            integer dimension(nxy) :: ic
-            integer dimension(nxy),depend(nxy) :: ia
-            integer dimension(nxy),depend(nxy) :: ipack
-            integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
-            integer :: missp
-            integer :: minpk
-            integer :: ifirst
-            integer :: ifod
-            logical :: second
-        end subroutine packyy
-        subroutine pkbg(kfildo,ipack,nd5,loc,ipos,nvalue,nbit,l3264b,ier,e__er) ! in :_tdlpack:pkbg.f
-            integer :: kfildo
-            integer dimension(nd5) :: ipack
-            integer, optional,check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
-            integer :: loc
-            integer :: ipos
-            integer :: nvalue
-            integer :: nbit
-            integer :: l3264b
-            integer :: ier
-            real :: e__er
-        end subroutine pkbg
-        subroutine pkc4lx(kfildo,ipack,ndx,loc,ipos,ic,nxy,nov,lbit,lx,l3264b,ier) ! in :_tdlpack:pkc4lx.f
-            integer :: kfildo
-            integer dimension(ndx) :: ipack
-            integer, optional,check(len(ipack)>=ndx),depend(ipack) :: ndx=len(ipack)
-            integer :: loc
-            integer :: ipos
-            integer dimension(nxy) :: ic
-            integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
-            integer dimension(lx) :: nov
-            integer dimension(lx),depend(lx) :: lbit
-            integer, optional,check(len(nov)>=lx),depend(nov) :: lx=len(nov)
-            integer :: l3264b
-            integer :: ier
-        end subroutine pkc4lx
-        subroutine pkms00(kfildo,is1,nd7,ic,nxy,minpk,inc,missp,misss,jmax,jmin,lbit,nov,ndg,lx,ibit,jbit,kbit,mina) ! in :_tdlpack:pkms00.f
-            integer :: kfildo
-            integer dimension(nd7) :: is1
-            integer, optional,check(len(is1)>=nd7),depend(is1) :: nd7=len(is1)
-            integer dimension(nxy) :: ic
-            integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
-            integer :: minpk
-            integer :: inc
-            integer :: missp
-            integer :: misss
-            integer dimension(ndg) :: jmax
-            integer dimension(ndg),depend(ndg) :: jmin
-            integer dimension(ndg),depend(ndg) :: lbit
-            integer dimension(ndg),depend(ndg) :: nov
-            integer, optional,check(len(jmax)>=ndg),depend(jmax) :: ndg=len(jmax)
-            integer :: lx
-            integer :: ibit
-            integer :: jbit
-            integer :: kbit
-            integer :: mina
-        end subroutine pkms00
-        subroutine pkms97(kfildo,is1,nd7,ic,nxy,minpk,inc,missp,misss,jmax,jmin,lbit,nov,ndg,lx,ibit,jbit,kbit,mina,ier) ! in :_tdlpack:pkms97.f
-            integer :: kfildo
-            integer dimension(nd7) :: is1
-            integer, optional,check(len(is1)>=nd7),depend(is1) :: nd7=len(is1)
-            integer dimension(nxy) :: ic
-            integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
-            integer :: minpk
-            integer :: inc
-            integer :: missp
-            integer :: misss
-            integer dimension(ndg) :: jmax
-            integer dimension(ndg),depend(ndg) :: jmin
-            integer dimension(ndg),depend(ndg) :: lbit
-            integer dimension(ndg),depend(ndg) :: nov
-            integer, optional,check(len(jmax)>=ndg),depend(jmax) :: ndg=len(jmax)
-            integer :: lx
-            integer :: ibit
-            integer :: jbit
-            integer :: kbit
-            integer :: mina
-            integer :: ier
-        end subroutine pkms97
-        subroutine pkms99(kfildo,is1,nd7,ic,nxy,minpk,inc,missp,misss,jmax,jmin,lbit,nov,ndg,lx,ibit,jbit,kbit,mina,ier) ! in :_tdlpack:pkms99.f
-            integer :: kfildo
-            integer dimension(nd7) :: is1
-            integer, optional,check(len(is1)>=nd7),depend(is1) :: nd7=len(is1)
-            integer dimension(nxy) :: ic
-            integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
-            integer :: minpk
-            integer :: inc
-            integer :: missp
-            integer :: misss
-            integer dimension(ndg) :: jmax
-            integer dimension(ndg),depend(ndg) :: jmin
-            integer dimension(ndg),depend(ndg) :: lbit
-            integer dimension(ndg),depend(ndg) :: nov
-            integer, optional,check(len(jmax)>=ndg),depend(jmax) :: ndg=len(jmax)
-            integer :: lx
-            integer :: ibit
-            integer :: jbit
-            integer :: kbit
-            integer :: mina
-            integer :: ier
-        end subroutine pkms99
-        subroutine pks4lx(kfildo,ipack,ndx,loc,ipos,ic,nxy,nbit,l3264b,ier) ! in :_tdlpack:pks4lx.f
-            integer :: kfildo
-            integer dimension(ndx) :: ipack
-            integer, optional,check(len(ipack)>=ndx),depend(ipack) :: ndx=len(ipack)
-            integer :: loc
-            integer :: ipos
-            integer dimension(nxy) :: ic
-            integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
-            integer :: nbit
-            integer :: l3264b
-            integer :: ier
-        end subroutine pks4lx
-        subroutine readfile(lun,nd5,l3264b,ipack,ioctet,ier) ! in :_tdlpack:readfile.f
+        subroutine readfile(file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,id) ! in :_tdlpack:readfile.f
+            character*(*) intent(in) :: file
             integer intent(in) :: lun
             integer intent(in) :: nd5
             integer intent(in) :: l3264b
-            integer dimension(nd5),intent(out),depend(nd5) :: ipack
+            integer intent(in) :: ftype
             integer intent(out) :: ioctet
+            integer dimension(nd5),intent(out),depend(nd5) :: ipack
             integer intent(out) :: ier
+            integer, optional,dimension(4),intent(in) :: id
         end subroutine readfile
-        subroutine writefile(lun,nd5,l3264b,ioctet,ipack,ier) ! in :_tdlpack:readfile.f
+        subroutine writefile(file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,nreplace,ncheck) ! in :_tdlpack:writefile.f
+            character*(*) intent(in) :: file
             integer intent(in) :: lun
             integer, optional,intent(in),check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
             integer intent(in) :: l3264b
+            integer intent(in) :: ftype
             integer intent(in) :: ioctet
             integer dimension(nd5),intent(in) :: ipack
             integer intent(out) :: ier
+            integer, optional,intent(in) :: nreplace
+            integer, optional,intent(in) :: ncheck
         end subroutine writefile
-        subroutine reduce(kfildo,jmin,jmax,lbit,nov,lx,ndg,ibit,jbit,kbit,novref,ibxx2,ier) ! in :_tdlpack:reduce.f
-            integer :: kfildo
-            integer dimension(ndg) :: jmin
-            integer dimension(ndg),depend(ndg) :: jmax
-            integer dimension(ndg),depend(ndg) :: lbit
-            integer dimension(ndg),depend(ndg) :: nov
-            integer :: lx
-            integer, optional,check(len(jmin)>=ndg),depend(jmin) :: ndg=len(jmin)
-            integer :: ibit
-            integer :: jbit
-            integer :: kbit
-            integer :: novref
-            integer dimension(31) :: ibxx2
-            integer :: ier
-        end subroutine reduce
         subroutine trail(kfildo,kfilio,l3264b,l3264w,ntotby,ntotrc,ier) ! in :_tdlpack:trail.f
             integer :: kfildo
             integer :: kfilio
@@ -306,78 +132,6 @@ python module _tdlpack ! in
             integer :: l3264b
             integer intent(out) :: ier
         end subroutine unpack
-        subroutine unpkbg(kfildo,ipack,nd5,loc,ipos,nvalue,nbit,l3264b,ier,e__er) ! in :_tdlpack:unpkbg.f
-            integer :: kfildo
-            integer dimension(nd5) :: ipack
-            integer, optional,check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
-            integer :: loc
-            integer :: ipos
-            integer :: nvalue
-            integer :: nbit
-            integer :: l3264b
-            integer :: ier
-            real :: e__er
-        end subroutine unpkbg
-        subroutine unpklx(kfildo,ipack,ndx,loc,ipos,ic,nxy,nbit,l3264b,ier) ! in :_tdlpack:unpklx.f
-            integer :: kfildo
-            integer dimension(ndx) :: ipack
-            integer, optional,check(len(ipack)>=ndx),depend(ipack) :: ndx=len(ipack)
-            integer :: loc
-            integer :: ipos
-            integer dimension(nxy) :: ic
-            integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
-            integer :: nbit
-            integer :: l3264b
-            integer :: ier
-        end subroutine unpklx
-        subroutine unpkoo(kfildo,ipack,nd5,loc,ipos,mina,jmin,lbit,nov,lx,iwork,l3264b,ier) ! in :_tdlpack:unpkoo.f
-            integer :: kfildo
-            integer dimension(nd5) :: ipack
-            integer, optional,check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
-            integer :: loc
-            integer :: ipos
-            integer :: mina
-            integer dimension(lx) :: jmin
-            integer dimension(lx),depend(lx) :: lbit
-            integer dimension(lx),depend(lx) :: nov
-            integer, optional,check(len(jmin)>=lx),depend(jmin) :: lx=len(jmin)
-            integer dimension(nd5),depend(nd5) :: iwork
-            integer :: l3264b
-            integer :: ier
-        end subroutine unpkoo
-        subroutine unpkpo(kfildo,ipack,nd5,loc,ipos,missp,mina,jmin,lbit,nov,lx,iwork,l3264b,ier) ! in :_tdlpack:unpkpo.f
-            integer :: kfildo
-            integer dimension(nd5) :: ipack
-            integer, optional,check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
-            integer :: loc
-            integer :: ipos
-            integer :: missp
-            integer :: mina
-            integer dimension(lx) :: jmin
-            integer dimension(lx),depend(lx) :: lbit
-            integer dimension(lx),depend(lx) :: nov
-            integer, optional,check(len(jmin)>=lx),depend(jmin) :: lx=len(jmin)
-            integer dimension(nd5),depend(nd5) :: iwork
-            integer :: l3264b
-            integer :: ier
-        end subroutine unpkpo
-        subroutine unpkps(kfildo,ipack,nd5,loc,ipos,missp,misss,mina,jmin,lbit,nov,lx,iwork,l3264b,ier) ! in :_tdlpack:unpkps.f
-            integer :: kfildo
-            integer dimension(nd5) :: ipack
-            integer, optional,check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
-            integer :: loc
-            integer :: ipos
-            integer :: missp
-            integer :: misss
-            integer :: mina
-            integer dimension(lx) :: jmin
-            integer dimension(lx),depend(lx) :: lbit
-            integer dimension(lx),depend(lx) :: nov
-            integer, optional,check(len(jmin)>=lx),depend(jmin) :: lx=len(jmin)
-            integer dimension(nd5),depend(nd5) :: iwork
-            integer :: l3264b
-            integer :: ier
-        end subroutine unpkps
         subroutine writep(kfildo,kfilio,ipack,nwords,ntotby,ntotrc,l3264b,ier) ! in :_tdlpack:writep.f
             integer :: kfildo
             integer :: kfilio
@@ -388,18 +142,6 @@ python module _tdlpack ! in
             integer :: l3264b
             integer :: ier
         end subroutine writep
-        subroutine xfer1d2d(nx,ny,datain,dataout) ! in :_tdlpack:xfer1d2d.f
-            integer intent(in) :: nx
-            integer intent(in) :: ny
-            real dimension(nx*ny),intent(in),depend(nx,ny) :: datain
-            real dimension(nx,ny),intent(out),depend(nx,ny) :: dataout
-        end subroutine xfer1d2d
-        subroutine xfer2d1d(nx,ny,datain,dataout) ! in :_tdlpack:xfer1d2d.f
-            integer, optional,intent(in),check(shape(datain,0)==nx),depend(datain) :: nx=shape(datain,0)
-            integer, optional,intent(in),check(shape(datain,1)==ny),depend(datain) :: ny=shape(datain,1)
-            real dimension(nx,ny),intent(in) :: datain
-            real dimension(nx*ny),intent(out),depend(nx,ny) :: dataout
-        end subroutine xfer2d1d
         subroutine lmijll(kfildo,xi,yj,xmeshl,orient,xlat,xlatll,xlonll,alat,alon,ier) ! in :_tdlpack:lmijll.f
             integer :: kfildo
             real :: xi

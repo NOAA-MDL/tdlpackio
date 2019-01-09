@@ -1,12 +1,16 @@
-      subroutine openfile(file,mode,lun,byteorder,ftype,ier)
+      subroutine openfile(file,mode,l3264b,lun,byteorder,ftype,ier,
+     +                    ra_maxent,ra_nbytes)
       implicit none
 
       character(len=*), intent(in) :: file
       character(len=*), intent(in) :: mode
+      integer, intent(in) :: l3264b
+      integer, intent(inout) :: byteorder
+      integer, intent(inout) :: ftype
       integer, intent(out) :: lun
-      integer, intent(out) :: byteorder
-      integer, intent(out) :: ftype
       integer, intent(out) :: ier
+      integer, intent(in), optional :: ra_maxent
+      integer, intent(in), optional :: ra_nbytes
 
       integer :: ios,itemp
       character(len=:), allocatable :: caccess
@@ -53,13 +57,20 @@
 
       elseif(mode.eq."w".or.mode.eq."x")then
 
-         if(mode.eq."w")cstatus="replace"
-         if(mode.eq."x")cstatus="new"
-         byteorder=1
-         ftype=2
-         open(unit=lun,file=file,form="unformatted",
-     +        convert="big_endian",status=cstatus,
-     +        action=caction,iostat=ios)
+         if(ftype.eq.1)then
+            if(present(ra_maxent).and.present(ra_nbytes))then
+               call createra(file,l3264b,lun,ra_maxent,ra_nbytes,ier)
+               byteorder=1
+            endif
+         elseif(ftype.eq.2)then
+            if(mode.eq."w")cstatus="replace"
+            if(mode.eq."x")cstatus="new"
+            byteorder=1
+            ftype=2
+            open(unit=lun,file=file,form="unformatted",
+     +           convert="big_endian",status=cstatus,
+     +           action=caction,iostat=ios)
+         endif
 
       endif
 
