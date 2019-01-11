@@ -23,8 +23,9 @@ _DEFAULT_ND5 = np.int32(5242880)
 _DEFAULT_ND7 = np.int32(54)
 
 DEFAULT_MISSING_VALUE = np.float32(9999.0)
-FORTRAN_STDOUT_LUN = np.int32(6)
+FORTRAN_STDOUT_LUN = np.int32(12)
 L3264B = _DEFAULT_L3264B
+L3264W = np.int32(64/L3264B)
 MINPK = _DEFAULT_MINPK
 NCHAR = np.int32(8)
 NCHAR_PLAIN = np.int32(32)
@@ -95,6 +96,28 @@ class TdlpackFile(object):
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
+    
+    def _determine_record_type(self,ipack,ioctet):
+        kwargs = {}
+        if ipack[0] > 0:
+            kwargs['ipack'] = deepcopy(ipack)
+            kwargs['ioctet'] = deepcopy(ioctet)
+            if ioctet == 24 and ipack[4] == 9999:
+                kwargs ['id'] = np.int32([0,0,0,0])
+                return TdlpackTrailerRecord(**kwargs)
+            if struct.unpack('>4s',ipack[0].byteswap())[0] == "TDLP":
+                if not self.data_type: self.data_type = 'grid'
+                kwargs['id'] = deepcopy(ipack[5:9])
+                kwargs['reference_date'] = deepcopy(ipack[4])
+                return TdlpackRecord(**kwargs)
+            else:
+                if not self.data_type: self.data_type = 'station'
+                kwargs['id'] = np.int32([400001000,0,0,0])
+                kwargs['number_of_stations'] = deepcopy(ioctet/NCHAR)
+                return TdlpackStationRecord(**kwargs)
+        else:
+            #raise
+            pass #for now
 
     def backspace(self):
         """
@@ -128,7 +151,7 @@ class TdlpackFile(object):
         else:
             raise IOError("Trouble closing file. ier = "+str(_ier))
     
-    def read(self,all=False,unpack=True):
+    def read(self,all=False,unpack=True,id=None):
         """
         Read a record from a TDLPACK file.
 
@@ -138,6 +161,9 @@ class TdlpackFile(object):
             Read all records from file. The default is False.
         unpack : bool, optional
             Unpack TDLPACK identification sections.  Note that data are not unpacked.  The default is True.
+        id : array_like or list, optional
+            Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list 
+            with length 4.
         
         Returns
         -------
@@ -146,56 +172,45 @@ class TdlpackFile(object):
         if self.fortran_lun == -1:
             raise IOError("File is not opened.")
 
+        record = None
         records = []
         while True:
             _ipack = np.array((),dtype=np.int32)
             _ioctet = np.int32(0)
             _ier = np.int32(0)
             if self.format == 'random-access':
-                _id = np.int32([9999,0,0,0])
-                _ioctet,_ipack,_ier = _tdlpack.readfile(self.name,self.fortran_lun,ND5,L3264B,np.int32(1),id=_id)
-                print "IER",_ier
-            elif self.format == 'sequential':
-                _ioctet,_ipack,_ier = _tdlpack.readfile(self.name,self.fortran_lun,ND5,L3264B,np.int32(2))
-            if _ier == -1:
-                self.eof = True
-                break
-            elif _ier == 0:
-                kwargs = {}
-                kwargs['ipack'] = deepcopy(_ipack)
-                kwargs['ioctet'] = deepcopy(_ioctet)
-                if _ipack[0] > 0:
-                    if struct.unpack('>4s',_ipack[0].byteswap())[0] == "TDLP":
-                        kwargs['id'] = deepcopy(_ipack[5:9])
-                        kwargs['reference_date'] = deepcopy(_ipack[4])
-                        record = TdlpackRecord(**kwargs)
-                        if unpack:
-                            record.unpack()
-                            if record.is1[1] == 0:
-                                if self.position == 0: self.data_type = 'station'
-                            elif record.is1[1] == 1:
-                                if self.position == 0: self.data_type = 'grid'
-                    else:
-                        if self.position == 0: self.data_type = 'station'
-                        kwargs['number_of_stations'] = deepcopy(_ioctet/NCHAR)
-                        record = TdlpackStationRecord(**kwargs)
-                        if unpack: record.unpack()
-                elif _ioctet == 24 and _ipack[4] == 9999:
-                    record = TdlpackTrailerRecord(**kwargs)
-
-                self.position += 1
-                if all:
-                    records.append(record)
+                if id is None:
+                    id = np.int32([9999,0,0,0])
                 else:
+                    id = np.int32(id)
+                _nvalue = np.int32(0)
+                #_ioctet,_ipack,_ier = _tdlpack.readfile(FORTRAN_STDOUT_LUN,self.name,self.fortran_lun,ND5,L3264B,np.int32(1),id=id)
+                _ipack,_nvalue,_ier = _tdlpack.rdtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,id,ND5,L3264B)
+                if _ier == 0:
+                    _ioctet = _nvalue*NBYPWD
+                    record = self._determine_record_type(_ipack,_ioctet)
+                elif _ier == 153:
+                    self.eof = True
                     break
-
+                else:
+                    #raise
+                    pass # for now
+            elif self.format == 'sequential':
+                _ioctet,_ipack,_ier = _tdlpack.readfile(FORTRAN_STDOUT_LUN,self.name,self.fortran_lun,ND5,L3264B,np.int32(2))
+                if _ier == 0:
+                    record = self._determine_record_type(_ipack,_ioctet)
+                elif _ier == -1:
+                    self.eof = True
+                    break
+            if unpack: record.unpack()
+            if all:
+                records.append(record)
             else:
-                raise IOError("Error reading file. ier = ",str(_ier))
-
+                break
         if len(records) > 0:
             return records
         else:
-            if not self.eof: return record
+            return record
     
     def rewind(self):
         """
@@ -224,29 +239,31 @@ class TdlpackFile(object):
         _ier = np.int32(0)
         _ntotby = np.int32(0)
         _ntotrc = np.int32(0)
+        _nreplace = np.int32(0)
+        _ncheck = np.int32(0)
 
         if type(record) is TdlpackStationRecord:
             if self.position == 0: self.data_type = 'station'
             if self.format == 'random-access':
-                _nreplace = np.int32(0)
-                _ncheck = np.int32(0)
-                _ier = _tdlpack.writefile(self.name,self.fortran_lun,L3264B,np.int32(1),record.ioctet,
-                                          record.ipack,nreplace=_nreplace,ncheck=_ncheck)
+                record.pack(file_format=self.format)
+                _ier = _tdlpack.wrtdlmc(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
+                                        record.id,record.ipack,
+                                        _nreplace,_ncheck,L3264B)
             elif self.format == 'sequential':
                 _ier = _tdlpack.writefile(self.fortran_lun,L3264B,record.ioctet,record.ipack)
         elif type(record) is TdlpackRecord:
             if self.position == 0: self.data_type = 'grid'
-            _nwords = np.int32((record.ioctet*8)/L3264B)
+            _nwords = np.int32(record.ioctet/NBYPWD)
             if self.format == 'sequential':
                 _tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,record.ipack[0:_nwords],
                                 _ntotby,_ntotrc,L3264B,_ier)
             elif self.format == 'random-access':
-                _nreplace = np.int32(0)
-                _ncheck = np.int32(0)
-                _ier = _tdlpack.writefile(self.name,self.fortran_lun,L3264B,np.int32(1),record.ioctet,
-                                          record.ipack,nreplace=_nreplace,ncheck=_ncheck)
+                _ier = _tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
+                                       record.id,record.ipack[0:_nwords],_nwords,
+                                       _nreplace,_ncheck,L3264B)
         elif type(record) is TdlpackTrailerRecord:
-            _tdlpack.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,np.int32(64/L3264B),_ntotby,_ntotrc,_ier)
+            _tdlpack.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,L3264W,_ntotby,
+                           _ntotrc,_ier)
         if _ier == 0:
             self.position += 1
             self.size = os.path.getsize(self.name)
@@ -334,6 +351,7 @@ class TdlpackRecord(object):
             kwargs['is1'] = is1.astype(np.int32)
             kwargs['is2'] = is2.astype(np.int32)
             kwargs['is4'] = is4.astype(np.int32)
+            kwargs['id'] = np.int32(is1[8:12])
             kwargs['plain'] = plain
             kwargs['data'] = data.astype(np.float32)
             kwargs['_metadata_unpacked'] = True
@@ -476,7 +494,9 @@ class TdlpackStationRecord(object):
     Attributes
     ----------
     ccall : tuple
-        A tuple of station call letter records.
+        A tuple of station call letters.
+    id : array_like
+        ID of station call letters. Note: This id is only used for random-access IO.
     ioctet : int
         Size of station call letter record in bytes.
     ipack : array_like
@@ -503,6 +523,7 @@ class TdlpackStationRecord(object):
         else:
             self.ccall = tuple(ccall)
             self.number_of_stations = len(self.ccall)
+        self.id = np.int32([400001000,0,0,0])
         self.ioctet = np.int32(0)
         self.ipack = np.array((),dtype=np.int32)
         for k, v in kwargs.items():
@@ -516,17 +537,33 @@ class TdlpackStationRecord(object):
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
-
-    def pack(self):
+    
+    def pack(self,file_format='sequential'):
         """
         Pack a Station Call Letter Record.
+
+        Parameters
+        ----------
+        file_format : {'sequential', 'random-access'}
+            Represents the type of station call letter packing that should be performed 
+            according to the TDLPACK file format the packed record will be written to.
         """
-        self.ioctet = self.number_of_stations*NCHAR
-        self.ipack = np.ndarray((self.ioctet/(L3264B/NCHAR)),dtype=np.int32)
-        for n,c in enumerate(self.ccall):
-            sta = c.ljust(NCHAR,' ')
-            self.ipack[n*2] = np.copy(np.fromstring(sta[0:(NCHAR/2)],dtype=np.int32).byteswap())
-            self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[(NCHAR/2):NCHAR],dtype=np.int32).byteswap())
+        self._packed_file_format = file_format
+        if file_format == 'random-access':
+            _temp = []
+            for c in self.ccall:
+                c = c.ljust(NCHAR,' ')
+                for i in range(len(c)):
+                    _temp.append(c[i])
+            self.ioctet = np.int32(self.number_of_stations*NCHAR)
+            self.ipack = np.reshape(np.array(_temp,dtype='c'),(NCHAR/2,self.number_of_stations*2),order='F')
+        elif file_format == 'sequential':
+            self.ioctet = np.int32(self.number_of_stations*NCHAR)
+            self.ipack = np.ndarray((self.ioctet/(L3264B/NCHAR)),dtype=np.int32)
+            for n,c in enumerate(self.ccall):
+                sta = c.ljust(NCHAR,' ')
+                self.ipack[n*2] = np.copy(np.fromstring(sta[0:(NCHAR/2)],dtype=np.int32).byteswap())
+                self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[(NCHAR/2):NCHAR],dtype=np.int32).byteswap())
 
     def unpack(self):
         """
@@ -606,14 +643,14 @@ def open(name,mode='r',format=None,ra_template=None):
                 _maxent = np.int32(840)
                 _nbytes = np.int32(20000)
             _filetype = np.int32(1)
-            _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(name,mode,L3264B,_byteorder,_filetype,
+            _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype,
                                              ra_maxent=_maxent,ra_nbytes=_nbytes)
         elif format == 'sequential':
             _filetype = np.int32(2)
-            _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(name,mode,L3264B,_byteorder,_filetype)
+            _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
 
     elif mode == 'r' or mode == 'a':
-        _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(name,mode,L3264B,_byteorder,_filetype)
+        _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
 
     if _ier == 0:
         kwargs = {}
