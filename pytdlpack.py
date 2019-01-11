@@ -46,6 +46,10 @@ _is4 = np.zeros((ND7),dtype=np.int32)
 _iwork_meta = np.zeros((ND5_META),dtype=np.int32)
 _data_meta = np.zeros((ND5_META),dtype=np.int32)
 
+_ier = _tdlpack.openlog(FORTRAN_STDOUT_LUN,os.devnull)
+if _ier != 0:
+    raise IOError("Cannot write to log file")
+
 class TdlpackFile(object):
     """
     TDLPACK File with associated information.
