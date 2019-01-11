@@ -297,6 +297,11 @@ python module _tdlpack ! in
             integer dimension(2) :: nraend
             common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
         end subroutine wrtdlm
+        subroutine openlog(kstdout,file,ier) ! in :_tdlpack:openlog.f90
+            integer intent(in) :: kstdout
+            character*(*) intent(in) :: file
+            integer intent(out) :: ier
+        end subroutine openlog
     end interface 
 end python module _tdlpack
 
