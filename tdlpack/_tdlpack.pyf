@@ -252,7 +252,8 @@ python module _tdlpack ! in
             character*1024 :: cfilx
             integer dimension(4) :: id
             integer dimension(nsize),intent(out),depend(nsize) :: record
-            integer, optional,check(len(record)>=nsize),depend(record) :: nsize=len(record)
+            integer intent(in) :: nsize
+            !integer, optional,check(len(record)>=nsize),depend(record) :: nsize=len(record)
             integer intent(out) :: nvalue
             integer intent(in):: l3264b
             integer intent(out):: ier
