@@ -184,7 +184,6 @@ class TdlpackFile(object):
                 else:
                     id = np.int32(id)
                 _nvalue = np.int32(0)
-                #_ioctet,_ipack,_ier = _tdlpack.readfile(FORTRAN_STDOUT_LUN,self.name,self.fortran_lun,ND5,L3264B,np.int32(1),id=id)
                 _ipack,_nvalue,_ier = _tdlpack.rdtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,id,ND5,L3264B)
                 if _ier == 0:
                     _ioctet = _nvalue*NBYPWD
