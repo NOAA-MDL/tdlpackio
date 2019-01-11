@@ -85,7 +85,7 @@ python module _tdlpack ! in
             integer :: l3264b
             integer intent(out) :: ier
         end subroutine pack2d
-        subroutine readfile(kstdout,file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,id) ! in :_tdlpack:readfile.f
+        subroutine readfile(kstdout,file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,id) ! in :_tdlpack:readfile.f90
             integer intent(in) :: kstdout
             character*(*) intent(in) :: file
             integer intent(in) :: lun
@@ -97,7 +97,8 @@ python module _tdlpack ! in
             integer intent(out) :: ier
             integer, optional,dimension(4),intent(in) :: id
         end subroutine readfile
-        subroutine writefile(file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,nreplace,ncheck) ! in :_tdlpack:writefile.f
+        subroutine writefile(kstdout,file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,nreplace,ncheck) ! in :_tdlpack:writefile.f90
+            integer intent(in) :: kstdout
             character*(*) intent(in) :: file
             integer intent(in) :: lun
             integer, optional,intent(in),check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
@@ -181,7 +182,8 @@ python module _tdlpack ! in
             real :: alat
             real :: alon
         end subroutine psijll
-        subroutine gridij_to_latlon(nx,ny,mproj,xmeshl,orient,xlat,xlatll,xlonll,lats,lons,ier) ! in :_tdlpack:gridij_to_latlon.f
+        subroutine gridij_to_latlon(kstdout,nx,ny,mproj,xmeshl,orient,xlat,xlatll,xlonll,lats,lons,ier) ! in :_tdlpack:gridij_to_latlon.f90
+            integer intent(in) :: kstdout
             integer intent(in) :: nx
             integer intent(in) :: ny
             integer intent(in) :: mproj
