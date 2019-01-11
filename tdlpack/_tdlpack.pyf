@@ -137,14 +137,14 @@ python module _tdlpack ! in
             integer intent(out) :: ier
         end subroutine unpack
         subroutine writep(kfildo,kfilio,ipack,nwords,ntotby,ntotrc,l3264b,ier) ! in :_tdlpack:writep.f
-            integer :: kfildo
-            integer :: kfilio
+            integer intent(in) :: kfildo
+            integer intent(in) :: kfilio
             integer dimension(nwords) :: ipack
             integer, optional,check(len(ipack)>=nwords),depend(ipack) :: nwords=len(ipack)
-            integer :: ntotby
-            integer :: ntotrc
-            integer :: l3264b
-            integer :: ier
+            integer intent(in,out) :: ntotby
+            integer intent(in,out) :: ntotrc
+            integer intent(in) :: l3264b
+            integer intent(out) :: ier
         end subroutine writep
         subroutine lmijll(kfildo,xi,yj,xmeshl,orient,xlat,xlatll,xlonll,alat,alon,ier) ! in :_tdlpack:lmijll.f
             integer :: kfildo
@@ -205,9 +205,9 @@ python module _tdlpack ! in
             integer intent(out) :: ier
         end subroutine rewindfile
         subroutine clfilm(kfildo,kfilx,ier) ! in :_tdlpack:clfilm.f
-            integer :: kfildo
-            integer :: kfilx
-            integer :: ier
+            integer intent(in) :: kfildo
+            integer intent(in) :: kfilx
+            integer intent(out) :: ier
             integer dimension(2) :: nopen
             integer dimension(2,2) :: lstrd
             character dimension(2,1024),intent(c) :: cfile
@@ -247,18 +247,14 @@ python module _tdlpack ! in
         end subroutine flopnm
         subroutine rdtdlm(kfildo,kfilx,cfilx,id,record,nsize,nvalue,l3264b,ier) ! in :_tdlpack:rdtdlm.f
             ! This interface has been modified from what f2py generated.
-            !   record - Changed from real (as defined in Fortran source via implicit typing) to integer
-            !            which what the data are.
-            !   nsize - Changed to intent(in) and record depends on this so it must be given as an arg.
-            !   ier - Changed to intent(out) in order to handle ier values accordingly in Python.
-            integer :: kfildo
-            integer :: kfilx
+            integer intent(in) :: kfildo
+            integer intent(in) :: kfilx
             character*1024 :: cfilx
             integer dimension(4) :: id
             integer dimension(nsize),intent(out),depend(nsize) :: record
-            integer intent(in) :: nsize
+            integer, optional,check(len(record)>=nsize),depend(record) :: nsize=len(record)
             integer intent(out) :: nvalue
-            integer :: l3264b
+            integer intent(in):: l3264b
             integer intent(out):: ier
             integer dimension(2) :: nopen
             integer dimension(2,2) :: lstrd
@@ -274,45 +270,17 @@ python module _tdlpack ! in
             integer dimension(2) :: nraend
             common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
         end subroutine rdtdlm
-        subroutine rdtdlmc(kfildo,kfilx,cfilx,id,record,nsize,nvalue,l3264b,ier) ! in :_tdlpack:rdtdlmc.f
-            integer :: kfildo
-            integer :: kfilx
-            character*1024 :: cfilx
-            integer dimension(4) :: id
-            character(len=l3264b/8) dimension(nsize) :: record
-            integer, optional,check(len(record)>=nsize),depend(record) :: nsize=len(record)
-            integer :: nvalue
-            integer :: l3264b
-            integer :: ier
-            integer dimension(2) :: nopen
-            integer dimension(2,2) :: lstrd
-            character dimension(2,1024),intent(c) :: cfile
-            integer dimension(2) :: kuse
-            integer dimension(2) :: nirw
-            integer dimension(7,2) :: master
-            integer dimension(6,2) :: noprec
-            integer dimension(6,840,2) :: keyrec
-            character dimension(20,1024),intent(c) :: clist
-            integer dimension(20) :: nfilsz
-            integer :: kount
-            integer dimension(2) :: nraend
-            common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
-        end subroutine rdtdlmc
         subroutine wrtdlm(kfildo,kfilx,cfilx,id,record,nsize,nrepla,ncheck,l3264b,ier) ! in :_tdlpack:wrtdlm.f
             ! This interface has been modified from what f2py generated.
-            !   record - Changed from real (as defined in Fortran source via implicit typing) to integer
-            !            which what the data are.
-            !   nsize - Changed to intent(in) and record depends on this so it must be given as an arg.
-            !   ier - Changed to intent(out) in order to handle ier values accordingly in Python.
-            integer :: kfildo
-            integer :: kfilx
-            character*1024 :: cfilx
-            integer dimension(4) :: id
-            integer intent(in),dimension(nsize),depend(nsize) :: record
-            integer intent(in) :: nsize
-            integer :: nrepla
-            integer :: ncheck
-            integer :: l3264b
+            integer intent(in) :: kfildo
+            integer intent(in) :: kfilx
+            character*1024 intent(in) :: cfilx
+            integer intent(in),dimension(4) :: id
+            integer intent(in),dimension(nsize) :: record
+            integer, optional,check(len(record)>=nsize),depend(record) :: nsize=len(record)
+            integer intent(in) :: nrepla
+            integer intent(in) :: ncheck
+            integer intent(in) :: l3264b
             integer intent(out) :: ier
             integer dimension(2) :: nopen
             integer dimension(2,2) :: lstrd
@@ -328,36 +296,6 @@ python module _tdlpack ! in
             integer dimension(2) :: nraend
             common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
         end subroutine wrtdlm
-        subroutine wrtdlmc(kfildo,kfilx,cfilx,id,record,nsize,nrepla,ncheck,l3264b,ier) ! in :_tdlpack:wrtdlmc.f
-            ! This interface has been modified from what f2py generated.
-            !   record - Defined here as character(len=1) with rank=2, sized by (4,nsize).  This works with
-            !            NumPy "character" arrays.
-            !   nsize - Changed to intent(in) from a more complicated definition.
-            !   ier - Changed to intent(out) in order to handle ier values accordingly in Python.
-            integer :: kfildo
-            integer :: kfilx
-            character*1024 :: cfilx
-            integer dimension(4) :: id
-            character(len=1) intent(in),dimension(4,nsize) :: record
-            integer intent(in) :: nsize
-            integer :: nrepla
-            integer :: ncheck
-            integer :: l3264b
-            integer intent(out) :: ier
-            integer dimension(2) :: nopen
-            integer dimension(2,2) :: lstrd
-            character dimension(2,1024),intent(c) :: cfile
-            integer dimension(2) :: kuse
-            integer dimension(2) :: nirw
-            integer dimension(7,2) :: master
-            integer dimension(6,2) :: noprec
-            integer dimension(6,840,2) :: keyrec
-            character dimension(20,1024),intent(c) :: clist
-            integer dimension(20) :: nfilsz
-            integer :: kount
-            integer dimension(2) :: nraend
-            common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
-        end subroutine wrtdlmc
     end interface 
 end python module _tdlpack
 
