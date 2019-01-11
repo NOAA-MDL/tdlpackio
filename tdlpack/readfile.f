@@ -1,6 +1,8 @@
-      subroutine readfile(file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,id)
+      subroutine readfile(kstdout,file,lun,nd5,l3264b,ftype,ioctet,
+     +                    ipack,ier,id)
       implicit none
 
+      integer, intent(in) :: kstdout
       character(len=*), intent(in) :: file
       integer, intent(in) :: lun
       integer, intent(in) :: nd5
@@ -19,7 +21,7 @@
       nvalue=0
 
       if(ftype.eq.1)then
-         call rdtdlm(6,lun,file,id,ipack,nd5,nvalue,l3264b,ier)
+         call rdtdlm(kstdout,lun,file,id,ipack,nd5,nvalue,l3264b,ier)
          ioctet=nvalue*(l3264b/8)
          if(ier.eq.153)ios=-1
       elseif(ftype.eq.2)then

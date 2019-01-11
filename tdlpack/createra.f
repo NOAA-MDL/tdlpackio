@@ -1,8 +1,9 @@
-      subroutine createra(file,l3264b,lun,maxent,nbytes,ier)
+      subroutine createra(kstdout,file,l3264b,lun,maxent,nbytes,ier)
       implicit none
 
       integer, parameter :: NW=140000
 
+      integer, intent(in) :: kstdout
       character(len=*), intent(in) :: file
       integer, intent(in) :: l3264b
       integer, intent(in) :: lun
@@ -41,7 +42,7 @@
 
       write(lun,rec=1,iostat=ios)master
 
-      call wrkeym(6,lun,noprec,keyr,master(5)*6+3,master(3),
+      call wrkeym(kstdout,lun,noprec,keyr,master(5)*6+3,master(3),
      +            "      ",ier)
 
       close(lun,iostat=ios)

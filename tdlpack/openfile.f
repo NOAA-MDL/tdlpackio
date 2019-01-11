@@ -1,7 +1,8 @@
-      subroutine openfile(file,mode,l3264b,lun,byteorder,ftype,ier,
-     +                    ra_maxent,ra_nbytes)
+      subroutine openfile(kstdout,file,mode,l3264b,lun,byteorder,ftype,
+     +                    ier,ra_maxent,ra_nbytes)
       implicit none
 
+      integer, intent(in) :: kstdout
       character(len=*), intent(in) :: file
       character(len=*), intent(in) :: mode
       integer, intent(in) :: l3264b
@@ -38,10 +39,12 @@
          close(lun)
 
          if(itemp.eq.0)then
-            call ckraend(6,lun,file,isysend,byteorder,convertx,ier)
+            call ckraend(kstdout,lun,file,isysend,byteorder,convertx,
+     +                   ier)
             ftype=1
          else
-            call ckfilend(6,lun,file,isysend,byteorder,convertx,ier)
+            call ckfilend(kstdout,lun,file,isysend,byteorder,convertx,
+     +                    ier)
             ftype=2
             cstatus="old"
             if(mode.eq."r")then
@@ -59,7 +62,8 @@
 
          if(ftype.eq.1)then
             if(present(ra_maxent).and.present(ra_nbytes))then
-               call createra(file,l3264b,lun,ra_maxent,ra_nbytes,ier)
+               call createra(kstdout,file,l3264b,lun,ra_maxent,
+     +                       ra_nbytes,ier)
                byteorder=1
             endif
          elseif(ftype.eq.2)then
