@@ -53,7 +53,7 @@ if __name__ == "__main__":
           author_email      = "eric.engle@mac.com",
           url               = "https://github.com/eengl/pytdlpack",
           download_url      = "https://github.com/eengl/pytdlpack/releases",
-          version           = "0.1",
+          version           = "0.8.0",
           description       = "Python interface for reading and writing TDLPACK data",
           ext_modules       = [ext],
           py_modules        = ['pytdlpack'],
