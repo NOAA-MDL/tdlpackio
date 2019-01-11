@@ -3,12 +3,13 @@
 
 python module _tdlpack ! in 
     interface  ! in :_tdlpack
-        subroutine closefile(lun,ftype,ier) ! in :_tdlpack:closefile.f
+        subroutine closefile(kstdout,lun,ftype,ier) ! in :_tdlpack:closefile.f90
+            integer intent(in) :: kstdout
             integer intent(in) :: lun
             integer intent(in) :: ftype
             integer intent(out) :: ier
         end subroutine closefile
-        subroutine openfile(kstdout,file,mode,l3264b,lun,byteorder,ftype,ier,ra_maxent,ra_nbytes) ! in :_tdlpack:openfile.f
+        subroutine openfile(kstdout,file,mode,l3264b,lun,byteorder,ftype,ier,ra_maxent,ra_nbytes) ! in :_tdlpack:openfile.f90
             integer intent(in) :: kstdout
             character*(*) intent(in) :: file
             character*(*) intent(in) :: mode
