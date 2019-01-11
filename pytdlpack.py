@@ -1,4 +1,4 @@
-__version__ = '0.5.0'
+__version__ = '0.8.0'
 
 from copy import deepcopy
 from itertools import count
@@ -140,9 +140,9 @@ class TdlpackFile(object):
         """
         _ier = np.int32(0)
         if self.format == 'random-access':
-            _ier = _tdlpack.closefile(self.fortran_lun,np.int32(1))
+            _ier = _tdlpack.clfilm(FORTRAN_STDOUT_LUN,self.fortran_lun)
         elif self.format == 'sequential':
-            _ier = _tdlpack.closefile(self.fortran_lun,np.int32(2))
+            _ier = _tdlpack.closefile(FORTRAN_STDOUT_LUN,self.fortran_lun,np.int32(2))
         if _ier == 0:
             self.eof = False
             self.fortran_lun = -1
@@ -244,23 +244,24 @@ class TdlpackFile(object):
 
         if type(record) is TdlpackStationRecord:
             if self.position == 0: self.data_type = 'station'
+            _nwords = record.number_of_stations*2
             if self.format == 'random-access':
-                record.pack(file_format=self.format)
-                _ier = _tdlpack.wrtdlmc(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
-                                        record.id,record.ipack,
-                                        _nreplace,_ncheck,L3264B)
-            elif self.format == 'sequential':
-                _ier = _tdlpack.writefile(self.fortran_lun,L3264B,record.ioctet,record.ipack)
-        elif type(record) is TdlpackRecord:
-            if self.position == 0: self.data_type = 'grid'
-            _nwords = np.int32(record.ioctet/NBYPWD)
-            if self.format == 'sequential':
-                _tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,record.ipack[0:_nwords],
-                                _ntotby,_ntotrc,L3264B,_ier)
-            elif self.format == 'random-access':
                 _ier = _tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
                                        record.id,record.ipack[0:_nwords],_nwords,
                                        _nreplace,_ncheck,L3264B)
+            elif self.format == 'sequential':
+                _ntotby,_ntotrc,_ier = _tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,
+                                       record.ipack[0:_nwords],_ntotby,_ntotrc,L3264B)
+        elif type(record) is TdlpackRecord:
+            if self.position == 0: self.data_type = 'grid'
+            _nwords = np.int32(record.ioctet/NBYPWD)
+            if self.format == 'random-access':
+                _ier = _tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
+                                       record.id,record.ipack[0:_nwords],_nwords,
+                                       _nreplace,_ncheck,L3264B)
+            elif self.format == 'sequential':
+                _tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,record.ipack[0:_nwords],
+                                _ntotby,_ntotrc,L3264B,_ier)
         elif type(record) is TdlpackTrailerRecord:
             _tdlpack.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,L3264W,_ntotby,
                            _ntotrc,_ier)
@@ -481,8 +482,8 @@ class TdlpackRecord(object):
             _ier = np.int32(0)
             lats = np.zeros((self.nx,self.ny),dtype=np.float32,order="F")
             lons = np.zeros((self.nx,self.ny),dtype=np.float32,order="F")
-            lats,lons,_ier = _tdlpack.gridij_to_latlon(self.nx,self.ny,self.map_proj,
-                             self.grid_length,self.origin_longitude,
+            lats,lons,_ier = _tdlpack.gridij_to_latlon(FORTRAN_STDOUT_LUN,self.nx,self.ny,
+                             self.map_proj,self.grid_length,self.origin_longitude,
                              self.standard_latitude,self.lower_left_latitude,
                              self.lower_left_longitude)
         return lats,lons
@@ -538,32 +539,16 @@ class TdlpackStationRecord(object):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
     
-    def pack(self,file_format='sequential'):
+    def pack(self):
         """
         Pack a Station Call Letter Record.
-
-        Parameters
-        ----------
-        file_format : {'sequential', 'random-access'}
-            Represents the type of station call letter packing that should be performed 
-            according to the TDLPACK file format the packed record will be written to.
         """
-        self._packed_file_format = file_format
-        if file_format == 'random-access':
-            _temp = []
-            for c in self.ccall:
-                c = c.ljust(NCHAR,' ')
-                for i in range(len(c)):
-                    _temp.append(c[i])
-            self.ioctet = np.int32(self.number_of_stations*NCHAR)
-            self.ipack = np.reshape(np.array(_temp,dtype='c'),(NCHAR/2,self.number_of_stations*2),order='F')
-        elif file_format == 'sequential':
-            self.ioctet = np.int32(self.number_of_stations*NCHAR)
-            self.ipack = np.ndarray((self.ioctet/(L3264B/NCHAR)),dtype=np.int32)
-            for n,c in enumerate(self.ccall):
-                sta = c.ljust(NCHAR,' ')
-                self.ipack[n*2] = np.copy(np.fromstring(sta[0:(NCHAR/2)],dtype=np.int32).byteswap())
-                self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[(NCHAR/2):NCHAR],dtype=np.int32).byteswap())
+        self.ioctet = np.int32(self.number_of_stations*NCHAR)
+        self.ipack = np.ndarray((self.ioctet/(L3264B/NCHAR)),dtype=np.int32)
+        for n,c in enumerate(self.ccall):
+            sta = c.ljust(NCHAR,' ')
+            self.ipack[n*2] = np.copy(np.fromstring(sta[0:(NCHAR/2)],dtype=np.int32).byteswap())
+            self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[(NCHAR/2):NCHAR],dtype=np.int32).byteswap())
 
     def unpack(self):
         """
