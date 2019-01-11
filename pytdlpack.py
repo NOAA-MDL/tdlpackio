@@ -263,8 +263,8 @@ class TdlpackFile(object):
                 _tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,record.ipack[0:_nwords],
                                 _ntotby,_ntotrc,L3264B,_ier)
         elif type(record) is TdlpackTrailerRecord:
-            _tdlpack.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,L3264W,_ntotby,
-                           _ntotrc,_ier)
+            _ier = _tdlpack.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,L3264W,_ntotby,
+                           _ntotrc)
         if _ier == 0:
             self.position += 1
             self.size = os.path.getsize(self.name)
