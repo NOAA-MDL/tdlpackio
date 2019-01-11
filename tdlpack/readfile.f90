@@ -35,7 +35,7 @@ if(ftype.eq.1)then
    ! Random-Access
    call rdtdlm(kstdout,lun,file,id,ipack,nd5,nvalue,l3264b,ier)
    ioctet=nvalue*(l3264b/8)
-   if(ier.eq.153)ios=-1
+   if(ier.eq.153)ier=-1
 elseif(ftype.eq.2)then
    ! Sequential
    if(l3264b.eq.32)then
