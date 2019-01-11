@@ -14,37 +14,39 @@ if __name__ == "__main__":
     # Define Fortran compiler flags for GNU and Intel Fortran
     if "build" in sys.argv:
         if "--fcompiler=gnu95" in sys.argv:
-            tdlpack_fortran_args = ["-O3",
-                                    "-g",
-                                    "-fbacktrace",
-                                    "-fd-lines-as-comments",
-                                    "-ffixed-form",
-                                    "-fautomatic",
-                                    "-finit-integer=0",
-                                    "-finit-real=zero",
-                                    "-finit-logical=false"]
+            f77_flags = ["-O3",
+                         "-g",
+                         "-fbacktrace",
+                         "-fd-lines-as-comments",
+                         "-ffixed-form",
+                         "-fautomatic",
+                         "-finit-integer=0",
+                         "-finit-real=zero",
+                         "-finit-logical=false"]
         elif "--fcompiler=intelem" in sys.argv:
-            tdlpack_fortran_args = ["-O3",
-                                    "-nofree",
-                                    "-integer-size 32",
-                                    "-real-size 32",
-                                    "-auto",
-                                    "-fpscomp logicals",
-                                    "-fp-model strict",
-                                    "-assume byterecl",
-                                    "-xHost",
-                                    "-align array64byte",
-                                    "-fast-transcendentals",
-                                    "-assume buffered_io"]
+            f77_flags = ["-O3",
+                         "-nofree",
+                         "-integer-size 32",
+                         "-real-size 32",
+                         "-auto",
+                         "-fpscomp logicals",
+                         "-fp-model strict",
+                         "-assume byterecl",
+                         "-xHost",
+                         "-align array64byte",
+                         "-fast-transcendentals",
+                         "-assume buffered_io"]
     else:
-        tdlpack_fortran_args = []
+        f77_flags = []
 
     # Define Extension object. For Fortran 77 source files, use "extra_f77_compile_args".
     # For Fortran 90+ source files, use "extra_f90_compile_args".
-    fortran_sources = glob.glob("tdlpack/*.f")
+    f77_sources = glob.glob("tdlpack/*.f")
+    f90_sources = glob.glob("tdlpack/*.f90")
+    all_sources = ["tdlpack/_tdlpack.pyf"]+f77_sources+f90_sources
     ext = Extension(name  = '_tdlpack',
-                    sources = ["tdlpack/_tdlpack.pyf"]+glob.glob("tdlpack/*.f"),
-                    extra_f77_compile_args = tdlpack_fortran_args
+                    sources = all_sources,
+                    extra_f77_compile_args = f77_flags
                     )
 
     # Run setup
