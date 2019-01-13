@@ -84,5 +84,5 @@ if __name__ == "__main__":
           license          = 'GPL-3.0',
           install_requires = ['numpy'],
           ext_modules      = [ext],
-          py_modules       = ['pytdlpack'],
+          packages         = ['pytdlpack'],
           )

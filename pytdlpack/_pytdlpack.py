@@ -24,7 +24,7 @@ datasets such as station observations, along with 2D grids.
 
 There also exists two other types of records in a TDLPACK file: station call letter record
 and trailer record.  A station call letter record can exist in both types of TDLPACK files
-and contains a stream of alphanumeric characters (CHARACTER(LEN=8)).  A trailer record exists
+and contains a stream of alphanumeric characters (`CHARACTER(LEN=8)`).  A trailer record exists
 to signal the MOS2K system that another station call letter record is about to be read or we
 have reached the end of the file (EOF).  A trailer record is not written to a random-access
 file.
@@ -648,8 +648,10 @@ class TdlpackTrailerRecord(object):
     def unpack(self):
         pass
     
-def open(name,mode='r',format=None,ra_template=None):
+def open(name, mode='r', format=None, ra_template=None):
     """
+    **`open(name, mode='r', format=None, ra_template=None)`**
+    
     Open a TDLPACK File.
 
     Parameters
