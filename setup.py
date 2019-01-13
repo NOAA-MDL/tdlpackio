@@ -75,12 +75,14 @@ if __name__ == "__main__":
 
     # Run setup
     setup(name = 'pytdlpack',
-          author            = "Eric Engle",
-          author_email      = "eric.engle@mac.com",
-          url               = "https://github.com/eengl/pytdlpack",
-          download_url      = "https://github.com/eengl/pytdlpack/releases",
-          version           = "0.8.0",
-          description       = "Python interface for reading and writing TDLPACK data",
-          ext_modules       = [ext],
-          py_modules        = ['pytdlpack'],
+          author           = "Eric Engle",
+          author_email     = "eric.engle@mac.com",
+          url              = "https://github.com/eengl/pytdlpack",
+          download_url     = "https://github.com/eengl/pytdlpack/releases",
+          version          = "0.9.0",
+          description      = "Python interface for reading and writing TDLPACK data",
+          license          = 'GPL-3.0',
+          install_requires = ['numpy'],
+          ext_modules      = [ext],
+          py_modules       = ['pytdlpack'],
           )
