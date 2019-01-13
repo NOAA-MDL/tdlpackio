@@ -1,4 +1,4 @@
-__version__ = '0.8.0'
+__version__ = '0.9.0'
 
 from copy import deepcopy
 from itertools import count
@@ -250,8 +250,8 @@ class TdlpackFile(object):
             _nwords = record.number_of_stations*2
             if self.format == 'random-access':
                 _ier = _tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
-                                       record.id,record.ipack[0:_nwords],_nwords,
-                                       _nreplace,_ncheck,L3264B)
+                                       record.id,record.ipack[0:_nwords],_nreplace,
+                                       _ncheck,L3264B)
             elif self.format == 'sequential':
                 _ntotby,_ntotrc,_ier = _tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,
                                        record.ipack[0:_nwords],_ntotby,_ntotrc,L3264B)
@@ -260,8 +260,8 @@ class TdlpackFile(object):
             _nwords = np.int32(record.ioctet/NBYPWD)
             if self.format == 'random-access':
                 _ier = _tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
-                                       record.id,record.ipack[0:_nwords],_nwords,
-                                       _nreplace,_ncheck,L3264B)
+                                       record.id,record.ipack[0:_nwords],_nreplace,
+                                       _ncheck,L3264B)
             elif self.format == 'sequential':
                 _tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,record.ipack[0:_nwords],
                                 _ntotby,_ntotrc,L3264B,_ier)
