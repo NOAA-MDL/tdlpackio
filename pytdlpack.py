@@ -1,3 +1,49 @@
+"""
+Version 0.9.0
+-------------
+- - -
+
+Introduction
+============
+
+pytdlpack is a Python interface to reading/writing TDLPACK files.
+
+TDLPACK is a GRIB-like binary data format that is exclusive to MOS-2000 (MOS2K)
+Fortran-based sofftware system.  This software system was developed at the 
+Meteorological Development Laboratory (MDL) within NOAA/NWS and its primary purpose is
+to perform statistical post-processing of meteorological data.
+
+TDLPACK files contain TDLPACK data records and be of two type of Fortran-based files;
+sequential or random-access.  Sequential files are variable length, record-based, and unformatted.
+Random-access files are fixed-length and direct-access.
+
+TDLPACK format is based on the World Meteorological Organizations (WMO) GRIdded Binary (GRIB)
+code, but has been tailored to MDL needs for data -- mainly the ability to store 1D (vector),
+datasets such as station observations, along with 2D grids.
+
+Download
+========
+
+- Latest code from [github repository](https://github.com/eengl/pytdlpack).
+- Latest [releases](https://pypi.python.org/pypi/pytdlpack) (source code and binary installers).
+
+Requires
+========
+
+- Python 2.7 (Python 3 support coming soon!).
+- [numpy array module](http://numpy.scipy.org), version 1.8.0 or later.
+- [setuptools](https://pypi.python.org/pypi/setuptools), version 18.0 or later.
+- Fortran compiler (if installed from source). Only GNU (gfortran) and Intel (ifort) are supported at this time.
+
+Install
+=======
+
+Tutorial
+========
+
+1. [Creating/Opening/Closing a TDLPACK file.]
+
+"""
 __version__ = '0.9.0'
 
 from copy import deepcopy
