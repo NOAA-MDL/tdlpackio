@@ -259,6 +259,7 @@ class TdlpackFile(object):
             if self.position == 0: self.data_type = 'grid'
             _nwords = np.int32(record.ioctet/NBYPWD)
             if self.format == 'random-access':
+                record.ipack[0] = record.ipack[0].byteswap()
                 _ier = _tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
                                        record.id,record.ipack[0:_nwords],_nreplace,
                                        _ncheck,L3264B)
