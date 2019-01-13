@@ -381,8 +381,8 @@ class TdlpackRecord(object):
         _ier = np.int32(0)
         self.ipack = np.zeros((ND5),dtype=np.int32)
         if self.type == 'grid':
-            _a = np.zeros((self.nx,self.ny),dtype=np.float32,order="F")
-            _ia = np.zeros((self.nx,self.ny),dtype=np.int32,order="F")
+            _a = np.zeros((self.nx,self.ny),dtype=np.float32,order='F')
+            _ia = np.zeros((self.nx,self.ny),dtype=np.int32,order='F')
             _ic = np.zeros((self.nx*self.ny),dtype=np.int32)
             self.ioctet,_ier = _tdlpack.pack2d(FORTRAN_STDOUT_LUN,self.data,_ia,_ic,self.is0,
                                self.is1,self.is2,self.is4,self.primary_missing_value,
@@ -469,7 +469,7 @@ class TdlpackRecord(object):
                 self.data = np.where(self.data==self.primary_missing_value,np.float32(missing_value),self.data)
                 self.primary_missing_value = np.float32(missing_value)
             if self.type == "grid":
-                self.data = np.reshape(self.data[0:self.number_of_values],(self.nx,self.ny),order="F")
+                self.data = np.reshape(self.data[0:self.number_of_values],(self.nx,self.ny),order='F')
     
     def grid(self):
         """
@@ -484,8 +484,8 @@ class TdlpackRecord(object):
         lons = None
         if self.type == 'grid':
             _ier = np.int32(0)
-            lats = np.zeros((self.nx,self.ny),dtype=np.float32,order="F")
-            lons = np.zeros((self.nx,self.ny),dtype=np.float32,order="F")
+            lats = np.zeros((self.nx,self.ny),dtype=np.float32,order='F')
+            lons = np.zeros((self.nx,self.ny),dtype=np.float32,order='F')
             lats,lons,_ier = _tdlpack.gridij_to_latlon(FORTRAN_STDOUT_LUN,self.nx,self.ny,
                              self.map_proj,self.grid_length,self.origin_longitude,
                              self.standard_latitude,self.lower_left_latitude,
