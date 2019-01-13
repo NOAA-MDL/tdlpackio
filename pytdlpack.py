@@ -15,11 +15,22 @@ to perform statistical post-processing of meteorological data.
 
 TDLPACK files contain TDLPACK data records and be of two type of Fortran-based files;
 sequential or random-access.  Sequential files are variable length, record-based, and unformatted.
-Random-access files are fixed-length and direct-access.
+Random-access files are fixed-length and direct-access.  pytdlpack accommodates reading
+and writing of both types of TDLPACK files.
 
 TDLPACK format is based on the World Meteorological Organizations (WMO) GRIdded Binary (GRIB)
 code, but has been tailored to MDL needs for data -- mainly the ability to store 1D (vector),
 datasets such as station observations, along with 2D grids.
+
+There also exists two other types of records in a TDLPACK file: station call letter record
+and trailer record.  A station call letter record can exist in both types of TDLPACK files
+and contains a stream of alphanumeric characters (CHARACTER(LEN=8)).  A trailer record exists
+to signal the MOS2K system that another station call letter record is about to be read or we
+have reached the end of the file (EOF).  A trailer record is not written to a random-access
+file.
+
+For more information on the MOS-2000 software system and TDLPACK foremat, user is
+referred to the official [MOS-2000 documentation](https://www.weather.gov/media/mdl/TDL_OfficeNote00-1.pdf).
 
 Download
 ========
@@ -33,7 +44,7 @@ Requires
 - Python 2.7 (Python 3 support coming soon!).
 - [numpy array module](http://numpy.scipy.org), version 1.8.0 or later.
 - [setuptools](https://pypi.python.org/pypi/setuptools), version 18.0 or later.
-- Fortran compiler (if installed from source). Only GNU (gfortran) and Intel (ifort) are supported at this time.
+- Fortran compiler (if installing from source). Only GNU (gfortran) and Intel (ifort) are supported at this time.
 
 Install
 =======
@@ -41,7 +52,9 @@ Install
 Tutorial
 ========
 
-1. [Creating/Opening/Closing a TDLPACK file.]
+1. [Creating/Opening/Closing a TDLPACK file.](#section1)
+
+## <div id='section1'>1) Creating/Opening/Closing a TDLPACK file.
 
 """
 __version__ = '0.9.0'
