@@ -1129,7 +1129,7 @@ table {
 Fortran-based sofftware system.  This software system was developed at the 
 Meteorological Development Laboratory (MDL) within NOAA/NWS and its primary purpose is
 to perform statistical post-processing of meteorological data.</p>
-<p>TDLPACK files contain TDLPACK data records and be of two type of Fortran-based files;
+<p>TDLPACK-formatted data are contained in two type of Fortran-based files;
 sequential or random-access.  Sequential files are variable length, record-based, and unformatted.
 Random-access files are fixed-length and direct-access.  pytdlpack accommodates reading
 and writing of both types of TDLPACK files.</p>
@@ -1154,14 +1154,129 @@ referred to the official <a href="https://www.weather.gov/media/mdl/TDL_OfficeNo
 <li>Python 2.7 (Python 3 support coming soon!).</li>
 <li><a href="http://numpy.scipy.org">numpy array module</a>, version 1.8.0 or later.</li>
 <li><a href="https://pypi.python.org/pypi/setuptools">setuptools</a>, version 18.0 or later.</li>
-<li>Fortran compiler (if installing from source). Only GNU (gfortran) and Intel (ifort) are supported at this time.</li>
+<li>Fortran compiler (if installing from source). <strong><em>Only GNU (gfortran) and Intel (ifort) are supported at this time.</em></strong></li>
 </ul>
 <h1>Install</h1>
 <h1>Tutorial</h1>
 <ol>
 <li><a href="#section1">Creating/Opening/Closing a TDLPACK file.</a></li>
+<li><a href="#section2">Reading aTDLPACK file.</a></li>
 </ol>
 <h2><div id='section1'>1) Creating/Opening/Closing a TDLPACK file.</h2>
+<p>To create a TDLPACK file from Python, you call the <a href="#pytdlpack.open"><code>open</code></a> function and provide the
+file name and <code>mode='w' or 'a'</code>.  For <code>mode='a'</code>, this will append to an existing file.  When 
+creating a new file, the default file format is <code>'sequential'</code>, but the user can also specify 
+the format with <code>format='sequential' or 'random-access'</code>.  If the new file is random-access, 
+then the user can also specify <code>ra_template='small' or 'large'</code>.  The default is 'small'.</p>
+<p>Example: Create a new sequential file:</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.sq&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Example: Create a new random-access file:</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.sq&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;random-access&#39;</span><span class="p">,</span><span class="n">ra_template</span><span class="o">=</span><span class="s1">&#39;small&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>To open an existing TDLPACK file, the user only need to provide the file name.</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">pytdlpack</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.sq&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">pytdlpack</span><span class="o">.</span><span class="n">_pytdlpack</span><span class="o">.</span><span class="n">TdlpackFile</span><span class="s1">&#39;&gt;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">f</span>
+<span class="n">byte_order</span> <span class="o">=</span> <span class="o">&gt;</span>
+<span class="n">data_type</span> <span class="o">=</span>
+<span class="n">eof</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">format</span> <span class="o">=</span> <span class="n">sequential</span>
+<span class="n">fortran_lun</span> <span class="o">=</span> <span class="mi">65535</span>
+<span class="n">mode</span> <span class="o">=</span> <span class="n">r</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">sq</span>
+<span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">ra_master_key</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">size</span> <span class="o">=</span> <span class="mi">998672</span>
+</pre></div>
+
+
+<p>To close a TDLPACK file is straightforward.</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+
+<h2><div id='section2'>2) Reading a TDLPACK file.</h2>
+<p>Once a TDLPACK file has been opened, an instance of class <a href="#pytdlpack.TdlpackFile"><code>TdlpackFile</code></a> has 
+been created.  To read a record the file, use the class method <a href="#pytdlpack.TdlpackFile.read"><code>read</code></a>.<br />
+By default only 1 record is returned and the TDLPACK indentification sections are unpacked.</p>
+<p>Example: Reading a gridded TDLPACK record.</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">x</span>
+<span class="n">grid_length</span> <span class="o">=</span> <span class="mf">2539.703</span>
+<span class="nb">id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">223254166</span>         <span class="mi">0</span>         <span class="mi">6</span>         <span class="mi">0</span><span class="p">]</span>
+<span class="n">ioctet</span> <span class="o">=</span> <span class="mi">998656</span>
+<span class="n">ipack</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1347175508</span>  <span class="mi">255654144</span> <span class="mi">1191249890</span> <span class="o">...</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span><span class="p">]</span>
+<span class="n">is0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1347175508</span>     <span class="mi">998649</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span><span class="p">]</span>
+<span class="n">is1</span> <span class="o">=</span> <span class="p">[</span>        <span class="mi">71</span>          <span class="mi">1</span>       <span class="mi">2018</span>         <span class="mi">12</span>          <span class="mi">4</span>          <span class="mi">0</span>
+          <span class="mi">0</span> <span class="mi">2018120400</span>  <span class="mi">223254166</span>          <span class="mi">0</span>          <span class="mi">6</span>          <span class="mi">0</span>
+          <span class="mi">6</span>          <span class="mi">0</span>         <span class="mi">66</span>          <span class="mi">0</span>          <span class="mi">1</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>         <span class="mi">32</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span><span class="p">]</span>
+<span class="n">is2</span> <span class="o">=</span> <span class="p">[</span>     <span class="mi">28</span>       <span class="mi">3</span>    <span class="mi">2345</span>    <span class="mi">1597</span>  <span class="mi">192290</span> <span class="mi">2337234</span>  <span class="mi">950000</span> <span class="mi">2539703</span>  <span class="mi">250000</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span><span class="p">]</span>
+<span class="n">is4</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">998538</span>      <span class="mi">12</span> <span class="mi">3744965</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span><span class="p">]</span>
+<span class="n">lead_time</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">lower_left_latitude</span> <span class="o">=</span> <span class="mf">19.229</span>
+<span class="n">lower_left_longitude</span> <span class="o">=</span> <span class="mf">233.7234</span>
+<span class="n">map_proj</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">number_of_values</span> <span class="o">=</span> <span class="mi">3744965</span>
+<span class="n">nx</span> <span class="o">=</span> <span class="mi">2345</span>
+<span class="n">ny</span> <span class="o">=</span> <span class="mi">1597</span>
+<span class="n">origin_longitude</span> <span class="o">=</span> <span class="mf">95.0</span>
+<span class="n">plain</span> <span class="o">=</span>
+<span class="n">primary_missing_value</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">reference_date</span> <span class="o">=</span> <span class="mi">2018120400</span>
+<span class="n">secondary_missing_value</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">standard_latitude</span> <span class="o">=</span> <span class="mf">25.0</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="n">grid</span>
+</pre></div>
+
+
+<p>You can also configure the <a href="#pytdlpack.TdlpackFile.read"><code>read</code></a> to read the entire file with</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Here, x will become a list of instances of either <a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a>, 
+<a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a>, or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></a>.</p>
+<p>If the file being read is <code>format='random-access'</code>, then you can also provide the <code>id=</code> 
+argument to search for a specific record.</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.ra&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="p">[</span><span class="mi">400001000</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">pytdlpack</span><span class="o">.</span><span class="n">_pytdlpack</span><span class="o">.</span><span class="n">TdlpackStationRecord</span><span class="s1">&#39;</span>
+</pre></div>
   
 
   </header>
@@ -1188,10 +1303,10 @@ referred to the official <a href="https://www.weather.gov/media/mdl/TDL_OfficeNo
 the file exists, an error is raised).</p>
 <p><strong><code>format : {'sequential', 'random-access'}, optional</code></strong></p>
 <p>Type of TDLPACK File when creating a new file.  This parameter is ignored if the
-file access mode is 'r' or 'a'.</p>
+file access mode is <code>'r'</code> or <code>'a'</code>.</p>
 <p><strong><code>ra_template : {'small', 'large'}, optional</code></strong></p>
 <p>How to initialize a new random-access file. The default is 'small'.  This parameter
-is ignored for existing files, or if the file format is 'sequential'.</p>
+is ignored if the file access mode is <code>'r'</code> or <code>'a'</code> or if the file format is <code>'sequential'</code>.</p>
 <h2>Returns</h2>
 <p><strong><a href="#pytdlpack.TdlpackFile"><code>TdlpackFile</code></a></strong></p>
 <p>Instance of class TdlpackFile.</p></div>
@@ -1209,25 +1324,25 @@ is ignored for existing files, or if the file format is 'sequential'.</p>
   
     <div class="desc"><p>TDLPACK File with associated information.</p>
 <h2>Attributes</h2>
-<p>byte_order : str
-    Byte order of TDLPACK file using definitions as defined by Python built-in struct module.
-data_type : {'grid', 'station'}
-    Type of data contained in the file.
-eof : bool
-    True if we have reached end of file.
-format : {'random-access', 'sequential'}
-    File format of TDLPACK file.
-fortran_lun : np.int32
-    Fortran unit number for file access. If the file is not open, then this value is -1. 
-mode : str
-    Access mode (see pytdlpack.open() docstring).
-name : str
-    File name.
-position : int
-    The current record being read from file. If the file type is 'random-access', then this
-    value is -1.
-size : int
-    File size in units of bytes.</p></div>
+<p><strong><code>byte_order : str</code></strong></p>
+<p>Byte order of TDLPACK file using definitions as defined by Python built-in struct module.</p>
+<p><strong><code>data_type : {'grid', 'station'}</code></strong></p>
+<p>Type of data contained in the file.</p>
+<p><strong><code>eof : bool</code></strong></p>
+<p>True if we have reached end of file.</p>
+<p><strong><code>format : {'random-access', 'sequential'}</code></strong></p>
+<p>File format of TDLPACK file.</p>
+<p><strong><code>fortran_lun : np.int32</code></strong></p>
+<p>Fortran unit number for file access. If the file is not open, then this value is -1. </p>
+<p><strong><code>mode : str</code></strong></p>
+<p>Access mode (see pytdlpack.open() docstring).</p>
+<p><strong><code>name : str</code></strong></p>
+<p>File name.</p>
+<p><strong><code>position : int</code></strong></p>
+<p>The current record being read from file. If the file type is 'random-access', then this
+value is -1.</p>
+<p><strong><code>size : int</code></strong></p>
+<p>File size in units of bytes.</p></div>
   <div class="source_cont">
 </div>
 

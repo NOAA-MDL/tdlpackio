@@ -44,7 +44,7 @@ Requires
 - Python 2.7 (Python 3 support coming soon!).
 - [numpy array module](http://numpy.scipy.org), version 1.8.0 or later.
 - [setuptools](https://pypi.python.org/pypi/setuptools), version 18.0 or later.
-- Fortran compiler (if installing from source). Only GNU (gfortran) and Intel (ifort) are supported at this time.
+- Fortran compiler (if installing from source). ***Only GNU (gfortran) and Intel (ifort) are supported at this time.***
 
 Install
 =======
@@ -53,8 +53,129 @@ Tutorial
 ========
 
 1. [Creating/Opening/Closing a TDLPACK file.](#section1)
+2. [Reading aTDLPACK file.](#section2)
 
 ## <div id='section1'>1) Creating/Opening/Closing a TDLPACK file.
+
+To create a TDLPACK file from Python, you call the `pytdlpack.open` function and provide the
+file name and `mode='w' or 'a'`.  For `mode='a'`, this will append to an existing file.  When 
+creating a new file, the default file format is `'sequential'`, but the user can also specify 
+the format with `format='sequential' or 'random-access'`.  If the new file is random-access, 
+then the user can also specify `ra_template='small' or 'large'`.  The default is 'small'.
+
+Example: Create a new sequential file:
+
+    :::python
+    >>> import pytdlpack
+    >>> f = pytdlpack.open('test.sq',mode='w')
+
+Example: Create a new random-access file:
+
+    :::python
+    >>> import pytdlpack
+    >>> f = pytdlpack.open('test.sq',mode='w',format='random-access',ra_template='small')
+
+To open an existing TDLPACK file, the user only need to provide the file name.
+
+    :::python
+    import pytdlpack
+    >>> f = pytdlpack.open('test.sq')
+    >>> type(f)
+    <class 'pytdlpack._pytdlpack.TdlpackFile'>
+    >>> print f
+    byte_order = >
+    data_type =
+    eof = False
+    format = sequential
+    fortran_lun = 65535
+    mode = r
+    name = test.sq
+    position = 0
+    ra_master_key = None
+    size = 998672
+
+To close a TDLPACK file is straightforward.
+
+    :::python
+    >>> f.close()
+
+## <div id='section2'>2) Reading a TDLPACK file.
+
+Once a TDLPACK file has been opened, an instance of class `pytdlpack.TdlpackFile` has 
+been created.  To read a record the file, use the class method `pytdlpack.TdlpackFile.read`.  
+By default only 1 record is returned and the TDLPACK indentification sections are unpacked.
+
+Example: Reading a gridded TDLPACK record.
+
+    :::python
+    >>> x = f.read()
+    >>> print x
+    grid_length = 2539.703
+    id = [223254166         0         6         0]
+    ioctet = 998656
+    ipack = [1347175508  255654144 1191249890 ...          0          0          0]
+    is0 = [1347175508     998649          0          0          0          0
+              0          0          0          0          0          0
+              0          0          0          0          0          0
+              0          0          0          0          0          0
+              0          0          0          0          0          0
+              0          0          0          0          0          0
+              0          0          0          0          0          0
+              0          0          0          0          0          0
+              0          0          0          0          0          0]
+    is1 = [        71          1       2018         12          4          0
+              0 2018120400  223254166          0          6          0
+              6          0         66          0          1          0
+              0          0          0         32          0          0
+              0          0          0          0          0          0
+              0          0          0          0          0          0
+              0          0          0          0          0          0
+              0          0          0          0          0          0
+              0          0          0          0          0          0]
+    is2 = [     28       3    2345    1597  192290 2337234  950000 2539703  250000
+           0       0       0       0       0       0       0       0       0
+           0       0       0       0       0       0       0       0       0
+           0       0       0       0       0       0       0       0       0
+           0       0       0       0       0       0       0       0       0
+           0       0       0       0       0       0       0       0       0]
+    is4 = [ 998538      12 3744965       0       0       0       0       0       0
+           0       0       0       0       0       0       0       0       0
+           0       0       0       0       0       0       0       0       0
+           0       0       0       0       0       0       0       0       0
+           0       0       0       0       0       0       0       0       0
+           0       0       0       0       0       0       0       0       0]
+    lead_time = 6
+    lower_left_latitude = 19.229
+    lower_left_longitude = 233.7234
+    map_proj = 3
+    number_of_values = 3744965
+    nx = 2345
+    ny = 1597
+    origin_longitude = 95.0
+    plain =
+    primary_missing_value = 0.0
+    reference_date = 2018120400
+    secondary_missing_value = 0.0
+    standard_latitude = 25.0
+    type = grid
+
+You can also configure the `pytdlpack.TdlpackFile.read` to read the entire file with
+
+    :::python
+    >>> x = f.read(all=True)
+
+Here, x will become a list of instances of either `pytdlpack.TdlpackStationRecord`, 
+`pytdlpack.TdlpackRecord`, or `pytdlpack.TdlpackTrailerRecord`.
+
+If the file being read is `format='random-access'`, then you can also provide the `id=` 
+argument to search for a specific record.
+
+    :::python
+    >>> import pytdlpack
+    >>> f = pytdlpack.open('test.ra')
+    >>> x = f.read(id=[400001000,0,0,0])
+    >>> type(x)
+    <class 'pytdlpack._pytdlpack.TdlpackStationRecord'
 
 """
 __version__ = '0.9.0'
@@ -117,25 +238,43 @@ class TdlpackFile(object):
 
     Attributes
     ----------
-    byte_order : str
-        Byte order of TDLPACK file using definitions as defined by Python built-in struct module.
-    data_type : {'grid', 'station'}
-        Type of data contained in the file.
-    eof : bool
-        True if we have reached end of file.
-    format : {'random-access', 'sequential'}
-        File format of TDLPACK file.
-    fortran_lun : np.int32
-        Fortran unit number for file access. If the file is not open, then this value is -1. 
-    mode : str
-        Access mode (see pytdlpack.open() docstring).
-    name : str
-        File name.
-    position : int
-        The current record being read from file. If the file type is 'random-access', then this
-        value is -1.
-    size : int
-        File size in units of bytes.
+
+    **`byte_order : str`**
+
+    Byte order of TDLPACK file using definitions as defined by Python built-in struct module.
+
+    **`data_type : {'grid', 'station'}`**
+
+    Type of data contained in the file.
+
+    **`eof : bool`**
+
+    True if we have reached end of file.
+
+    **`format : {'random-access', 'sequential'}`**
+
+    File format of TDLPACK file.
+
+    **`fortran_lun : np.int32`**
+
+    Fortran unit number for file access. If the file is not open, then this value is -1. 
+
+    **`mode : str`**
+
+    Access mode (see pytdlpack.open() docstring).
+
+    **`name : str`**
+
+    File name.
+
+    **`position : int`**
+
+    The current record being read from file. If the file type is 'random-access', then this
+    value is -1.
+
+    **`size : int`**
+
+    File size in units of bytes.
     """
     counter = 0
     def __init__(self,**kwargs):
