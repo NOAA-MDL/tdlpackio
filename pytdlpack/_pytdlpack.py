@@ -210,6 +210,24 @@ be a single call letter string, list, tuple, or comma-delimited string of statio
     ipack = []
     number_of_stations = 3
 
+## <div id='section5'>5) Creating a TDLPACK Record.
+
+The recommended method for creating a `pytdlpack.TdlpackRecord` is to pass the TDLPACK 
+indentification arrays, plain language string, and data to the approproiate keyword.
+
+    :::python
+    >>> import numpy as np
+    >>> import pytdlpack
+    >>> is1 = np.int32(...)
+    >>> is2 = np.int32(...)
+    >>> is4 = np.int32(...)
+    >>> plain = "..."
+    >>> data = np.float32(...)
+    >>> record = pytdlpack.TdlpackRecord(is1=is1,is2=is2,is4=is4,plain=plain,data=data)
+
+The user is encouraged to read the official MOS-2000 documentation on construction of 
+these arrays and proper encoding.
+
 """
 __version__ = '0.9.0'
 
