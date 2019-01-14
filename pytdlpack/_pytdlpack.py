@@ -13,7 +13,7 @@ Fortran-based sofftware system.  This software system was developed at the
 Meteorological Development Laboratory (MDL) within NOAA/NWS and its primary purpose is
 to perform statistical post-processing of meteorological data.
 
-TDLPACK files contain TDLPACK data records and be of two type of Fortran-based files;
+TDLPACK-formatted data are contained in two type of Fortran-based files;
 sequential or random-access.  Sequential files are variable length, record-based, and unformatted.
 Random-access files are fixed-length and direct-access.  pytdlpack accommodates reading
 and writing of both types of TDLPACK files.
@@ -75,6 +75,8 @@ try:
     import _tdlpack
 except ImportError:
     raise ImportError("_tdlpack not found.")
+
+__pdoc__ = {}
 
 _DEFAULT_L3264B = np.int32(32)
 _DEFAULT_MINPK = np.int32(14)
@@ -650,29 +652,35 @@ class TdlpackTrailerRecord(object):
     
 def open(name, mode='r', format=None, ra_template=None):
     """
-    **`open(name, mode='r', format=None, ra_template=None)`**
-    
-    Open a TDLPACK File.
+    Opens a TDLPACK File for reading/writing.
 
     Parameters
     ----------
-    name : str
-        TDLPACK File name.
-    mode : {'r', 'w', 'a', 'x'}, optional
-        Access mode. 'r' means read only; 'w' means write (existing file is overwritten);
-        'a' means to append to the existing file; 'x' means to write to a new file (if
-        the file exists, an error is raised).
-    format : {'sequential', 'random-access'}, optional
-        Type of TDLPACK File when creating a new file.  This parameter is ignored if the
-        file access mode is 'r' or 'a'.
-    ra_template : {'small', 'large'}, optional
-        How to initialize a new random-access file. The default is 'small'.  This parameter
-        is ignored for existing files, or if the file format is 'sequential'.
+    **`name : str`**
+
+    TDLPACK file name.  This string is expanded into an absolute path via os.path.abspath().
+
+    **`mode : {'r', 'w', 'a', 'x'}, optional`**
+
+    Access mode. `'r'` means read only; `'w'` means write (existing file is overwritten);
+    `'a'` means to append to the existing file; `'x'` means to write to a new file (if
+    the file exists, an error is raised).
+
+    **`format : {'sequential', 'random-access'}, optional`**
+
+    Type of TDLPACK File when creating a new file.  This parameter is ignored if the
+    file access mode is `'r'` or `'a'`.
+
+    **`ra_template : {'small', 'large'}, optional`**
+
+    How to initialize a new random-access file. The default is 'small'.  This parameter
+    is ignored if the file access mode is `'r'` or `'a'` or if the file format is `'sequential'`.
     
     Returns
     -------
-    TdlpackFile
-        Instance of class TdlpackFile.
+    **`pytdlpack.TdlpackFile`**
+
+    Instance of class TdlpackFile.
     """
     _byteorder = np.int32(0)
     _filetype = np.int32(0)

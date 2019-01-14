@@ -1138,7 +1138,7 @@ code, but has been tailored to MDL needs for data -- mainly the ability to store
 datasets such as station observations, along with 2D grids.</p>
 <p>There also exists two other types of records in a TDLPACK file: station call letter record
 and trailer record.  A station call letter record can exist in both types of TDLPACK files
-and contains a stream of alphanumeric characters (CHARACTER(LEN=8)).  A trailer record exists
+and contains a stream of alphanumeric characters (<code>CHARACTER(LEN=8)</code>).  A trailer record exists
 to signal the MOS2K system that another station call letter record is about to be read or we
 have reached the end of the file (EOF).  A trailer record is not written to a random-access
 file.</p>
@@ -1178,23 +1178,23 @@ referred to the official <a href="https://www.weather.gov/media/mdl/TDL_OfficeNo
 
     
   
-    <div class="desc"><p>Open a TDLPACK File.</p>
+    <div class="desc"><p>Opens a TDLPACK File for reading/writing.</p>
 <h2>Parameters</h2>
-<p>name : str
-    TDLPACK File name.
-mode : {'r', 'w', 'a', 'x'}, optional
-    Access mode. 'r' means read only; 'w' means write (existing file is overwritten);
-    'a' means to append to the existing file; 'x' means to write to a new file (if
-    the file exists, an error is raised).
-format : {'sequential', 'random-access'}, optional
-    Type of TDLPACK File when creating a new file.  This parameter is ignored if the
-    file access mode is 'r' or 'a'.
-ra_template : {'small', 'large'}, optional
-    How to initialize a new random-access file. The default is 'small'.  This parameter
-    is ignored for existing files, or if the file format is 'sequential'.</p>
+<p><strong><code>name : str</code></strong></p>
+<p>TDLPACK file name.  This string is expanded into an absolute path via os.path.abspath().</p>
+<p><strong><code>mode : {'r', 'w', 'a', 'x'}, optional</code></strong></p>
+<p>Access mode. <code>'r'</code> means read only; <code>'w'</code> means write (existing file is overwritten);
+<code>'a'</code> means to append to the existing file; <code>'x'</code> means to write to a new file (if
+the file exists, an error is raised).</p>
+<p><strong><code>format : {'sequential', 'random-access'}, optional</code></strong></p>
+<p>Type of TDLPACK File when creating a new file.  This parameter is ignored if the
+file access mode is 'r' or 'a'.</p>
+<p><strong><code>ra_template : {'small', 'large'}, optional</code></strong></p>
+<p>How to initialize a new random-access file. The default is 'small'.  This parameter
+is ignored for existing files, or if the file format is 'sequential'.</p>
 <h2>Returns</h2>
-<p>TdlpackFile
-    Instance of class TdlpackFile.</p></div>
+<p><strong><a href="#pytdlpack.TdlpackFile"><code>TdlpackFile</code></a></strong></p>
+<p>Instance of class TdlpackFile.</p></div>
   <div class="source_cont">
 </div>
 
