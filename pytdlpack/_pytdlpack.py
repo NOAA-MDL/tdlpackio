@@ -53,7 +53,10 @@ Tutorial
 ========
 
 1. [Creating/Opening/Closing a TDLPACK file.](#section1)
-2. [Reading aTDLPACK file.](#section2)
+2. [Reading a TDLPACK file.](#section2)
+3. [Writing a TDLPACK file.](#section3)
+4. [Creating a TDLPACK Station Record.](#section4)
+5. [Creating a TDLPACK Record.](#section5)
 
 ## <div id='section1'>1) Creating/Opening/Closing a TDLPACK file.
 
@@ -176,6 +179,36 @@ argument to search for a specific record.
     >>> x = f.read(id=[400001000,0,0,0])
     >>> type(x)
     <class 'pytdlpack._pytdlpack.TdlpackStationRecord'
+
+## <div id='section3'>3) Writing a TDLPACK file.
+
+Writing to a TDLPACK file is as easy as reading.  The following that the variable, x, 
+is an instance of `pytdlpack.TdlpackRecord` that has been packed.
+
+Example: Write to a new TDLPACK sequential file.
+
+    :::python
+    >>> import pytdlpack
+    >>> f.open("new.sq",mode="w",format="sequential")
+    >>> f.write(x)
+    >>> f.close()
+
+## <div id='section4'>4) Creating a TDLPACK Station Record.
+
+The constructor for `pytdlpack.TdlpackStationRecord` provides two methods of
+instantiation via the traditional **kwargs (see `pytdlpack.TdlpackStationRecord.__init__`) 
+or simply providing `ccall = ...` ***(recommended)***.  The value passed to the `ccall=` argument can
+be a single call letter string, list, tuple, or comma-delimited string of station call letter records.
+
+    :::python
+    >>> import pytdlpack
+    >>> stations = pytdlpack.TdlpackStationRecord(ccall=['KBWI','KDCA','KIAD'])
+    >>> print stations
+    ccall = ('KBWI', 'KDCA', 'KIAD')
+    id = [400001000         0         0         0]
+    ioctet = 0
+    ipack = []
+    number_of_stations = 3
 
 """
 __version__ = '0.9.0'

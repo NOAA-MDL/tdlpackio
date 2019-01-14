@@ -1160,7 +1160,10 @@ referred to the official <a href="https://www.weather.gov/media/mdl/TDL_OfficeNo
 <h1>Tutorial</h1>
 <ol>
 <li><a href="#section1">Creating/Opening/Closing a TDLPACK file.</a></li>
-<li><a href="#section2">Reading aTDLPACK file.</a></li>
+<li><a href="#section2">Reading a TDLPACK file.</a></li>
+<li><a href="#section3">Writing a TDLPACK file.</a></li>
+<li><a href="#section4">Creating a TDLPACK Station Record.</a></li>
+<li><a href="#section5">Creating a TDLPACK Record.</a></li>
 </ol>
 <h2><div id='section1'>1) Creating/Opening/Closing a TDLPACK file.</h2>
 <p>To create a TDLPACK file from Python, you call the <a href="#pytdlpack.open"><code>open</code></a> function and provide the
@@ -1276,6 +1279,33 @@ argument to search for a specific record.</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="p">[</span><span class="mi">400001000</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 <span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">pytdlpack</span><span class="o">.</span><span class="n">_pytdlpack</span><span class="o">.</span><span class="n">TdlpackStationRecord</span><span class="s1">&#39;</span>
+</pre></div>
+
+
+<h2><div id='section3'>3) Writing a TDLPACK file.</h2>
+<p>Writing to a TDLPACK file is as easy as reading.  The following that the variable, x, 
+is an instance of <a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a> that has been packed.</p>
+<p>Example: Write to a new TDLPACK sequential file.</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;new.sq&quot;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s2">&quot;sequential&quot;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+
+
+<h2><div id='section4'>4) Creating a TDLPACK Station Record.</h2>
+<p>The constructor for <a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a> provides two methods of
+instantiation via the traditional **kwargs (see <a href="#pytdlpack.TdlpackStationRecord.__init__"><code>__init__</code></a>) 
+or simply providing <code>ccall = ...</code> <strong><em>(recommended)</em></strong>.  The value passed to the <code>ccall=</code> argument can
+be a single call letter string, list, tuple, or comma-delimited string of station call letter records.</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">stations</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">TdlpackStationRecord</span><span class="p">(</span><span class="n">ccall</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;KBWI&#39;</span><span class="p">,</span><span class="s1">&#39;KDCA&#39;</span><span class="p">,</span><span class="s1">&#39;KIAD&#39;</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">stations</span>
+<span class="n">ccall</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;KBWI&#39;</span><span class="p">,</span> <span class="s1">&#39;KDCA&#39;</span><span class="p">,</span> <span class="s1">&#39;KIAD&#39;</span><span class="p">)</span>
+<span class="nb">id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">400001000</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span><span class="p">]</span>
+<span class="n">ioctet</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">ipack</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">number_of_stations</span> <span class="o">=</span> <span class="mi">3</span>
 </pre></div>
   
 
