@@ -1164,6 +1164,7 @@ referred to the official <a href="https://www.weather.gov/media/mdl/TDL_OfficeNo
 <li><a href="#section3">Writing a TDLPACK file.</a></li>
 <li><a href="#section4">Creating a TDLPACK Station Record.</a></li>
 <li><a href="#section5">Creating a TDLPACK Record.</a></li>
+<li><a href="#section6">Packing/Unpacking a TDLPACK Record.</a></li>
 </ol>
 <h2><div id='section1'>1) Creating/Opening/Closing a TDLPACK file.</h2>
 <p>To create a TDLPACK file from Python, you call the <a href="#pytdlpack.open"><code>open</code></a> function and provide the
@@ -1278,13 +1279,13 @@ argument to search for a specific record.</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.ra&#39;</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="p">[</span><span class="mi">400001000</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">pytdlpack</span><span class="o">.</span><span class="n">_pytdlpack</span><span class="o">.</span><span class="n">TdlpackStationRecord</span><span class="s1">&#39;</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">pytdlpack</span><span class="o">.</span><span class="n">_pytdlpack</span><span class="o">.</span><span class="n">TdlpackStationRecord</span><span class="s1">&#39;&gt;</span>
 </pre></div>
 
 
 <h2><div id='section3'>3) Writing a TDLPACK file.</h2>
-<p>Writing to a TDLPACK file is as easy as reading.  The following that the variable, x, 
-is an instance of <a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a> that has been packed.</p>
+<p>Writing to a TDLPACK file is as easy as reading.  The following uses variable x, from 
+above, is an instance of <a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a> that has been packed.</p>
 <p>Example: Write to a new TDLPACK sequential file.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;new.sq&quot;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s2">&quot;sequential&quot;</span><span class="p">)</span>
@@ -1323,8 +1324,30 @@ indentification arrays, plain language string, and data to the approproiate keyw
 </pre></div>
 
 
-<p>The user is encouraged to read the official MOS-2000 documentation on construction of 
-these arrays.</p>
+<p>The user is encouraged to read the official MOS-2000 documentation (specifically Chapter 5) 
+on construction of these arrays and proper encoding.</p>
+<h2><div id='section6'>6) Packing/Unpacking a TDLPACK Record.</h2>
+<p>Once any of the three classes of TDLPACK records have been instantiated, you can pack the
+record using the class method <code>pack</code>.  Using the example from <a href="#section5">Section 5</a>, <code>record</code>
+is now an instance of <a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a>.  You can pack this record with the following:</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">record</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+</pre></div>
+
+
+<p>To unpack a packed TDLPACK record, perform:</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">record</span><span class="o">.</span><span class="n">unpack</span><span class="p">()</span>
+</pre></div>
+
+
+<p>The <a href="#pytdlpack.TdlpackRecord.unpack"><code>unpack</code></a> class method for TDLPACK data records, contains optional
+arguments <code>data=False</code> (to control the unpacking of data) and <code>missing_value=None</code> (to set a
+different missing value other than what is contained in the record).  For TDLPACK data records, 
+<a href="#pytdlpack.TdlpackRecord.unpack"><code>unpack</code></a> automatically unpacks the TDLPACK meta-data.</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">record</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">missing_value</span><span class="o">=-</span><span class="mf">9999.0</span><span class="p">)</span>
+</pre></div>
+
+
+<hr />
   
 
   </header>
@@ -1353,7 +1376,7 @@ the file exists, an error is raised).</p>
 <p>Type of TDLPACK File when creating a new file.  This parameter is ignored if the
 file access mode is <code>'r'</code> or <code>'a'</code>.</p>
 <p><strong><code>ra_template : {'small', 'large'}, optional</code></strong></p>
-<p>How to initialize a new random-access file. The default is 'small'.  This parameter
+<p>Template used to create new random-access file. The default is 'small'.  This parameter
 is ignored if the file access mode is <code>'r'</code> or <code>'a'</code> or if the file format is <code>'sequential'</code>.</p>
 <h2>Returns</h2>
 <p><strong><a href="#pytdlpack.TdlpackFile"><code>TdlpackFile</code></a></strong></p>
@@ -1560,15 +1583,17 @@ value is -1.</p>
   
     <div class="desc"><p>Read a record from a TDLPACK file.</p>
 <h2>Parameters</h2>
-<p>all : bool, optional
-    Read all records from file. The default is False.
-unpack : bool, optional
-    Unpack TDLPACK identification sections.  Note that data are not unpacked.  The default is True.
-id : array_like or list, optional
-    Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list 
-    with length 4.</p>
+<p><strong><code>all : bool, optional</code></strong></p>
+<p>Read all records from file. The default is False.</p>
+<p><strong><code>unpack : bool, optional</code></strong></p>
+<p>Unpack TDLPACK identification sections.  Note that data are not unpacked.  The default is True.</p>
+<p><strong><code>id : array_like or list, optional</code></strong></p>
+<p>Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list 
+with length 4.</p>
 <h2>Returns</h2>
-<p>TdlpackStationRecord, TdlpackRecord, TdlpackTrailerRecord, or None</p></div>
+<p><strong><code>record [records] : instance [list]</code></strong></p>
+<p>An instance of list of instances contaning <a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a>, 
+<a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a>, or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></a></p></div>
   <div class="source_cont">
 </div>
 
@@ -1598,7 +1623,11 @@ id : array_like or list, optional
 
     
   
-    <div class="desc"><p>Write a packed TDLPACK record to file.</p></div>
+    <div class="desc"><p>Write a packed TDLPACK record to file.</p>
+<h2>Parameters</h2>
+<p><strong><code>record : instance</code></strong></p>
+<p>An instance of either <a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a>, <a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a>, 
+or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></a>.  <code>record</code> should contain a packed data.</p></div>
   <div class="source_cont">
 </div>
 
@@ -1613,50 +1642,50 @@ id : array_like or list, optional
   
     <div class="desc"><p>Defines a TDLPACK data record object.</p>
 <h2>Attributes</h2>
-<p>data : array_like
-    Data values.
-grid_length : float
-    Distance between grid points in units of meters.
-id : array_like
-    ID of the TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.
-ioctet : int
-    Size of the packed TDLPACK data record in bytes.
-ipack : array_like
-    Packed TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.
-is0 : array_like
-    TDLPACK Section 0 (Indicator Section).
-is1 : array_like
-    TDLPACK Section 1 (Product Definition Section).
-is2 : array_like
-    TDLPACK Section 2 (Grid Definition Section)
-is4 : array_like
-    TDLPACK Section 4 (Data Section).
-lead_time : int
-    Forecast lead time in units of hours.
-lower_left_latitude : float
-    Latitude of lower left grid point
-lower_left_longitude : float
-    Longitude of lower left grid point
-number_of_values : int
-    Number of data values.
-nx : int
-    Number of points in the x-direction (West-East).
-ny : int
-    Number of points in the y-direction (West-East).
-origin_longitude : float
-    Originating longitude of projected grid.
-plain : str
-    Plain language description of TDLPACK record.
-primary_missing_value : float
-    Primary missing value.
-reference_date : int
-    Reference date from the TDLPACK data record in YYYYMMDDHH format.
-secondary_missing_value : float
-    Secondary missing value.
-standard_latitude : float
-    Latitude at which the grid length applies.
-type : {'grid', 'station'}
-    Identifies the type of data.</p></div>
+<p><strong><code>data : array_like</code></strong></p>
+<p>Data values.</p>
+<p><strong><code>grid_length : float</code></strong></p>
+<p>Distance between grid points in units of meters.</p>
+<p><strong><code>id : array_like</code></strong></p>
+<p>ID of the TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.</p>
+<p><strong><code>ioctet : int</code></strong></p>
+<p>Size of the packed TDLPACK data record in bytes.</p>
+<p><strong><code>ipack : array_like</code></strong></p>
+<p>Packed TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.</p>
+<p><strong><code>is0 : array_like</code></strong></p>
+<p>TDLPACK Section 0 (Indicator Section).</p>
+<p><strong><code>is1 : array_like</code></strong></p>
+<p>TDLPACK Section 1 (Product Definition Section).</p>
+<p><strong><code>is2 : array_like</code></strong></p>
+<p>TDLPACK Section 2 (Grid Definition Section)</p>
+<p><strong><code>is4 : array_like</code></strong></p>
+<p>TDLPACK Section 4 (Data Section).</p>
+<p><strong><code>lead_time : int</code></strong></p>
+<p>Forecast lead time in units of hours.</p>
+<p><strong><code>lower_left_latitude : float</code></strong></p>
+<p>Latitude of lower left grid point</p>
+<p><strong><code>lower_left_longitude : float</code></strong></p>
+<p>Longitude of lower left grid point</p>
+<p><strong><code>number_of_values : int</code></strong></p>
+<p>Number of data values.</p>
+<p><strong><code>nx : int</code></strong></p>
+<p>Number of points in the x-direction (West-East).</p>
+<p><strong><code>ny : int</code></strong></p>
+<p>Number of points in the y-direction (West-East).</p>
+<p><strong><code>origin_longitude : float</code></strong></p>
+<p>Originating longitude of projected grid.</p>
+<p><strong><code>plain : str</code></strong></p>
+<p>Plain language description of TDLPACK record.</p>
+<p><strong><code>primary_missing_value : float</code></strong></p>
+<p>Primary missing value.</p>
+<p><strong><code>reference_date : int</code></strong></p>
+<p>Reference date from the TDLPACK data record in YYYYMMDDHH format.</p>
+<p><strong><code>secondary_missing_value : float</code></strong></p>
+<p>Secondary missing value.</p>
+<p><strong><code>standard_latitude : float</code></strong></p>
+<p>Latitude at which the grid length applies.</p>
+<p><strong><code>type : {'grid', 'station'}</code></strong></p>
+<p>Identifies the type of data.</p></div>
   <div class="source_cont">
 </div>
 
@@ -1721,18 +1750,18 @@ type : {'grid', 'station'}
   
     <div class="desc"><p>Constructor</p>
 <h2>Parameters</h2>
-<p>is1 : array_like, optional
-    TDLPACK Identification Section 1 (Product Definition Section).
-is2 : array_like, optional
-    TDLPACK Identification Section 2 (Grid Definition Section).
-is4 : array_like, optional
-    TDLPACK Identification Section 4 (Data Section).
-plain : str, optional
-    Plain language descriptor.
-data : array_like, optional
-    Data values.
-**kwargs : dict, optional
-    Dictionary of class attributes (keys) and class attributes (values).</p></div>
+<p><strong><code>is1 : array_like, optional</code></strong></p>
+<p>Numpy array with dtype=numpy.int32 with shape (<code>pytdlpack.ND7</code>,).  TDLPACK Identification Section 1 (Product Definition Section).</p>
+<p><strong><code>is2 : array_like, optional</code></strong></p>
+<p>TDLPACK Identification Section 2 (Grid Definition Section).</p>
+<p><strong><code>is4 : array_like, optional</code></strong></p>
+<p>TDLPACK Identification Section 4 (Data Section).</p>
+<p><strong><code>plain : str, optional</code></strong></p>
+<p>Plain language descriptor.</p>
+<p><strong><code>data : array_like, optional</code></strong></p>
+<p>Data values.</p>
+<p><strong><code>**kwargs : dict, optional</code></strong></p>
+<p>Dictionary of class attributes (keys) and class attributes (values).</p></div>
   <div class="source_cont">
 </div>
 
@@ -1750,7 +1779,8 @@ data : array_like, optional
     <div class="desc"><p>Returns latitudes and lontiude numpy.float32 arrays for the TDLPACK record. 
 If the record is station, then return is None.</p>
 <h2>Returns</h2>
-<p>lats,lons : array_like if TdlpackRecord is type = "grid", otherwise None are returned.</p></div>
+<p><strong><code>lats,lons : array_like</code></strong></p>
+<p>Arrays of grid latitudes and longitudes.  If <code>self.grid = 'grid'</code>, then None are returned.</p></div>
   <div class="source_cont">
 </div>
 
@@ -1782,11 +1812,11 @@ If the record is station, then return is None.</p>
   
     <div class="desc"><p>Unpacks the TDLPACK identification sections and data (optional).</p>
 <h2>Parameters</h2>
-<p>data : bool, optional
-    If True, unpack data values. The default is False.
-missing_value : float, optional
-    Set a missing value. If a missing value exists for the TDLPACK data record,
-    it will be replaced with this value.</p></div>
+<p><strong><code>data : bool, optional</code></strong></p>
+<p>If True, unpack data values. The default is False.</p>
+<p><strong><code>missing_value : float, optional</code></strong></p>
+<p>Set a missing value. If a missing value exists for the TDLPACK data record,
+it will be replaced with this value.</p></div>
   <div class="source_cont">
 </div>
 
@@ -1801,16 +1831,16 @@ missing_value : float, optional
   
     <div class="desc"><p>Defines a TDLPACK Station Call Letter Record.</p>
 <h2>Attributes</h2>
-<p>ccall : tuple
-    A tuple of station call letters.
-id : array_like
-    ID of station call letters. Note: This id is only used for random-access IO.
-ioctet : int
-    Size of station call letter record in bytes.
-ipack : array_like
-    Packed station call letter record.
-number_of_stations: int
-    Size of station call letter record.</p></div>
+<p><strong><code>ccall : tuple</code></strong></p>
+<p>A tuple of station call letters.</p>
+<p><strong><code>id : array_like</code></strong></p>
+<p>ID of station call letters. Note: This id is only used for random-access IO.</p>
+<p><strong><code>ioctet : int</code></strong></p>
+<p>Size of packed station call letter record in bytes.</p>
+<p><strong><code>ipack : array_like</code></strong></p>
+<p>Packed station call letter record.</p>
+<p><strong><code>number_of_stations: int</code></strong></p>
+<p>Size of station call letter record.</p></div>
   <div class="source_cont">
 </div>
 
@@ -1873,12 +1903,13 @@ number_of_stations: int
 
     
   
-    <div class="desc"><p>Constructor</p>
+    <div class="desc"><p><a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a> Constructor</p>
 <h2>Parameters</h2>
-<p>ccall : list, optional
-    A list of station call letter records.
-**kwargs : dict
-    Dictionary of class attributes (keys) and class attributes (values).</p></div>
+<p><strong><code>ccall : str or list or tuple, optional</code></strong></p>
+<p>Contains stations call letters.  Can be a string (containing a single call letter
+or a comma-delimited string of multiple); list; or tuple.</p>
+<p><strong><code>**kwargs : dict</code></strong></p>
+<p>Dictionary of class attributes (keys) and class attributes (values).</p></div>
   <div class="source_cont">
 </div>
 
@@ -1953,6 +1984,7 @@ number_of_stations: int
 
     
   
+    <div class="desc"><p><a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></a> Constructor</p></div>
   <div class="source_cont">
 </div>
 

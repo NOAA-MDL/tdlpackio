@@ -57,6 +57,7 @@ Tutorial
 3. [Writing a TDLPACK file.](#section3)
 4. [Creating a TDLPACK Station Record.](#section4)
 5. [Creating a TDLPACK Record.](#section5)
+6. [Packing/Unpacking a TDLPACK Record.](#section6)
 
 ## <div id='section1'>1) Creating/Opening/Closing a TDLPACK file.
 
@@ -178,12 +179,12 @@ argument to search for a specific record.
     >>> f = pytdlpack.open('test.ra')
     >>> x = f.read(id=[400001000,0,0,0])
     >>> type(x)
-    <class 'pytdlpack._pytdlpack.TdlpackStationRecord'
+    <class 'pytdlpack._pytdlpack.TdlpackStationRecord'>
 
 ## <div id='section3'>3) Writing a TDLPACK file.
 
-Writing to a TDLPACK file is as easy as reading.  The following that the variable, x, 
-is an instance of `pytdlpack.TdlpackRecord` that has been packed.
+Writing to a TDLPACK file is as easy as reading.  The following uses variable x, from 
+above, is an instance of `pytdlpack.TdlpackStationRecord` that has been packed.
 
 Example: Write to a new TDLPACK sequential file.
 
@@ -225,9 +226,33 @@ indentification arrays, plain language string, and data to the approproiate keyw
     >>> data = np.float32(...)
     >>> record = pytdlpack.TdlpackRecord(is1=is1,is2=is2,is4=is4,plain=plain,data=data)
 
-The user is encouraged to read the official MOS-2000 documentation on construction of 
-these arrays and proper encoding.
+The user is encouraged to read the official MOS-2000 documentation (specifically Chapter 5) 
+on construction of these arrays and proper encoding.
 
+## <div id='section6'>6) Packing/Unpacking a TDLPACK Record.
+
+Once any of the three classes of TDLPACK records have been instantiated, you can pack the
+record using the class method `pack`.  Using the example from [Section 5](#section5), `record`
+is now an instance of `pytdlpack.TdlpackRecord`.  You can pack this record with the following:
+
+    :::python
+    >>> record.pack()
+
+To unpack a packed TDLPACK record, perform:
+
+    :::python
+    >>> record.unpack()
+
+The `pytdlpack.TdlpackRecord.unpack` class method for TDLPACK data records, contains optional
+arguments `data=False` (to control the unpacking of data) and `missing_value=None` (to set a
+different missing value other than what is contained in the record).  For TDLPACK data records, 
+`pytdlpack.TdlpackRecord.unpack` automatically unpacks the TDLPACK meta-data.
+
+    :::python
+    >>> record.unpack(data=True,missing_value=-9999.0)
+
+
+- - -
 """
 __version__ = '0.9.0'
 
@@ -412,17 +437,27 @@ class TdlpackFile(object):
 
         Parameters
         ----------
-        all : bool, optional
-            Read all records from file. The default is False.
-        unpack : bool, optional
-            Unpack TDLPACK identification sections.  Note that data are not unpacked.  The default is True.
-        id : array_like or list, optional
-            Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list 
-            with length 4.
+
+        **`all : bool, optional`**
+
+        Read all records from file. The default is False.
+
+        **`unpack : bool, optional`**
+
+        Unpack TDLPACK identification sections.  Note that data are not unpacked.  The default is True.
+            
+        **`id : array_like or list, optional`**
+
+        Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list 
+        with length 4.
         
         Returns
         -------
-        TdlpackStationRecord, TdlpackRecord, TdlpackTrailerRecord, or None
+
+        **`record [records] : instance [list]`**
+
+        An instance of list of instances contaning `pytdlpack.TdlpackStationRecord`, 
+        `pytdlpack.TdlpackRecord`, or `pytdlpack.TdlpackTrailerRecord`
         """
         if self.fortran_lun == -1:
             raise IOError("File is not opened.")
@@ -484,6 +519,14 @@ class TdlpackFile(object):
     def write(self,record):
         """
         Write a packed TDLPACK record to file.
+
+        Parameters
+        ----------
+
+        **`record : instance`**
+
+        An instance of either `pytdlpack.TdlpackStationRecord`, `pytdlpack.TdlpackRecord`, 
+        or `pytdlpack.TdlpackTrailerRecord`.  `record` should contain a packed data.
         """
         if self.fortran_lun == -1:
             raise IOError("File is not opened.")
@@ -530,50 +573,94 @@ class TdlpackRecord(object):
 
     Attributes
     ----------
-    data : array_like
-        Data values.
-    grid_length : float
-        Distance between grid points in units of meters.
-    id : array_like
-        ID of the TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.
-    ioctet : int
-        Size of the packed TDLPACK data record in bytes.
-    ipack : array_like
-        Packed TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.
-    is0 : array_like
-        TDLPACK Section 0 (Indicator Section).
-    is1 : array_like
-        TDLPACK Section 1 (Product Definition Section).
-    is2 : array_like
-        TDLPACK Section 2 (Grid Definition Section)
-    is4 : array_like
-        TDLPACK Section 4 (Data Section).
-    lead_time : int
-        Forecast lead time in units of hours.
-    lower_left_latitude : float
-        Latitude of lower left grid point
-    lower_left_longitude : float
-        Longitude of lower left grid point
-    number_of_values : int
-        Number of data values.
-    nx : int
-        Number of points in the x-direction (West-East).
-    ny : int
-        Number of points in the y-direction (West-East).
-    origin_longitude : float
-        Originating longitude of projected grid.
-    plain : str
-        Plain language description of TDLPACK record.
-    primary_missing_value : float
-        Primary missing value.
-    reference_date : int
-        Reference date from the TDLPACK data record in YYYYMMDDHH format.
-    secondary_missing_value : float
-        Secondary missing value.
-    standard_latitude : float
-        Latitude at which the grid length applies.
-    type : {'grid', 'station'}
-        Identifies the type of data. 
+
+    **`data : array_like`**
+
+    Data values.
+
+    **`grid_length : float`**
+
+    Distance between grid points in units of meters.
+
+    **`id : array_like`**
+
+    ID of the TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.
+
+    **`ioctet : int`**
+
+    Size of the packed TDLPACK data record in bytes.
+
+    **`ipack : array_like`**
+
+    Packed TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.
+
+    **`is0 : array_like`**
+
+    TDLPACK Section 0 (Indicator Section).
+
+    **`is1 : array_like`**
+
+    TDLPACK Section 1 (Product Definition Section).
+
+    **`is2 : array_like`**
+
+    TDLPACK Section 2 (Grid Definition Section)
+
+    **`is4 : array_like`**
+
+    TDLPACK Section 4 (Data Section).
+
+    **`lead_time : int`**
+
+    Forecast lead time in units of hours.
+
+    **`lower_left_latitude : float`**
+
+    Latitude of lower left grid point
+
+    **`lower_left_longitude : float`**
+
+    Longitude of lower left grid point
+
+    **`number_of_values : int`**
+
+    Number of data values.
+
+    **`nx : int`**
+
+    Number of points in the x-direction (West-East).
+
+    **`ny : int`**
+
+    Number of points in the y-direction (West-East).
+
+    **`origin_longitude : float`**
+
+    Originating longitude of projected grid.
+
+    **`plain : str`**
+
+    Plain language description of TDLPACK record.
+
+    **`primary_missing_value : float`**
+
+    Primary missing value.
+
+    **`reference_date : int`**
+
+    Reference date from the TDLPACK data record in YYYYMMDDHH format.
+
+    **`secondary_missing_value : float`**
+
+    Secondary missing value.
+
+    **`standard_latitude : float`**
+
+    Latitude at which the grid length applies.
+
+    **`type : {'grid', 'station'}`**
+
+    Identifies the type of data. 
     """
     counter = 0
     def __init__(self,is1=None,is2=None,is4=None,plain=None,data=None,**kwargs):
@@ -582,18 +669,30 @@ class TdlpackRecord(object):
 
         Parameters
         ----------
-        is1 : array_like, optional
-            TDLPACK Identification Section 1 (Product Definition Section).
-        is2 : array_like, optional
-            TDLPACK Identification Section 2 (Grid Definition Section).
-        is4 : array_like, optional
-            TDLPACK Identification Section 4 (Data Section).
-        plain : str, optional
-            Plain language descriptor.
-        data : array_like, optional
-            Data values.
-        **kwargs : dict, optional
-            Dictionary of class attributes (keys) and class attributes (values).
+
+        **`is1 : array_like, optional`**
+
+        Numpy array with dtype=numpy.int32 with shape (`pytdlpack.ND7`,).  TDLPACK Identification Section 1 (Product Definition Section).
+
+        **`is2 : array_like, optional`**
+
+        TDLPACK Identification Section 2 (Grid Definition Section).
+
+        **`is4 : array_like, optional`**
+
+        TDLPACK Identification Section 4 (Data Section).
+
+        **`plain : str, optional`**
+
+        Plain language descriptor.
+
+        **`data : array_like, optional`**
+
+        Data values.
+
+        **`**kwargs : dict, optional`**
+
+        Dictionary of class attributes (keys) and class attributes (values).
         """
         type(self).counter += 1
         self._metadata_unpacked = False
@@ -651,11 +750,15 @@ class TdlpackRecord(object):
 
         Parameters
         ----------
-        data : bool, optional
-            If True, unpack data values. The default is False.
-        missing_value : float, optional
-            Set a missing value. If a missing value exists for the TDLPACK data record,
-            it will be replaced with this value.
+
+        **`data : bool, optional`**
+
+        If True, unpack data values. The default is False.
+
+        **`missing_value : float, optional`**
+        
+        Set a missing value. If a missing value exists for the TDLPACK data record,
+        it will be replaced with this value.
         """
         _ier = np.int32(0)
         if not self._metadata_unpacked:
@@ -719,7 +822,7 @@ class TdlpackRecord(object):
             if missing_value is not None:
                 self.data = np.where(self.data==self.primary_missing_value,np.float32(missing_value),self.data)
                 self.primary_missing_value = np.float32(missing_value)
-            if self.type == "grid":
+            if self.type == 'grid':
                 self.data = np.reshape(self.data[0:self.number_of_values],(self.nx,self.ny),order='F')
     
     def grid(self):
@@ -729,7 +832,10 @@ class TdlpackRecord(object):
 
         Returns
         -------
-        lats,lons : array_like if TdlpackRecord is type = "grid", otherwise None are returned.
+
+        **`lats,lons : array_like`**
+        
+        Arrays of grid latitudes and longitudes.  If `self.grid = 'grid'`, then None are returned.
         """
         lats = None
         lons = None
@@ -749,35 +855,53 @@ class TdlpackStationRecord(object):
 
     Attributes
     ----------
-    ccall : tuple
-        A tuple of station call letters.
-    id : array_like
-        ID of station call letters. Note: This id is only used for random-access IO.
-    ioctet : int
-        Size of station call letter record in bytes.
-    ipack : array_like
-        Packed station call letter record.
-    number_of_stations: int
-        Size of station call letter record.
+
+    **`ccall : tuple`**
+
+    A tuple of station call letters.
+
+    **`id : array_like`**
+
+    ID of station call letters. Note: This id is only used for random-access IO.
+
+    **`ioctet : int`**
+
+    Size of packed station call letter record in bytes.
+
+    **`ipack : array_like`**
+
+    Packed station call letter record.
+
+    **`number_of_stations: int`**
+
+    Size of station call letter record.
     """
     counter = 0
     def __init__(self,ccall=None,**kwargs):
         """
-        Constructor
+        `pytdlpack.TdlpackStationRecord` Constructor
 
         Parameters
         ----------
-        ccall : list, optional
-            A list of station call letter records.
-        **kwargs : dict
-            Dictionary of class attributes (keys) and class attributes (values).
+
+        **`ccall : str or list or tuple, optional`**
+
+        Contains stations call letters.  Can be a string (containing a single call letter
+        or a comma-delimited string of multiple); list; or tuple.
+            
+        **`**kwargs : dict`**
+
+        Dictionary of class attributes (keys) and class attributes (values).
         """
         type(self).counter += 1
         if ccall is None:
             self.ccall = None
             self.number_of_stations = np.int32(0)
         else:
-            self.ccall = tuple(ccall)
+            if type(ccall) is str:
+                self.ccall = tuple(ccall.split(','))
+            else:
+                self.ccall = tuple(ccall)
             self.number_of_stations = len(self.ccall)
         self.id = np.int32([400001000,0,0,0])
         self.ioctet = np.int32(0)
@@ -821,6 +945,9 @@ class TdlpackTrailerRecord(object):
     """
     counter = 0
     def __init__(self, **kwargs):
+        """
+        `pytdlpack.TdlpackTrailerRecord` Constructor
+        """
         type(self).counter += 0
         for k, v in kwargs.items():
             setattr(self, k, v)
@@ -863,7 +990,7 @@ def open(name, mode='r', format=None, ra_template=None):
 
     **`ra_template : {'small', 'large'}, optional`**
 
-    How to initialize a new random-access file. The default is 'small'.  This parameter
+    Template used to create new random-access file. The default is 'small'.  This parameter
     is ignored if the file access mode is `'r'` or `'a'` or if the file format is `'sequential'`.
     
     Returns
