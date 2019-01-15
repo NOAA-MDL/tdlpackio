@@ -12,23 +12,20 @@ Provide a Python interface for reading and writing TDLPACK files.
 
 ## Requirements
 * Fortran compiler supported by f2py (GNU Fortran or Intel Fortran preferred)
-* Python 2.6+
+* Python 2.7+
 * NumPy 1.8+
 
-## Build and Installation
-
-Note that building on macOS requires setting ``CC=clang``. Python setuptools and f2py seems to have trouble using the GNU C compiler on macOS.
+## Installation
 
 ### Build
-* macOS: ``CC=clang python setup.py build_ext --fcompiler=gnu95 build``
-* Linux: ``python setup.py build_ext --fcompiler=[gnu95|intelem] build``
+``python setup.py build_ext --fcompiler=[gnu95|intelem] build``
 
 ### Install
 
 System area:
-* ``sudo python setup.py install``
+``sudo python setup.py install``
 
 Local area:
-* ``python setup.py install --prefix=<INSTALL_DIR>``
+``python setup.py install --prefix=<INSTALL_DIR>``
 
 You can also build and install using the provided ``install.sh`` script (see its usage print).
