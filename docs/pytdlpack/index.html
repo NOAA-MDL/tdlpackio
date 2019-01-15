@@ -1312,7 +1312,8 @@ be a single call letter string, list, tuple, or comma-delimited string of statio
 
 <h2><div id='section5'>5) Creating a TDLPACK Record.</h2>
 <p>The recommended method for creating a <a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a> is to pass the TDLPACK 
-indentification arrays, plain language string, and data to the approproiate keyword.</p>
+indentification arrays, plain language string, and data to the approproiate keyword.  Please
+see <a href="#pytdlpack.TdlpackRecord.__init__"><code>__init__</code></a> for more info.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">is1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
@@ -1345,9 +1346,6 @@ different missing value other than what is contained in the record).  For TDLPAC
 <a href="#pytdlpack.TdlpackRecord.unpack"><code>unpack</code></a> automatically unpacks the TDLPACK meta-data.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">record</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">missing_value</span><span class="o">=-</span><span class="mf">9999.0</span><span class="p">)</span>
 </pre></div>
-
-
-<hr />
   
 
   </header>
@@ -1751,13 +1749,17 @@ or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></
     <div class="desc"><p>Constructor</p>
 <h2>Parameters</h2>
 <p><strong><code>is1 : array_like, optional</code></strong></p>
-<p>Numpy array with dtype=numpy.int32 with shape (<code>pytdlpack.ND7</code>,).  TDLPACK Identification Section 1 (Product Definition Section).</p>
+<p>Numpy array with <code>dtype=int32</code> and of shape <code>(pytdlpack.ND7</code>)`.  Contains TDLPACK 
+Identification Section 1 (Product Definition Section).</p>
 <p><strong><code>is2 : array_like, optional</code></strong></p>
-<p>TDLPACK Identification Section 2 (Grid Definition Section).</p>
+<p>Numpy array with <code>dtypeint32</code> and of shape <code>(pytdlpack.ND7</code>)`.  Contains TDLPACK 
+Identification Section 2 (Grid Definition Section).</p>
 <p><strong><code>is4 : array_like, optional</code></strong></p>
-<p>TDLPACK Identification Section 4 (Data Section).</p>
+<p>Numpy array of type <code>int32</code> and of shape <code>(pytdlpack.ND7</code>)`.  Contains 
+TDLPACK Identification Section 4 (Data Section).</p>
 <p><strong><code>plain : str, optional</code></strong></p>
-<p>Plain language descriptor.</p>
+<p>Plain language descriptor.  This is limited to 32 characters, though here 
+the input can be longer (will be cut off when packing).</p>
 <p><strong><code>data : array_like, optional</code></strong></p>
 <p>Data values.</p>
 <p><strong><code>**kwargs : dict, optional</code></strong></p>
@@ -1780,7 +1782,7 @@ or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></
 If the record is station, then return is None.</p>
 <h2>Returns</h2>
 <p><strong><code>lats,lons : array_like</code></strong></p>
-<p>Arrays of grid latitudes and longitudes.  If <code>self.grid = 'grid'</code>, then None are returned.</p></div>
+<p>Numpy.float32 arrays of grid latitudes and longitudes.  If <code>self.grid = 'station'</code>, then None are returned.</p></div>
   <div class="source_cont">
 </div>
 

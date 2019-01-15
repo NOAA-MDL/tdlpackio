@@ -214,7 +214,8 @@ be a single call letter string, list, tuple, or comma-delimited string of statio
 ## <div id='section5'>5) Creating a TDLPACK Record.
 
 The recommended method for creating a `pytdlpack.TdlpackRecord` is to pass the TDLPACK 
-indentification arrays, plain language string, and data to the approproiate keyword.
+indentification arrays, plain language string, and data to the approproiate keyword.  Please
+see `pytdlpack.TdlpackRecord.__init__` for more info.
 
     :::python
     >>> import numpy as np
@@ -244,15 +245,13 @@ To unpack a packed TDLPACK record, perform:
     >>> record.unpack()
 
 The `pytdlpack.TdlpackRecord.unpack` class method for TDLPACK data records, contains optional
-arguments `data=False` (to control the unpacking of data) and `missing_value=None` (to set a
-different missing value other than what is contained in the record).  For TDLPACK data records, 
+arguments `data=` (to control the unpacking of data) and `missing_value=` (to set a different 
+missing value other than what is contained in the record).  For TDLPACK data records, 
 `pytdlpack.TdlpackRecord.unpack` automatically unpacks the TDLPACK meta-data.
 
     :::python
     >>> record.unpack(data=True,missing_value=-9999.0)
 
-
-- - -
 """
 __version__ = '0.9.0'
 
@@ -672,19 +671,23 @@ class TdlpackRecord(object):
 
         **`is1 : array_like, optional`**
 
-        Numpy array with dtype=numpy.int32 with shape (`pytdlpack.ND7`,).  TDLPACK Identification Section 1 (Product Definition Section).
+        Numpy array with `dtype=int32` and of shape `(pytdlpack.ND7`)`.  Contains TDLPACK 
+        Identification Section 1 (Product Definition Section).
 
         **`is2 : array_like, optional`**
 
-        TDLPACK Identification Section 2 (Grid Definition Section).
+        Numpy array with `dtypeint32` and of shape `(pytdlpack.ND7`)`.  Contains TDLPACK 
+        Identification Section 2 (Grid Definition Section).
 
         **`is4 : array_like, optional`**
 
+        Numpy array of type `int32` and of shape `(pytdlpack.ND7`)`.  Contains 
         TDLPACK Identification Section 4 (Data Section).
 
         **`plain : str, optional`**
 
-        Plain language descriptor.
+        Plain language descriptor.  This is limited to 32 characters, though here 
+        the input can be longer (will be cut off when packing).
 
         **`data : array_like, optional`**
 
@@ -835,7 +838,7 @@ class TdlpackRecord(object):
 
         **`lats,lons : array_like`**
         
-        Arrays of grid latitudes and longitudes.  If `self.grid = 'grid'`, then None are returned.
+        Numpy.float32 arrays of grid latitudes and longitudes.  If `self.grid = 'station'`, then None are returned.
         """
         lats = None
         lons = None
