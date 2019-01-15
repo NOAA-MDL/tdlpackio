@@ -6,12 +6,14 @@ Version 0.9.0
 Introduction
 ============
 
-pytdlpack is a Python interface to reading/writing TDLPACK files.
+pytdlpack is a Python interface to reading/writing TDLPACK files via official
+MOS-2000 (MOS2K) Fortran-based source files.  The necessary MOS2K source files are included
+in this package and are available as module, tdlpack.
 
-TDLPACK is a GRIB-like binary data format that is exclusive to MOS-2000 (MOS2K)
-Fortran-based sofftware system.  This software system was developed at the 
-Meteorological Development Laboratory (MDL) within NOAA/NWS and its primary purpose is
-to perform statistical post-processing of meteorological data.
+TDLPACK is a GRIB-like binary data format that is exclusive to MOS2K Fortran-based 
+sofftware system.  This software system was developed at the Meteorological Development 
+Laboratory (MDL) within NOAA/NWS and its primary purpose is to perform statistical 
+post-processing of meteorological data.
 
 TDLPACK-formatted data are contained in two type of Fortran-based files;
 sequential or random-access.  Sequential files are variable length, record-based, and unformatted.
@@ -32,11 +34,21 @@ file.
 For more information on the MOS-2000 software system and TDLPACK foremat, user is
 referred to the official [MOS-2000 documentation](https://www.weather.gov/media/mdl/TDL_OfficeNote00-1.pdf).
 
+In order for pytdlpack to read/write TDLPACK files, we need to compile the necessary MOS2K
+Fortran source code into a shared object library.  This is handled by the setup process as the
+Fortran source is compiled with f2py (included with Numpy).  The following are some important
+items to note regarding MOS2K source files included:
+
+- Several Fortran 90+ source files have been created to better interface to MOS2K Fortran 77 code.
+- The only modification made to MOS2K source files is changing the filename variable, `CFILX` from
+`CHARACTER*60` to `CHARACTER*1024` in the appropropriate subroutines where random-access file IO
+occurs.
+
 Download
 ========
 
 - Latest code from [github repository](https://github.com/eengl/pytdlpack).
-- Latest [releases](https://pypi.python.org/pypi/pytdlpack) (source code and binary installers).
+- Latest [releases](https://github.com/eengl/pytdlpack/releases) on GitHub. ***PyPI releases coming...***
 
 Requires
 ========
@@ -48,6 +60,25 @@ Requires
 
 Install
 =======
+
+**Build**
+
+First build the tdlpack module.
+
+    :::shell
+    $ python setup.py build_ext --fcompiler=[gnu95|intelem] build
+
+**Install**
+
+System-wide:
+
+    :::shell
+    $ sudo python setup.py install
+
+Locally:
+
+    :::shell
+    $ python setup.py install --prefix=<INSTALL_DIR>
 
 Tutorial
 ========
@@ -268,9 +299,9 @@ try:
 except ImportError:
     raise ImportError("NumPy required")
 try:
-    import _tdlpack
+    import tdlpack
 except ImportError:
-    raise ImportError("_tdlpack not found.")
+    raise ImportError("tdlpack not found.")
 
 __pdoc__ = {}
 
@@ -303,7 +334,7 @@ _is4 = np.zeros((ND7),dtype=np.int32)
 _iwork_meta = np.zeros((ND5_META),dtype=np.int32)
 _data_meta = np.zeros((ND5_META),dtype=np.int32)
 
-_ier = _tdlpack.openlog(FORTRAN_STDOUT_LUN,os.devnull)
+_ier = tdlpack.openlog(FORTRAN_STDOUT_LUN,os.devnull)
 if _ier != 0:
     raise IOError("Cannot write to log file")
 
@@ -407,7 +438,7 @@ class TdlpackFile(object):
 
         if self.format == 'sequential':
             _ier = np.int32(0)
-            _ier = _tdlpack.backspacefile(self.fortran_lun)
+            _ier = tdlpack.backspacefile(self.fortran_lun)
             if _ier == 0:
                 self.position -= 1
             else:
@@ -419,9 +450,9 @@ class TdlpackFile(object):
         """
         _ier = np.int32(0)
         if self.format == 'random-access':
-            _ier = _tdlpack.clfilm(FORTRAN_STDOUT_LUN,self.fortran_lun)
+            _ier = tdlpack.clfilm(FORTRAN_STDOUT_LUN,self.fortran_lun)
         elif self.format == 'sequential':
-            _ier = _tdlpack.closefile(FORTRAN_STDOUT_LUN,self.fortran_lun,np.int32(2))
+            _ier = tdlpack.closefile(FORTRAN_STDOUT_LUN,self.fortran_lun,np.int32(2))
         if _ier == 0:
             self.eof = False
             self.fortran_lun = -1
@@ -473,7 +504,7 @@ class TdlpackFile(object):
                 else:
                     id = np.int32(id)
                 _nvalue = np.int32(0)
-                _ipack,_nvalue,_ier = _tdlpack.rdtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,id,ND5,L3264B)
+                _ipack,_nvalue,_ier = tdlpack.rdtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,id,ND5,L3264B)
                 if _ier == 0:
                     _ioctet = _nvalue*NBYPWD
                     record = self._determine_record_type(_ipack,_ioctet)
@@ -484,7 +515,7 @@ class TdlpackFile(object):
                     #raise
                     pass # for now
             elif self.format == 'sequential':
-                _ioctet,_ipack,_ier = _tdlpack.readfile(FORTRAN_STDOUT_LUN,self.name,self.fortran_lun,ND5,L3264B,np.int32(2))
+                _ioctet,_ipack,_ier = tdlpack.readfile(FORTRAN_STDOUT_LUN,self.name,self.fortran_lun,ND5,L3264B,np.int32(2))
                 if _ier == 0:
                     record = self._determine_record_type(_ipack,_ioctet)
                 elif _ier == -1:
@@ -509,7 +540,7 @@ class TdlpackFile(object):
 
         if self.format == 'sequential':
             _ier = np.int32(0)
-            _ier = _tdlpack.rewindfile(self.fortran_lun)
+            _ier = tdlpack.rewindfile(self.fortran_lun)
             if _ier == 0:
                 self.position = 0
             else:
@@ -542,25 +573,25 @@ class TdlpackFile(object):
             if self.position == 0: self.data_type = 'station'
             _nwords = record.number_of_stations*2
             if self.format == 'random-access':
-                _ier = _tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
+                _ier = tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
                                        record.id,record.ipack[0:_nwords],_nreplace,
                                        _ncheck,L3264B)
             elif self.format == 'sequential':
-                _ntotby,_ntotrc,_ier = _tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,
+                _ntotby,_ntotrc,_ier = tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,
                                        record.ipack[0:_nwords],_ntotby,_ntotrc,L3264B)
         elif type(record) is TdlpackRecord:
             if self.position == 0: self.data_type = 'grid'
             _nwords = np.int32(record.ioctet/NBYPWD)
             if self.format == 'random-access':
                 record.ipack[0] = record.ipack[0].byteswap()
-                _ier = _tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
+                _ier = tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
                                        record.id,record.ipack[0:_nwords],_nreplace,
                                        _ncheck,L3264B)
             elif self.format == 'sequential':
-                _tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,record.ipack[0:_nwords],
+                tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,record.ipack[0:_nwords],
                                 _ntotby,_ntotrc,L3264B,_ier)
         elif type(record) is TdlpackTrailerRecord:
-            _ier = _tdlpack.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,L3264W,_ntotby,
+            _ier = tdlpack.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,L3264W,_ntotby,
                            _ntotrc)
         if _ier == 0:
             self.position += 1
@@ -737,12 +768,12 @@ class TdlpackRecord(object):
             _a = np.zeros((self.nx,self.ny),dtype=np.float32,order='F')
             _ia = np.zeros((self.nx,self.ny),dtype=np.int32,order='F')
             _ic = np.zeros((self.nx*self.ny),dtype=np.int32)
-            self.ioctet,_ier = _tdlpack.pack2d(FORTRAN_STDOUT_LUN,self.data,_ia,_ic,self.is0,
+            self.ioctet,_ier = tdlpack.pack2d(FORTRAN_STDOUT_LUN,self.data,_ia,_ic,self.is0,
                                self.is1,self.is2,self.is4,self.primary_missing_value,
                                self.secondary_missing_value,self.ipack,MINPK,_lx,L3264B)
         elif self.type == 'station':
             _ic = np.zeros((self.number_of_values),dtype=np.int32)
-            self.ioctet,_ier = _tdlpack.pack1d(FORTRAN_STDOUT_LUN,self.data,_ic,self.is0,
+            self.ioctet,_ier = tdlpack.pack1d(FORTRAN_STDOUT_LUN,self.data,_ic,self.is0,
                                self.is1,self.is2,self.is4,self.primary_missing_value,
                                self.secondary_missing_value,self.ipack,MINPK,
                                _lx,L3264B)
@@ -765,7 +796,7 @@ class TdlpackRecord(object):
         """
         _ier = np.int32(0)
         if not self._metadata_unpacked:
-            _data_meta,_ier = _tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:ND5_META],
+            _data_meta,_ier = tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:ND5_META],
                               _iwork_meta,_is0,_is1,_is2,_is4,_misspx,
                               _misssx,np.int32(1),L3264B)
             if _ier == 0:
@@ -814,7 +845,7 @@ class TdlpackRecord(object):
             _nd5_local = max(self.is4[2],(self.ioctet/NBYPWD))
             _iwork = np.zeros((_nd5_local),dtype=np.int32)
             _data = np.zeros((_nd5_local),dtype=np.float32)
-            _data,_ier = _tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:_nd5_local],
+            _data,_ier = tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:_nd5_local],
                                          _iwork,self.is0,self.is1,self.is2,self.is4,
                                          _misspx,_misssx,np.int32(2),L3264B)
             if _ier == 0:
@@ -846,7 +877,7 @@ class TdlpackRecord(object):
             _ier = np.int32(0)
             lats = np.zeros((self.nx,self.ny),dtype=np.float32,order='F')
             lons = np.zeros((self.nx,self.ny),dtype=np.float32,order='F')
-            lats,lons,_ier = _tdlpack.gridij_to_latlon(FORTRAN_STDOUT_LUN,self.nx,self.ny,
+            lats,lons,_ier = tdlpack.gridij_to_latlon(FORTRAN_STDOUT_LUN,self.nx,self.ny,
                              self.map_proj,self.grid_length,self.origin_longitude,
                              self.standard_latitude,self.lower_left_latitude,
                              self.lower_left_longitude)
@@ -1021,14 +1052,14 @@ def open(name, mode='r', format=None, ra_template=None):
                 _maxent = np.int32(840)
                 _nbytes = np.int32(20000)
             _filetype = np.int32(1)
-            _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype,
+            _lun,_byteorder,_filetype,_ier = tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype,
                                              ra_maxent=_maxent,ra_nbytes=_nbytes)
         elif format == 'sequential':
             _filetype = np.int32(2)
-            _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
+            _lun,_byteorder,_filetype,_ier = tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
 
     elif mode == 'r' or mode == 'a':
-        _lun,_byteorder,_filetype,_ier = _tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
+        _lun,_byteorder,_filetype,_ier = tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
 
     if _ier == 0:
         kwargs = {}
@@ -1047,7 +1078,7 @@ def open(name, mode='r', format=None, ra_template=None):
         kwargs['position'] = np.int32(0)
         kwargs['size'] = os.path.getsize(name)
     else:
-        raise IOError("Could not open TDLPACK file"+name+". Error return from _tdlpack.openfile = "+str(_ier))
+        raise IOError("Could not open TDLPACK file"+name+". Error return from tdlpack.openfile = "+str(_ier))
 
     return TdlpackFile(**kwargs)
 

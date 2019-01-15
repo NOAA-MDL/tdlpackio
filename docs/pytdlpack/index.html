@@ -1124,11 +1124,13 @@ table {
   <h2>Version 0.9.0</h2>
 <hr />
 <h1>Introduction</h1>
-<p>pytdlpack is a Python interface to reading/writing TDLPACK files.</p>
-<p>TDLPACK is a GRIB-like binary data format that is exclusive to MOS-2000 (MOS2K)
-Fortran-based sofftware system.  This software system was developed at the 
-Meteorological Development Laboratory (MDL) within NOAA/NWS and its primary purpose is
-to perform statistical post-processing of meteorological data.</p>
+<p>pytdlpack is a Python interface to reading/writing TDLPACK files via official
+MOS-2000 (MOS2K) Fortran-based source files.  The necessary MOS2K source files are included
+in this package and are available as module, tdlpack.</p>
+<p>TDLPACK is a GRIB-like binary data format that is exclusive to MOS2K Fortran-based 
+sofftware system.  This software system was developed at the Meteorological Development 
+Laboratory (MDL) within NOAA/NWS and its primary purpose is to perform statistical 
+post-processing of meteorological data.</p>
 <p>TDLPACK-formatted data are contained in two type of Fortran-based files;
 sequential or random-access.  Sequential files are variable length, record-based, and unformatted.
 Random-access files are fixed-length and direct-access.  pytdlpack accommodates reading
@@ -1144,10 +1146,20 @@ have reached the end of the file (EOF).  A trailer record is not written to a ra
 file.</p>
 <p>For more information on the MOS-2000 software system and TDLPACK foremat, user is
 referred to the official <a href="https://www.weather.gov/media/mdl/TDL_OfficeNote00-1.pdf">MOS-2000 documentation</a>.</p>
+<p>In order for pytdlpack to read/write TDLPACK files, we need to compile the necessary MOS2K
+Fortran source code into a shared object library.  This is handled by the setup process as the
+Fortran source is compiled with f2py (included with Numpy).  The following are some important
+items to note regarding MOS2K source files included:</p>
+<ul>
+<li>Several Fortran 90+ source files have been created to better interface to MOS2K Fortran 77 code.</li>
+<li>The only modification made to MOS2K source files is changing the filename variable, <code>CFILX</code> from
+<code>CHARACTER*60</code> to <code>CHARACTER*1024</code> in the appropropriate subroutines where random-access file IO
+occurs.</li>
+</ul>
 <h1>Download</h1>
 <ul>
 <li>Latest code from <a href="https://github.com/eengl/pytdlpack">github repository</a>.</li>
-<li>Latest <a href="https://pypi.python.org/pypi/pytdlpack">releases</a> (source code and binary installers).</li>
+<li>Latest <a href="https://github.com/eengl/pytdlpack/releases">releases</a> on GitHub. <strong><em>PyPI releases coming...</em></strong></li>
 </ul>
 <h1>Requires</h1>
 <ul>
@@ -1157,6 +1169,23 @@ referred to the official <a href="https://www.weather.gov/media/mdl/TDL_OfficeNo
 <li>Fortran compiler (if installing from source). <strong><em>Only GNU (gfortran) and Intel (ifort) are supported at this time.</em></strong></li>
 </ul>
 <h1>Install</h1>
+<p><strong>Build</strong></p>
+<p>First build the tdlpack module.</p>
+<div class="codehilite"><pre><span></span>$ python setup.py build_ext --fcompiler<span class="o">=[</span>gnu95<span class="p">|</span>intelem<span class="o">]</span> build
+</pre></div>
+
+
+<p><strong>Install</strong></p>
+<p>System-wide:</p>
+<div class="codehilite"><pre><span></span>$ sudo python setup.py install
+</pre></div>
+
+
+<p>Locally:</p>
+<div class="codehilite"><pre><span></span>$ python setup.py install --prefix<span class="o">=</span>&lt;INSTALL_DIR&gt;
+</pre></div>
+
+
 <h1>Tutorial</h1>
 <ol>
 <li><a href="#section1">Creating/Opening/Closing a TDLPACK file.</a></li>
@@ -1341,8 +1370,8 @@ is now an instance of <a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</co
 
 
 <p>The <a href="#pytdlpack.TdlpackRecord.unpack"><code>unpack</code></a> class method for TDLPACK data records, contains optional
-arguments <code>data=False</code> (to control the unpacking of data) and <code>missing_value=None</code> (to set a
-different missing value other than what is contained in the record).  For TDLPACK data records, 
+arguments <code>data=</code> (to control the unpacking of data) and <code>missing_value=</code> (to set a different 
+missing value other than what is contained in the record).  For TDLPACK data records, 
 <a href="#pytdlpack.TdlpackRecord.unpack"><code>unpack</code></a> automatically unpacks the TDLPACK meta-data.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">record</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">missing_value</span><span class="o">=-</span><span class="mf">9999.0</span><span class="p">)</span>
 </pre></div>

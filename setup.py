@@ -66,8 +66,8 @@ if __name__ == "__main__":
     # For Fortran 90+ source files, use "extra_f90_compile_args".
     f77_sources = glob.glob("tdlpack/*.f")
     f90_sources = glob.glob("tdlpack/*.f90")
-    all_sources = ["tdlpack/_tdlpack.pyf"]+f77_sources+f90_sources
-    ext = Extension(name  = '_tdlpack',
+    all_sources = ["tdlpack/tdlpack.pyf"]+f77_sources+f90_sources
+    ext = Extension(name  = 'tdlpack',
                     sources = all_sources,
                     extra_f77_compile_args = f77_flags,
                     extra_f90_compile_args = f90_flags
@@ -82,7 +82,14 @@ if __name__ == "__main__":
           version          = "0.9.0",
           description      = "Python interface for reading and writing TDLPACK data",
           license          = 'GPL-3.0',
-          install_requires = ['numpy'],
           ext_modules      = [ext],
           packages         = ['pytdlpack'],
+          classifiers      = ['Development Status :: 4 - Beta',
+                              'Programming Language :: Python :: 2',
+                              'Programming Language :: Python :: 2.7',
+                              'Topic :: Scientific/Engineering',
+                              'Topic :: Scientific/Engineering :: Atmospheric Science',
+                              'Intended Audience :: Science/Research',
+                              'Operating System :: OS Independent',
+                              'License :: OSI Approved :: GPL-3.0 License'],
           )
