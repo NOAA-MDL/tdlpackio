@@ -23,7 +23,7 @@ Provide a Python interface for reading and writing TDLPACK files.
 
 **NOTE for macOS users:** If GNU C compilers are not installed on your system, build via the follwing:
 
-``CC=clang python setup.py build_exst --fcompiler=gnu96 build``
+``CC=clang python setup.py build_ext --fcompiler=gnu95 build``
 
 ### Install
 
