@@ -406,6 +406,13 @@ class TdlpackFile(object):
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
+
+    def __enter__(self):
+        """no additional setup as opening with context manager is not required"""
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.close()
     
     def _determine_record_type(self,ipack,ioctet):
         kwargs = {}
