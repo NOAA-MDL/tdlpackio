@@ -1115,6 +1115,7 @@ def open(name, mode='r', format=None, ra_template=None):
 
     if mode == 'w' or mode == 'x':
 
+        if mode is None: mode = 'sequential'
         if format == 'random-access':
             if not ra_template: ra_template = 'small'
             if ra_template == 'small':
@@ -1148,7 +1149,7 @@ def open(name, mode='r', format=None, ra_template=None):
         kwargs['mode'] = mode
         kwargs['name'] = name
         kwargs['position'] = np.int32(0)
-        kwargs['size'] = os.path.getsize(name)
+        if mode == 'r' or mode == 'a': kwargs['size'] = os.path.getsize(name)
     else:
         raise IOError("Could not open TDLPACK file"+name+". Error return from tdlpack.openfile = "+str(_ier))
 
