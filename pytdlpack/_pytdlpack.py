@@ -595,8 +595,8 @@ class TdlpackFile(object):
                                        record.id,record.ipack[0:_nwords],_nreplace,
                                        _ncheck,L3264B)
             elif self.format == 'sequential':
-                tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,record.ipack[0:_nwords],
-                                _ntotby,_ntotrc,L3264B,_ier)
+                _ntotby,_ntotrc,_ier = tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,
+                                       record.ipack[0:_nwords],_ntotby,_ntotrc,L3264B)
         elif type(record) is TdlpackTrailerRecord:
             _ier = tdlpack.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,L3264W,_ntotby,
                            _ntotrc)
@@ -753,12 +753,13 @@ class TdlpackRecord(object):
         Dictionary of class attributes (keys) and class attributes (values).
         """
         type(self).counter += 1
+        self._metadata_unpacked = False
+        self._data_unpacked = False
+        self.plain = ''
         if len(kwargs) == 0:
             # Means we are creating TdlpackRecord instance from the other function
             # input, NOT the kwargs Dict.
             self.type = 'station'
-            self._metadata_unpacked = False
-            self._data_unpacked = False
             self.is0 = np.zeros(ND7,dtype=np.int32)
             self.is1 = np.zeros(ND7,dtype=np.int32)
             self.is2 = np.zeros(ND7,dtype=np.int32)
