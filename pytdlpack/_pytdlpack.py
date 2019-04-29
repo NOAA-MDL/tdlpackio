@@ -700,61 +700,133 @@ class TdlpackRecord(object):
     Identifies the type of data. 
     """
     counter = 0
-    def __init__(self,is1=None,is2=None,is4=None,plain=None,data=None,**kwargs):
+    def __init__(self,date=None,dcf=0,id=None,lead=None,plain=None,grid=None,data=None,
+                 missing_value=None,**kwargs):
+                
         """
         Constructor
 
         Parameters
         ----------
 
-        **`is1 : array_like, optional`**
+        **`date : int, optional`**
 
-        Numpy array with `dtype=int32` and of shape `(pytdlpack.ND7`)`.  Contains TDLPACK 
-        Identification Section 1 (Product Definition Section).
+        Forecast initialization or observation date in YYYYMMDDHH format.
 
-        **`is2 : array_like, optional`**
+        **`dcf : int, optional`**
 
-        Numpy array with `dtypeint32` and of shape `(pytdlpack.ND7`)`.  Contains TDLPACK 
-        Identification Section 2 (Grid Definition Section).
+        Decimal Scale Factor used to when packing TdlpackRecord data [DEFAULT is 0].
 
-        **`is4 : array_like, optional`**
+        **`id : list or array, optional`**
 
-        Numpy array of type `int32` and of shape `(pytdlpack.ND7`)`.  Contains 
-        TDLPACK Identification Section 4 (Data Section).
+        List or array of length 4 containing the 4-word (integer) MOS-2000 ID of the data
+        to be put into TdlpackRecord
 
+        **`grid : What should this be?"", optional`**
+
+        Contains the grid specs.
+
+        **`lead : int, optional`**
+
+        Lead time (i.e. forecast projection) in hours of the data.  NOTE: This can be omitted
+        if the lead time is already contains in the id.
+        
         **`plain : str, optional`**
 
         Plain language descriptor.  This is limited to 32 characters, though here 
         the input can be longer (will be cut off when packing).
 
+        **`grid : dict, optional`**
+
+        Dictionary of grid specs (created from create_grid_def_dict)
+
         **`data : array_like, optional`**
 
         Data values.
+
+        **`missing_value : float or list of floats, optional`**
+
+        Provide either a primary missing value or primary and secondary as list.
 
         **`**kwargs : dict, optional`**
 
         Dictionary of class attributes (keys) and class attributes (values).
         """
         type(self).counter += 1
-        self._metadata_unpacked = False
-        self._data_unpacked = False
-        self.nx = None
-        self.ny = None
-        self.plain = ''
-        if np.any(is1) and np.any(is4) and plain and np.any(data) and len(kwargs) == 0:
-            kwargs = {}
-            kwargs['is0'] = np.zeros((ND7),dtype=np.int32)
-            kwargs['is1'] = is1.astype(np.int32)
-            kwargs['is2'] = is2.astype(np.int32)
-            kwargs['is4'] = is4.astype(np.int32)
-            kwargs['id'] = np.int32(is1[8:12])
-            kwargs['plain'] = plain
-            kwargs['data'] = data.astype(np.float32)
-            kwargs['_metadata_unpacked'] = True
-            kwargs['_data_unpacked'] = True
-        for k,v in kwargs.items():
-            setattr(self,k,v)
-        if self._metadata_unpacked: self.unpack()
+        if len(kwargs) == 0:
+            # Means we are creating TdlpackRecord instance from the other function
+            # input, NOT the kwargs Dict.
+            self.type = 'station'
+            self._metadata_unpacked = False
+            self._data_unpacked = False
+            self.is0 = np.zeros(ND7,dtype=np.int32)
+            self.is1 = np.zeros(ND7,dtype=np.int32)
+            self.is2 = np.zeros(ND7,dtype=np.int32)
+            self.is4 = np.zeros(ND7,dtype=np.int32)
+
+            self.is1[2] = np.int32(date/1000000)
+            self.is1[3] = np.int32((date/10000)-(self.is1[2]*100))
+            self.is1[4] = np.int32((date/100)-(self.is1[2]*10000)-(self.is1[3]*100))
+            self.is1[5] = np.int32(date-((date/100)*100))
+            self.is1[6] = np.int32(0)
+            self.is1[7] = np.int32(date)
+            self.is1[8] = np.int32(id[0])
+            self.is1[9] = np.int32(id[1])
+            self.is1[10] = np.int32(id[2])
+            self.is1[11] = np.int32(id[3])
+            if lead is None:
+                self.is1[12] = np.int32(self.is1[10]-((self.is1[10]/1000)*1000))
+            else:
+                self.is1[12] = np.int32(lead)
+            self.is1[13] = np.int32(0)
+            self.is1[14] = np.int32(self.is1[8]-((self.is1[8]/100)*100))
+            self.is1[15] = np.int32(0)
+            self.is1[16] = np.int32(dcf)
+            self.is1[17] = np.int32(0)
+            self.is1[18] = np.int32(0)
+            self.is1[19] = np.int32(0)
+            self.is1[20] = np.int32(0)
+            self.is1[21] = NCHAR_PLAIN
+            if plain is None:
+                self.plain = ' '*NCHAR_PLAIN
+            else:
+                self.plain = plain
+                for n,p in enumerate(plain):
+                    self.is1[22+n] = np.int32(ord(p))
+
+            if grid is not None and type(grid) is dict:
+                # Gridded Data
+                self.type = 'grid'
+                self.is1[1] = np.int32(1) # Set IS1[1] = 1
+                self.is2[1] = np.int32(grid['proj'])
+                self.is2[2] = np.int32(grid['nx'])
+                self.is2[3] = np.int32(grid['ny'])
+                self.is2[4] = np.int32(grid['latll']*10000)
+                self.is2[5] = np.int32(grid['lonll']*10000)
+                self.is2[6] = np.int32(grid['orient_lon']*10000)
+                self.is2[7] = np.int32(grid['mesh_length']*1000) # Value in dict is in units of meters.
+                self.is2[8] = np.int32(grid['std_lat']*10000)
+
+            if len(data) > 0:
+                self.data = np.array(data,dtype=np.float32)
+                self.number_of_values = len(data)
+            else:
+                raise ValueError
+
+            if missing_value is None:
+                self.primary_missing_value = np.int32(0)
+                self.secondary_missing_value = np.int32(0)
+            else:
+                if type(missing_value) is list:
+                    self.primary_missing_value = np.int32(missing_value[0])
+                    self.secondary_missing_value = np.int32(missing_value[1])
+                else:
+                    self.primary_missing_value = np.int32(missing_value)
+                    self.secondary_missing_value = np.int32(0)
+
+        else:
+            for k,v in kwargs.items():
+                setattr(self,k,v)
 
     def __repr__(self):
         strings = []
@@ -1088,6 +1160,73 @@ def open(name, mode='r', format=None, ra_template=None):
         raise IOError("Could not open TDLPACK file"+name+". Error return from tdlpack.openfile = "+str(_ier))
 
     return TdlpackFile(**kwargs)
+
+def create_grid_def_dict(proj=None,nx=None,ny=None,latll=None,lonll=None,
+                         orient_lon=None,std_lat=None,mesh_length=None):
+    """
+    Create a dictionary of grid specs.  The user has the option to 
+    populate the dictionary via the args or create an empty dict. 
+
+    Parameters
+    ----------
+
+    **`proj : int, optional`**
+
+    Map projection of the grid (3 = Lambert Conformal; 5 = Polar Stereographic; 
+    7 = Mercator). NOTE: This parameter is optional if data are station-based.
+
+    **`nx : int, optional`**
+
+    Number of points in X-direction (East-West). NOTE: This parameter is optional if
+    data are station-based. 
+
+    **`ny : int, optional`**
+
+    Number of points in Y-direction (North-South). NOTE: This parameter is optional if
+    data are station-based.
+
+    **`latll : float, optional`**
+
+    Latitude in decimal degrees of lower-left grid point.  NOTE: This parameter is optional if
+    data are station-based.
+
+    **`lonll : float, optional`**
+
+    Longitude in decimal degrees of lower-left grid point.  NOTE: This parameter is optional if
+    data are station-based. 
+
+    **`orient_lon : float, optional`**
+
+    Longitude in decimal degrees of the central meridian.  NOTE: This parameter is optional if
+    data are station-based.
+
+    **`std_lat : float, optional`**
+
+    Latitude in decimal degrees of the standard latitude.  NOTE: This parameter is optional if
+    data are station-based.
+
+    **`mesh_length : float, optional`**
+
+    Distance in meters between grid points.  NOTE: This parameter is optional if
+    data are station-based.
+
+    Returns
+    -------
+
+    **`griddict : dict`**
+
+    Dictionary whose keys are the names parameters of this function.
+    """
+    griddict = {}
+    griddict['proj'] = proj
+    griddict['nx'] = nx
+    griddict['ny'] = ny
+    griddict['latll'] = latll
+    griddict['lonll'] = lonll
+    griddict['orient_lon'] = orient_lon
+    griddict['std_lat'] = std_lat
+    griddict['mesh_length'] = mesh_length
+    return griddict
 
 def _read_ra_master_key(file):
     f = __builtin__.open(file,'rb')
