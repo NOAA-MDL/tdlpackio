@@ -808,7 +808,8 @@ class TdlpackRecord(object):
                 self.is2[6] = np.int32(grid['orient_lon']*10000)
                 self.is2[7] = np.int32(grid['mesh_length']*1000) # Value in dict is in units of meters.
                 self.is2[8] = np.int32(grid['std_lat']*10000)
-
+                self.nx = np.int32(grid['nx'])
+                self.ny = np.int32(grid['ny'])
             if len(data) > 0:
                 self.data = np.array(data,dtype=np.float32)
                 self.number_of_values = len(data)
