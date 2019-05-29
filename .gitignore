@@ -5,5 +5,7 @@ tdlpack/*.o
 *.pyc
 .DS_Store
 .vscode
-test/lib/
+test/*.ra
+test/*.sq
 test/*.tdlp
+
