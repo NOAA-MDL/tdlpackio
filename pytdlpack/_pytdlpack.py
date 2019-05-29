@@ -411,7 +411,7 @@ class TdlpackFile(object):
         """no additional setup as opening with context manager is not required"""
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self,type,value,traceback):
         self.close()
     
     def _determine_record_type(self,ipack,ioctet):
@@ -525,6 +525,7 @@ class TdlpackFile(object):
                 _ioctet,_ipack,_ier = tdlpack.readfile(FORTRAN_STDOUT_LUN,self.name,self.fortran_lun,ND5,L3264B,np.int32(2))
                 if _ier == 0:
                     record = self._determine_record_type(_ipack,_ioctet)
+                    self.position += 1
                 elif _ier == -1:
                     self.eof = True
                     break
@@ -717,9 +718,9 @@ class TdlpackRecord(object):
 
         Decimal Scale Factor used to when packing TdlpackRecord data [DEFAULT is 0].
 
-        **`id : list or array, optional`**
+        **`id : list or 1-D array, optional`**
 
-        List or array of length 4 containing the 4-word (integer) MOS-2000 ID of the data
+        List or 1-D array of length 4 containing the 4-word (integer) MOS-2000 ID of the data
         to be put into TdlpackRecord
 
         **`grid : What should this be?"", optional`**
@@ -885,6 +886,8 @@ class TdlpackRecord(object):
                 self.is1 = deepcopy(_is1)
                 self.is2 = deepcopy(_is2)
                 self.is4 = deepcopy(_is4)
+                self.id = self.is1[8:12]
+                self.lead = self.is1[12]
 
         # Set attributes from is1[].
         self.lead_time = self.is1[10]-((self.is1[10]/1000)*1000)
@@ -1163,7 +1166,7 @@ def open(name, mode='r', format=None, ra_template=None):
 
     return TdlpackFile(**kwargs)
 
-def create_grid_def_dict(proj=None,nx=None,ny=None,latll=None,lonll=None,
+def create_grid_definition(proj=None,nx=None,ny=None,latll=None,lonll=None,
                          orient_lon=None,std_lat=None,mesh_length=None):
     """
     Create a dictionary of grid specs.  The user has the option to 
@@ -1217,7 +1220,7 @@ def create_grid_def_dict(proj=None,nx=None,ny=None,latll=None,lonll=None,
 
     **`griddict : dict`**
 
-    Dictionary whose keys are the names parameters of this function.
+    Dictionary whose keys are the named parameters of this function.
     """
     griddict = {}
     griddict['proj'] = proj
@@ -1231,6 +1234,22 @@ def create_grid_def_dict(proj=None,nx=None,ny=None,latll=None,lonll=None,
     return griddict
 
 def _read_ra_master_key(file):
+    """
+    Reads the master key record of TDLPACK Random-Access files.
+
+    Parameters
+    ----------
+
+    **`file : str`**
+
+    Distance in meters between grid points.  NOTE: This parameter is optional if
+    data are station-based.
+
+    Returns
+    -------
+
+    **`array`**    
+    """
     f = __builtin__.open(file,'rb')
     raw = f.read(24)
     f.close()
