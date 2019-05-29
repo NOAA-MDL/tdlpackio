@@ -4,8 +4,10 @@
 # Import Modules
 # ---------------------------------------------------------------------------------------- 
 import numpy as np
-import pytdlpack
 import sys
+sys.path.insert(0,'../build/lib.macosx-10.6-x86_64-2.7')
+
+import pytdlpack
 
 # ---------------------------------------------------------------------------------------- 
 # Process command line arguments
@@ -15,28 +17,19 @@ if len(sys.argv) != 2:
     exit(1)
 
 # ---------------------------------------------------------------------------------------- 
-# Open file
-# ---------------------------------------------------------------------------------------- 
-fin = pytdlpack.open(sys.argv[1],"r")
-
-# ---------------------------------------------------------------------------------------- 
 # Iterate over records in the file.
 # ---------------------------------------------------------------------------------------- 
-while 1:
+fin = pytdlpack.open(sys.argv[1],mode="r")
+while True:
     frec = fin.read()
-    if fin.lun == -1: break
-    n = fin.current_record
-    if type(frec) is pytdlpack.TdlpackStations:
+    if fin.eof: break
+    n = fin.position
+    if type(frec) is pytdlpack.TdlpackStationRecord:
         frec.unpack()
-        print "%d:%s:%d" % (n,"STATION CALL LETTER RECORD",frec.nsta)
+        print "%d:%s:%d" % (n,"STATION CALL LETTER RECORD",frec.number_of_stations)
     elif type(frec) is pytdlpack.TdlpackRecord:
-        frec.unpack(unpack_data=False)
+        frec.unpack(data=False)
         print "%d:d=%10d:%.9d %.9d %.9d %.10d:%3d-HR FCST:%32s:%d" % (n,frec.reference_date,
-        frec.id[0],frec.id[1],frec.id[2],frec.id[3],frec.leadTime,frec.plain,frec.ioctet)
+        frec.id[0],frec.id[1],frec.id[2],frec.id[3],frec.lead,frec.plain,frec.ioctet)
     elif type(frec) is pytdlpack.TdlpackTrailer:
         print "%d:%s" % (n,"TRAILER RECORD")
-
-# ---------------------------------------------------------------------------------------- 
-# Close file
-# ---------------------------------------------------------------------------------------- 
-fin.close()
