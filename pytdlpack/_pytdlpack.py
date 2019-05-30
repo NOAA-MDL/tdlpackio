@@ -416,12 +416,14 @@ class TdlpackFile(object):
     
     def _determine_record_type(self,ipack,ioctet):
         kwargs = {}
+        if ipack[0] == 0 and ipack[4] == 9999 and ioctet == 24:
+            kwargs['ipack'] = deepcopy(ipack)
+            kwargs['ioctet'] = deepcopy(ioctet)
+            kwargs['id'] = np.int32([0,0,0,0])
+            return TdlpackTrailerRecord(**kwargs)
         if ipack[0] > 0:
             kwargs['ipack'] = deepcopy(ipack)
             kwargs['ioctet'] = deepcopy(ioctet)
-            if ioctet == 24 and ipack[4] == 9999:
-                kwargs ['id'] = np.int32([0,0,0,0])
-                return TdlpackTrailerRecord(**kwargs)
             if struct.unpack('>4s',ipack[0].byteswap())[0] == "TDLP":
                 if not self.data_type: self.data_type = 'grid'
                 kwargs['id'] = deepcopy(ipack[5:9])
