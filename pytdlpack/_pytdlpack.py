@@ -202,7 +202,7 @@ You can also configure the `pytdlpack.TdlpackFile.read` to read the entire file 
 Here, x will become a list of instances of either `pytdlpack.TdlpackStationRecord`, 
 `pytdlpack.TdlpackRecord`, or `pytdlpack.TdlpackTrailerRecord`.
 
-If the file being read is `format='random-access'`, then you can also provide the `id=` 
+If the file being read a TDLPACK random-access (`format='random-access'`), then you can also provide the `id=` 
 argument to search for a specific record.
 
     :::python
@@ -234,9 +234,9 @@ be a single call letter string, list, tuple, or comma-delimited string of statio
 
     :::python
     >>> import pytdlpack
-    >>> stations = pytdlpack.TdlpackStationRecord(ccall=['KBWI','KDCA','KIAD'])
+    >>> stations = pytdlpack.TdlpackStationRecord(['KBWI','KDCA','KIAD'])
     >>> print stations
-    ccall = ('KBWI', 'KDCA', 'KIAD')
+    ccall = ['KBWI', 'KDCA', 'KIAD']
     id = [400001000         0         0         0]
     ioctet = 0
     ipack = []
@@ -250,13 +250,8 @@ see `pytdlpack.TdlpackRecord.__init__` for more info.
 
     :::python
     >>> import numpy as np
-    >>> import pytdlpack
-    >>> is1 = np.int32(...)
-    >>> is2 = np.int32(...)
-    >>> is4 = np.int32(...)
-    >>> plain = "..."
-    >>> data = np.float32(...)
-    >>> record = pytdlpack.TdlpackRecord(is1=is1,is2=is2,is4=is4,plain=plain,data=data)
+    >>> record = pytdlpack.TdlpackRecord(date=2019070100,dcf=0,id=[4210008, 0, 24, 0],lead=24,
+    plain="GFS WIND SPEED",grid=grid_def,data=<np.float32 array>)
 
 The user is encouraged to read the official MOS-2000 documentation (specifically Chapter 5) 
 on construction of these arrays and proper encoding.
@@ -288,11 +283,17 @@ __version__ = '0.9.0'
 
 from copy import deepcopy
 from itertools import count
-
-import __builtin__
+import pdb
 import os
 import struct
 import sys
+
+_IS_PYTHON3 = sys.version_info.major >= 3
+
+if _IS_PYTHON3:
+    import builtins
+else:
+    import __builtin__ as builtins
 
 try:
     import numpy as np
@@ -334,7 +335,7 @@ _is4 = np.zeros((ND7),dtype=np.int32)
 _iwork_meta = np.zeros((ND5_META),dtype=np.int32)
 _data_meta = np.zeros((ND5_META),dtype=np.int32)
 
-_ier = tdlpack.openlog(FORTRAN_STDOUT_LUN,os.devnull)
+_ier = tdlpack.openlog(FORTRAN_STDOUT_LUN,file=os.devnull)
 if _ier != 0:
     raise IOError("Cannot write to log file")
 
@@ -401,7 +402,6 @@ class TdlpackFile(object):
     def __repr__(self):
         strings = []
         keys = self.__dict__.keys()
-        keys.sort()
         for k in keys:
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
@@ -424,7 +424,10 @@ class TdlpackFile(object):
         if ipack[0] > 0:
             kwargs['ipack'] = deepcopy(ipack)
             kwargs['ioctet'] = deepcopy(ioctet)
-            if struct.unpack('>4s',ipack[0].byteswap())[0] == "TDLP":
+            header = struct.unpack('>4s',ipack[0].byteswap())[0]
+            if _IS_PYTHON3:
+                header = header.decode()
+            if header == "TDLP":
                 if not self.data_type: self.data_type = 'grid'
                 kwargs['id'] = deepcopy(ipack[5:9])
                 kwargs['reference_date'] = deepcopy(ipack[4])
@@ -432,7 +435,7 @@ class TdlpackFile(object):
             else:
                 if not self.data_type: self.data_type = 'station'
                 kwargs['id'] = np.int32([400001000,0,0,0])
-                kwargs['number_of_stations'] = deepcopy(ioctet/NCHAR)
+                kwargs['number_of_stations'] = np.int32(deepcopy(ioctet/NCHAR))
                 return TdlpackStationRecord(**kwargs)
         else:
             #raise
@@ -568,6 +571,7 @@ class TdlpackFile(object):
         An instance of either `pytdlpack.TdlpackStationRecord`, `pytdlpack.TdlpackRecord`, 
         or `pytdlpack.TdlpackTrailerRecord`.  `record` should contain a packed data.
         """
+        #pdb.set_trace()
         if self.fortran_lun == -1:
             raise IOError("File is not opened.")
         if self.mode == "r":
@@ -836,7 +840,6 @@ class TdlpackRecord(object):
     def __repr__(self):
         strings = []
         keys = self.__dict__.keys()
-        keys.sort()
         for k in keys:
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
@@ -890,10 +893,9 @@ class TdlpackRecord(object):
                 self.is2 = deepcopy(_is2)
                 self.is4 = deepcopy(_is4)
                 self.id = self.is1[8:12]
-                self.lead = self.is1[12]
 
         # Set attributes from is1[].
-        self.lead_time = self.is1[10]-((self.is1[10]/1000)*1000)
+        self.lead_time = np.int32(self.is1[10]-((self.is1[10]/1000)*1000))
         if not self.plain:
             for n in np.nditer(self.is1[22:(22+self.is1[21])]):
                 self.plain += chr(n)
@@ -920,6 +922,10 @@ class TdlpackRecord(object):
             self.origin_longitude = self.is2[6]/10000.
             self.grid_length = self.is2[7]/1000.
             self.standard_latitude = self.is2[8]/10000.
+            self.grid_def = create_grid_definition(proj=self.map_proj,nx=self.nx,ny=self.ny,
+                            latll=self.lower_left_latitude,lonll=self.lower_left_longitude,
+                            orient_lon=self.origin_longitude,std_lat=self.standard_latitude,
+                            mesh_length=self.grid_length)
        
         # Set attributes from is4[].
         self.number_of_values = self.is4[2]
@@ -976,9 +982,9 @@ class TdlpackStationRecord(object):
     Attributes
     ----------
 
-    **`ccall : tuple`**
+    **`station : list`**
 
-    A tuple of station call letters.
+    A list of station call letters.
 
     **`id : array_like`**
 
@@ -990,49 +996,51 @@ class TdlpackStationRecord(object):
 
     **`ipack : array_like`**
 
-    Packed station call letter record.
+    Array containing the packed station call letter record.
 
     **`number_of_stations: int`**
 
     Size of station call letter record.
     """
     counter = 0
-    def __init__(self,ccall=None,**kwargs):
+    def __init__(self,stations=None,**kwargs):
         """
         `pytdlpack.TdlpackStationRecord` Constructor
 
         Parameters
         ----------
 
-        **`ccall : str or list or tuple, optional`**
+        **`stations : str or list or tuple`**
 
-        Contains stations call letters.  Can be a string (containing a single call letter
-        or a comma-delimited string of multiple); list; or tuple.
-            
-        **`**kwargs : dict`**
-
-        Dictionary of class attributes (keys) and class attributes (values).
+        String of a single station or a list or tuple of stations.
         """
         type(self).counter += 1
-        if ccall is None:
-            self.ccall = None
-            self.number_of_stations = np.int32(0)
-        else:
-            if type(ccall) is str:
-                self.ccall = tuple(ccall.split(','))
+
+        if stations is not None:
+            if type(stations) is str:
+                self.stations = [stations]
+            elif type(stations) is list:
+                self.stations = stations
+            elif type(stations) is tuple:
+                self.stations = list(stations)
             else:
-                self.ccall = tuple(ccall)
-            self.number_of_stations = len(self.ccall)
-        self.id = np.int32([400001000,0,0,0])
-        self.ioctet = np.int32(0)
-        self.ipack = np.array((),dtype=np.int32)
-        for k, v in kwargs.items():
-            setattr(self, k, v)
+                pass # TODO: raise error... TypeError
+            self.number_of_stations = np.int32(len(stations))
+            self.id = np.int32([400001000,0,0,0])
+            self.ioctet = np.int32(0)
+            self.ipack = np.array((),dtype=np.int32)
+        else:
+            for k,v in kwargs.items():
+                setattr(self,k,v)
+
+        #self.number_of_stations = np.int32(len(stations))
+        #self.id = np.int32([400001000,0,0,0])
+        #self.ioctet = np.int32(0)
+        #self.ipack = np.array((),dtype=np.int32)
 
     def __repr__(self):
         strings = []
         keys = self.__dict__.keys()
-        keys.sort()
         for k in keys:
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
@@ -1042,22 +1050,29 @@ class TdlpackStationRecord(object):
         """
         Pack a Station Call Letter Record.
         """
+        #pdb.set_trace()
         self.ioctet = np.int32(self.number_of_stations*NCHAR)
-        self.ipack = np.ndarray((self.ioctet/(L3264B/NCHAR)),dtype=np.int32)
-        for n,c in enumerate(self.ccall):
-            sta = c.ljust(NCHAR,' ')
-            self.ipack[n*2] = np.copy(np.fromstring(sta[0:(NCHAR/2)],dtype=np.int32).byteswap())
-            self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[(NCHAR/2):NCHAR],dtype=np.int32).byteswap())
+        self.ipack = np.ndarray(int(self.ioctet/(L3264B/NCHAR)),dtype=np.int32)
+        for n,s in enumerate(self.stations):
+            sta = s.ljust(int(NCHAR),' ')
+            self.ipack[n*2] = np.copy(np.fromstring(sta[0:int(NCHAR/2)],dtype=np.int32).byteswap())
+            self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[int(NCHAR/2):int(NCHAR)],dtype=np.int32).byteswap())
 
     def unpack(self):
         """
         Unpack a Station Call Letter Record.
         """
-        _ccall = []
+        _stations = []
         _unpack_string_fmt = '>'+str(NCHAR)+'s'
-        for n in range(0,(self.ioctet/(NCHAR/2)),2):
-           _ccall.append(struct.unpack(_unpack_string_fmt,self.ipack[n:n+2].byteswap())[0].strip(' '))
-        self.ccall = tuple(deepcopy(_ccall))
+        nrange = range(0,int(self.ioctet/(NCHAR/2)),2)
+        if _IS_PYTHON3:
+            nrange = list(range(0,int(self.ioctet/(NCHAR/2)),2))
+        for n in nrange:
+            tmp = struct.unpack(_unpack_string_fmt,self.ipack[n:n+2].byteswap())[0]
+            if _IS_PYTHON3:
+                tmp = tmp.decode()
+            _stations.append(tmp.strip(' '))
+        self.stations = list(deepcopy(_stations))
 
 class TdlpackTrailerRecord(object):
     """
@@ -1075,7 +1090,6 @@ class TdlpackTrailerRecord(object):
     def __repr__(self):
         strings = []
         keys = self.__dict__.keys()
-        keys.sort()
         for k in keys:
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
@@ -1125,11 +1139,10 @@ def open(name, mode='r', format=None, ra_template=None):
     _ier = np.int32(0)
     name = os.path.abspath(name)
 
-    if not format: format == 'sequential'
-
+    #pdb.set_trace()
+    if format is None: format = 'sequential'
     if mode == 'w' or mode == 'x':
 
-        if mode is None: mode = 'sequential'
         if format == 'random-access':
             if not ra_template: ra_template = 'small'
             if ra_template == 'small':
@@ -1146,7 +1159,10 @@ def open(name, mode='r', format=None, ra_template=None):
             _lun,_byteorder,_filetype,_ier = tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
 
     elif mode == 'r' or mode == 'a':
-        _lun,_byteorder,_filetype,_ier = tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
+        if os.path.isfile(name):
+            _lun,_byteorder,_filetype,_ier = tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
+        else:
+            raise IOError("File not found.")
 
     if _ier == 0:
         kwargs = {}
@@ -1253,7 +1269,7 @@ def _read_ra_master_key(file):
 
     **`array`**    
     """
-    f = __builtin__.open(file,'rb')
+    f = builtins.open(file,'rb')
     raw = f.read(24)
     f.close()
     return np.fromstring(raw,dtype='>i4')
