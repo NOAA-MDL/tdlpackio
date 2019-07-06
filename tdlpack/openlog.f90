@@ -1,15 +1,28 @@
-subroutine openlog(kstdout,file,ier)
+subroutine openlog(kstdout,ier,file)
 implicit none
 
+! ---------------------------------------------------------------------------------------- 
+! ---------------------------------------------------------------------------------------- 
 integer, intent(in) :: kstdout
-character(len=*), intent(in) :: file
 integer, intent(out) :: ier
+character(len=*), intent(in), optional :: file
 
+! ---------------------------------------------------------------------------------------- 
+! ---------------------------------------------------------------------------------------- 
 integer :: ios
 
+! ---------------------------------------------------------------------------------------- 
+! ---------------------------------------------------------------------------------------- 
+ier=0
 ios=0
 
-open(unit=kstdout,file=file,form="formatted",status="replace",iostat=ios)
+! ---------------------------------------------------------------------------------------- 
+! ---------------------------------------------------------------------------------------- 
+if(present(file))then
+   open(unit=kstdout,file=file,form="formatted",status="replace",iostat=ios)
+else
+   open(unit=kstdout,form="formatted",status="replace",iostat=ios)
+endif
 ier=ios
 
 return
