@@ -766,6 +766,8 @@ class TdlpackRecord(object):
         if len(kwargs) == 0:
             # Means we are creating TdlpackRecord instance from the other function
             # input, NOT the kwargs Dict.
+            self.id = id
+            self.reference_date = date
             self.type = 'station'
             self.is0 = np.zeros(ND7,dtype=np.int32)
             self.is1 = np.zeros(ND7,dtype=np.int32)
