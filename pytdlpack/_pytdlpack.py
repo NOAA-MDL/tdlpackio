@@ -707,7 +707,7 @@ class TdlpackRecord(object):
     Identifies the type of data. 
     """
     counter = 0
-    def __init__(self,date=None,dcf=0,id=None,lead=None,plain=None,grid=None,data=None,
+    def __init__(self,date=None,id=None,lead=None,plain=None,grid=None,data=None,
                  missing_value=None,**kwargs):
                 
         """
@@ -719,10 +719,6 @@ class TdlpackRecord(object):
         **`date : int, optional`**
 
         Forecast initialization or observation date in YYYYMMDDHH format.
-
-        **`dcf : int, optional`**
-
-        Decimal Scale Factor used to when packing TdlpackRecord data [DEFAULT is 0].
 
         **`id : list or 1-D array, optional`**
 
@@ -791,7 +787,7 @@ class TdlpackRecord(object):
             self.is1[13] = np.int32(0)
             self.is1[14] = np.int32(self.is1[8]-((self.is1[8]/100)*100))
             self.is1[15] = np.int32(0)
-            self.is1[16] = np.int32(dcf)
+            self.is1[16] = np.int32(1) # Will default to 1, but user can specify decimal scale factor in pack().
             self.is1[17] = np.int32(0)
             self.is1[18] = np.int32(0)
             self.is1[19] = np.int32(0)
@@ -836,6 +832,7 @@ class TdlpackRecord(object):
                     self.secondary_missing_value = np.int32(0)
 
         else:
+            # Instantiate via **kwargs
             for k,v in kwargs.items():
                 setattr(self,k,v)
 
@@ -847,12 +844,20 @@ class TdlpackRecord(object):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
     
-    def pack(self):
+    def pack(self,dec_scale=1):
         """
         Pack a TDLPACK record.
+
+        Parameters
+        ----------
+
+        **`dec_scale : int, optional, default = 1`**
+
+        Decimal Scale Factor used to when packing TdlpackRecord data [DEFAULT is 1].
         """
         _ier = np.int32(0)
         self.ipack = np.zeros((ND5),dtype=np.int32)
+        self.is1[16] = np.int32(dec_scale)
         if self.type == 'grid':
             _a = np.zeros((self.nx,self.ny),dtype=np.float32,order='F')
             _ia = np.zeros((self.nx,self.ny),dtype=np.int32,order='F')
