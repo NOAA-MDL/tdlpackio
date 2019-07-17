@@ -709,7 +709,6 @@ class TdlpackRecord(object):
     counter = 0
     def __init__(self,date=None,id=None,lead=None,plain=None,grid=None,data=None,
                  missing_value=None,**kwargs):
-                
         """
         Constructor
 
@@ -858,6 +857,13 @@ class TdlpackRecord(object):
         _ier = np.int32(0)
         self.ipack = np.zeros((ND5),dtype=np.int32)
         self.is1[16] = np.int32(dec_scale)
+
+        # Handle potential NaN values
+        if self.primary_missing_value == 0:
+            self.primary_missing_value == DEFAULT_MISSING_VALUE
+        self.data = np.where(np.isnan(self.data),np.float32(self.primary_missing_value),
+                             self.data)
+
         if self.type == 'grid':
             _a = np.zeros((self.nx,self.ny),dtype=np.float32,order='F')
             _ia = np.zeros((self.nx,self.ny),dtype=np.int32,order='F')
