@@ -83,6 +83,7 @@ if __name__ == "__main__":
           description      = "Python interface for reading and writing TDLPACK data",
           license          = 'GPL-3.0',
           ext_modules      = [ext],
+          py_modules       = ['TdlpackIO'],
           packages         = ['pytdlpack'],
           classifiers      = ['Development Status :: 4 - Beta',
                               'Programming Language :: Python :: 2',
