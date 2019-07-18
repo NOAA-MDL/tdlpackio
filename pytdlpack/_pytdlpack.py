@@ -319,7 +319,8 @@ MINPK = _DEFAULT_MINPK
 NCHAR = np.int32(8)
 NCHAR_PLAIN = np.int32(32)
 ND5 = _DEFAULT_ND5
-ND5_META = np.int32(32)
+ND5_META_MIN = np.int32(24)
+ND5_META_MAX = np.int32(32)
 ND7 = _DEFAULT_ND7
 NBYPWD = np.int32(L3264B/8)
 
@@ -332,8 +333,6 @@ _is0 = np.zeros((ND7),dtype=np.int32)
 _is1 = np.zeros((ND7),dtype=np.int32)
 _is2 = np.zeros((ND7),dtype=np.int32)
 _is4 = np.zeros((ND7),dtype=np.int32)
-_iwork_meta = np.zeros((ND5_META),dtype=np.int32)
-_data_meta = np.zeros((ND5_META),dtype=np.int32)
 
 _ier = tdlpack.openlog(FORTRAN_STDOUT_LUN,file=os.devnull)
 if _ier != 0:
@@ -896,7 +895,13 @@ class TdlpackRecord(object):
         """
         _ier = np.int32(0)
         if not self._metadata_unpacked:
-            _data_meta,_ier = tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:ND5_META],
+            if self.ipack.shape[0] < ND5_META_MAX:
+                _nd5_local = ND5_META_MIN
+            else:
+                _nd5_local = ND5_META_MAX
+            _data_meta = np.zeros((_nd5_local),dtype=np.int32)
+            _iwork_meta = np.zeros((_nd5_local),dtype=np.int32)
+            _data_meta,_ier = tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:_nd5_local],
                               _iwork_meta,_is0,_is1,_is2,_is4,_misspx,
                               _misssx,np.int32(1),L3264B)
             if _ier == 0:
@@ -950,6 +955,11 @@ class TdlpackRecord(object):
             _nd5_local = max(self.is4[2],(self.ioctet/NBYPWD))
             _iwork = np.zeros((_nd5_local),dtype=np.int32)
             _data = np.zeros((_nd5_local),dtype=np.float32)
+            # Check to make sure the size of self.ipack is long enough. If not, then
+            # we will "append" to self.ipack.
+            if self.ipack.shape[0] < _nd5_local:
+                pad = np.zeros((_nd5_local-self.ipack.shape[0]),dtype=np.int32)
+                self.ipack = np.append(self.ipack,pad)
             _data,_ier = tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:_nd5_local],
                                          _iwork,self.is0,self.is1,self.is2,self.is4,
                                          _misspx,_misssx,np.int32(2),L3264B)
