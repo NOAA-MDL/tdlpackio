@@ -50,6 +50,14 @@ class open(object):
         """
         self.close()
 
+    def __next__(self):
+        """
+        """
+        if self.recordnumber < len(self._index):
+            return self.read(1)[0]
+        else:
+            raise StopIteration
+
     def _get_index(self):
         """
         Perform fast indexing of records.
@@ -87,12 +95,17 @@ class open(object):
                         recdict['id2'] = 0  
                         recdict['id3'] = 0
                         recdict['id4'] = 0
-                self.records += 1 # This does include trailer records
+
+                # At this point we have successfully identified a TDLPACK record from
+                # the file. Increment self.records and position the file pointer to
+                # now read the Fortran trailer.
+                self.records += 1 # Includes trailer records
                 self._file.seek(fortran_header-bytes_to_read,1)
                 fortran_trailer = struct.unpack('>i',self._file.read(4))[0]
 
+                # Check Fortran header and trailer for the record.
                 if fortran_header != fortran_trailer:
-                    raise(IOError)
+                    raise IOError('Bad Fortran record.')
 
                 # NOTE: The 'offset' key contains the byte position in the file of where
                 # data record begins. A value of 12 is added to consider a 4-byte Fortran
@@ -112,43 +125,61 @@ class open(object):
         """
         self._file.close()
 
-    def read(self,num):
+    def read(self,num=None):
         """
+        Read num records from the current position.
         """
         recs = []
-        for n in range(self.recordnumber,self.recordnumber+num):
+        if num == 0:
+            return recs
+        elif num == 1:
+            reclist = [self.recordnumber+1]
+        elif num > 1:
+            reclist = list(range(self.recordnumber+1,self.recordnumber+1+num))
+        for n in reclist:
+            nn = n-1 # Use this for the self._index referencing
             kwargs = {}
             self.seek(n)
-            print(n,self._index[n]['recType'],self._index[n]['size']/4)
-            kwargs['ioctet'] = self._index[n]['size']
-            kwargs['ipack'] = np.frombuffer(self._file.read(self._index[n]['size']),dtype='>i4')
-            if self._index[n]['recType'] == 'data':
-                kwargs['reference_date'] = self._index[n]['refDate']
+            kwargs['ioctet'] = self._index[nn]['size']
+            kwargs['ipack'] = np.frombuffer(self._file.read(self._index[nn]['size']),dtype='>i4')
+            if self._index[nn]['recType'] == 'data':
+                kwargs['reference_date'] = self._index[nn]['refDate']
                 rec = pytdlpack.TdlpackRecord(**kwargs)
                 rec.unpack()
                 recs.append(rec)
-            elif self._index[n]['recType'] == 'station':
+            elif self._index[nn]['recType'] == 'station':
+                kwargs['ipack'] = kwargs['ipack'].byteswap()
                 rec = pytdlpack.TdlpackStationRecord(**kwargs)
                 rec.unpack()
                 recs.append(rec)
-            elif self._index[n]['recType'] == 'trailer':
+            elif self._index[nn]['recType'] == 'trailer':
                 recs.append(pytdlpack.TdlpackTrailerRecord(**kwargs))
-            self.recordnumber = n
         return recs
+    
+    def record(self,rec):
+        """
+        Read the rec-th record.
+        """
+        if rec <= 0:
+            return None
+        else:
+            self.seek(rec)
+            return self.read(1)[0]
 
     def seek(self,offset):
         """
         Set the position within the file in units of data records.
         """
         if self._hasindex:
-            try:
+            if offset == 0:
                 self._file.seek(self._index[offset]['offset'])
                 self.recordnumber = offset
-            except(IndexError):
-                raise OSError('Invalid record position')
-
+            elif offset > 0:
+                self._file.seek(self._index[offset-1]['offset'])
+                self.recordnumber = offset
+    
     def tell(self):
         """
+        Return the position in units of records.
         """
         return self.recordnumber
-
