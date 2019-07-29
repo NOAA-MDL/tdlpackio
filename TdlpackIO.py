@@ -75,9 +75,10 @@ class open(object):
         self._index['id2'] = []
         self._index['id3'] = []
         self._index['id4'] = []
+        self._index['linked_station_id_record'] = []
+        _last_station_id_record = 0
         while True:
             try:
-                #recdict = {}
                 pos = self._fh.tell()
                 fortran_header = struct.unpack('>i',self._fh.read(4))[0]
                 if fortran_header >= 44:
@@ -96,6 +97,7 @@ class open(object):
                     self._index['id2'].append(temp[8])
                     self._index['id3'].append(temp[9])
                     self._index['id4'].append(temp[10])
+                    self._index['linked_station_id_record'].append(_last_station_id_record)
                 else:
                     if temp[1] == 24 and temp[6] == 9999:
                         self._index['size'].append(temp[1])
@@ -106,6 +108,7 @@ class open(object):
                         self._index['id2'].append(None)
                         self._index['id3'].append(None)
                         self._index['id4'].append(None)
+                        self._index['linked_station_id_record'].append(_last_station_id_record)
                     else:
                         # This is a station ID record
                         self._index['size'].append(temp[1])
@@ -116,6 +119,7 @@ class open(object):
                         self._index['id2'].append(0)  
                         self._index['id3'].append(0)
                         self._index['id4'].append(0)
+                        self._index['linked_station_id_record'].append(_last_station_id_record)
 
                 # At this point we have successfully identified a TDLPACK record from
                 # the file. Increment self.records and position the file pointer to
@@ -132,7 +136,10 @@ class open(object):
                 # data record begins. A value of 12 is added to consider a 4-byte Fortran
                 # header, 4-byte "trash", and 4-byte ioctet value (already) stored on index.
                 self._index['offset'].append(pos+12) # 4-byte header + 4-byte trash + 4-byte ioctet
-                #self._index.append(recdict)
+
+                # Hold the record number of the last station ID record
+                if self._index['type'][-1] == 'station':
+                    _last_station_id_record = self.records # This should be OK.
 
             except(struct.error):
                 self._fh.seek(0)
@@ -183,11 +190,17 @@ class open(object):
         """
         Read the N-th record.
         """
+        #pdb.set_trace()
+        if rec is None:
+            return None
         if rec <= 0:
             warnings.warn("Record numbers begin at 1.") 
             return None
+        elif rec > self.records:
+            warnings.warn("Not that many records in the file.")
+            return None
         else:
-            self.seek(rec-1)
+            self.seek(rec) # Use the actual record number here.
             return self.read(1,unpack=unpack)[0]
 
     def seek(self,offset):
