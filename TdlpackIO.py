@@ -3,7 +3,8 @@ import logging
 import numpy as np
 import pytdlpack
 import struct
-import sys
+import sys  
+import warnings
 
 import pdb
 
@@ -38,11 +39,6 @@ class open(object):
         if 'r' in mode:
             self._get_index()
 
-    def __iter__(self):
-        """
-        """
-        return self
-
     def __enter__(self):
         """
         """
@@ -53,10 +49,15 @@ class open(object):
         """
         self.close()
 
+    def __iter__(self):
+        """
+        """
+        return self
+
     def __next__(self):
         """
         """
-        if self.recordnumber < len(self._index):
+        if self.recordnumber < self.records:
             return self.read(1)[0]
         else:
             raise StopIteration
@@ -159,9 +160,6 @@ class open(object):
             reclist = list(range(self.recordnumber+1,self.recordnumber+1+num))
         for n in reclist:
             nn = n-1 # Use this for the self._index referencing
-            # Test...
-            for k in self._index.keys():
-                print(n,nn,k,self._index[k][nn])
             kwargs = {}
             self.seek(n)
             kwargs['ioctet'] = self._index['size'][nn]
@@ -178,13 +176,15 @@ class open(object):
                 recs.append(rec)
             elif self._index['type'][nn] == 'trailer':
                 recs.append(pytdlpack.TdlpackTrailerRecord(**kwargs))
+            self.recordnumber = n
         return recs
     
     def record(self,rec,unpack=True):
         """
-        Read the rec-th record.
+        Read the N-th record.
         """
         if rec <= 0:
+            warnings.warn("Record numbers begin at 1.") 
             return None
         else:
             self.seek(rec-1)
@@ -199,8 +199,8 @@ class open(object):
                 self._fh.seek(self._index['offset'][offset])
                 self.recordnumber = offset
             elif offset > 0:
-                self._fh.seek(self._index['offset'][offset])
-                self.recordnumber = offset
+                self._fh.seek(self._index['offset'][offset-1])
+                self.recordnumber = offset-1
     
     def tell(self):
         """
