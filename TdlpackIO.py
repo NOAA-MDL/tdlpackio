@@ -1,12 +1,23 @@
+"""
+TdlpackIO is a pure Python implementation for performing IO with TDLPACK sequential files
+(i.e. Fortran unformatted files).  Instead of using Fortran for perform IO, we are using
+Python builtins.open() in binary mode.  This allows us to perform stream-based IO for TDLPACK
+files.  When a file is opened for reading, its contents (TDLPACK records) are automatically
+indexed and stored in a dictionary.  The dictionary stores the byte offset the data record;
+the size of the data record; date and lead time; and MOS-2000 ID.
+
+This indexing allow the user to access a TLDPACK sequential file in a random-access nature.
+For example if a users wants to read the 500th record in the file, the first 499 records in
+their entirety do not need to be read.
+"""
 import builtins
 import logging
 import numpy as np
+import pdb
 import pytdlpack
 import struct
 import sys  
 import warnings
-
-import pdb
 
 ONE_MB = 1024 ** 3
 
@@ -64,8 +75,10 @@ class open(object):
 
     def _get_index(self):
         """
-        Perform fast indexing of records.
+        Perform indexing of data records.
         """
+        #pdb.set_trace()
+        # Initialize index dictionary
         self._index['offset'] = []
         self._index['size'] = []
         self._index['type'] = []
@@ -77,8 +90,13 @@ class open(object):
         self._index['id4'] = []
         self._index['linked_station_id_record'] = []
         _last_station_id_record = 0
+
+        # Iterate
         while True:
             try:
+                # First read 4-byte Fortran record header, then read the next
+                # 44 bytes which provides enough information to catalog the
+                # data record.
                 pos = self._fh.tell()
                 fortran_header = struct.unpack('>i',self._fh.read(4))[0]
                 if fortran_header >= 44:
@@ -87,8 +105,11 @@ class open(object):
                     bytes_to_read = fortran_header
                 temp = np.frombuffer(self._fh.read(bytes_to_read),dtype='>i4')
                 _header = struct.unpack('>4s',temp[2])[0].decode()
+
+                # Check to first 4 bytes of the data record to determine the data
+                # record type.
                 if _header == 'PLDT':
-                    # This is a TDLPACK data record
+                    # TDLPACK data record
                     self._index['size'].append(temp[1])
                     self._index['type'].append('data')
                     self._index['date'].append(temp[6])
@@ -100,6 +121,7 @@ class open(object):
                     self._index['linked_station_id_record'].append(_last_station_id_record)
                 else:
                     if temp[1] == 24 and temp[6] == 9999:
+                        # Trailer record
                         self._index['size'].append(temp[1])
                         self._index['type'].append('trailer')
                         self._index['date'].append(None)
@@ -110,7 +132,7 @@ class open(object):
                         self._index['id4'].append(None)
                         self._index['linked_station_id_record'].append(_last_station_id_record)
                     else:
-                        # This is a station ID record
+                        # Station ID record
                         self._index['size'].append(temp[1])
                         self._index['type'].append('station')
                         self._index['date'].append(None)
@@ -207,6 +229,7 @@ class open(object):
         """
         Set the position within the file in units of data records.
         """
+        #pdb.set_trace()
         if self._hasindex:
             if offset == 0:
                 self._fh.seek(self._index['offset'][offset])
