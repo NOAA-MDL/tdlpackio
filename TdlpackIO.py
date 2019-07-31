@@ -18,6 +18,8 @@ import struct
 import sys  
 import warnings
 
+__version__ = pytdlpack.__version__ # Share the version number
+
 _IS_PYTHON3 = sys.version_info.major >= 3
 
 if _IS_PYTHON3:
