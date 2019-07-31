@@ -6,7 +6,7 @@ files.  When a file is opened for reading, its contents (TDLPACK records) are au
 indexed and stored in a dictionary.  The dictionary stores the byte offset the data record;
 the size of the data record; date and lead time; and MOS-2000 ID.
 
-This indexing allow the user to access a TLDPACK sequential file in a random-access nature.
+This indexing allow the user to access a TDLPACK sequential file in a random-access nature.
 For example if a users wants to read the 500th record in the file, the first 499 records in
 their entirety do not need to be read.
 """
