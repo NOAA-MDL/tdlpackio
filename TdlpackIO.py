@@ -10,7 +10,6 @@ This indexing allow the user to access a TLDPACK sequential file in a random-acc
 For example if a users wants to read the 500th record in the file, the first 499 records in
 their entirety do not need to be read.
 """
-import builtins
 import logging
 import numpy as np
 import pdb
@@ -18,6 +17,13 @@ import pytdlpack
 import struct
 import sys  
 import warnings
+
+_IS_PYTHON3 = sys.version_info.major >= 3
+
+if _IS_PYTHON3:
+    import builtins
+else:
+    import __builtin__ as builtins
 
 ONE_MB = 1024 ** 3
 
