@@ -10,22 +10,25 @@ import pytdlpack
 # ---------------------------------------------------------------------------------------- 
 # Create some data
 # ---------------------------------------------------------------------------------------- 
+nx = 2345
+ny = 1597
 date = 2019052900
 id = [4210008,10,24,0]
-grid_data = np.zeros((2345,1597),dtype=np.float32,order='F')+10.0
+grid_data = np.random.rand(nx,ny)*75.0
+grid_data.fill(np.nan)
 
 # ---------------------------------------------------------------------------------------- 
 # Grid Specs: CONUS Lambert-Conformal 2.5km 2345x1597 
 # ---------------------------------------------------------------------------------------- 
-griddef = pytdlpack.create_grid_definition(proj=3,nx=2345,ny=1597,latll=19.2290,
+griddef = pytdlpack.create_grid_definition(proj=3,nx=nx,ny=ny,latll=19.2290,
           lonll=233.7234,orient_lon=265.,std_lat=25.,mesh_length=2.539703)
 
 # ---------------------------------------------------------------------------------------- 
 # Create TDLPACK data record and pack
 # ---------------------------------------------------------------------------------------- 
-rec = pytdlpack.TdlpackRecord(date=date,dcf=1,id=id,lead=24,plain="GFS WIND SPEED",
+rec = pytdlpack.TdlpackRecord(date=date,id=id,lead=24,plain="GFS WIND SPEED",
                               data=grid_data,missing_value=9999.0,grid=griddef)
-rec.pack()
+rec.pack(dec_scale=3)
 
 # ---------------------------------------------------------------------------------------- 
 # Open new sequential file and write the records
@@ -33,3 +36,10 @@ rec.pack()
 f = pytdlpack.open('new_grid.sq',mode='w',format='sequential')
 f.write(rec)
 f.close()
+
+# ---------------------------------------------------------------------------------------- 
+# Open new random-access file and write the records
+# ---------------------------------------------------------------------------------------- 
+fra = pytdlpack.open('new_grid.ra',mode='w',format='random-access',ra_template='large')
+fra.write(rec)
+fra.close()
