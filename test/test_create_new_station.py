@@ -4,6 +4,11 @@
 # Import Modules
 # ---------------------------------------------------------------------------------------- 
 import sys
+
+import setuptools
+platform = setuptools.distutils.util.get_platform()
+build_path = './build/lib.'+platform+'-'+str(sys.version_info.major)+'.'+str(sys.version_info.minor)
+sys.path.insert(0,build_path)
 import pytdlpack
 
 # ---------------------------------------------------------------------------------------- 
@@ -30,7 +35,7 @@ rec.pack()
 # ---------------------------------------------------------------------------------------- 
 # Open new sequential file and write the records
 # ---------------------------------------------------------------------------------------- 
-f = pytdlpack.open('new.sq',mode='w',format='sequential')
+f = pytdlpack.open('new_station.sq',mode='w',format='sequential')
 f.write(sta)
 f.write(rec)
 f.write(pytdlpack.TdlpackTrailerRecord())

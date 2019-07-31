@@ -2,10 +2,15 @@
 
 import TdlpackIO
 import numpy as np
-import pytdlpack
 import pdb
 import os
 import sys
+
+import setuptools
+platform = setuptools.distutils.util.get_platform()
+build_path = './build/lib.'+platform+'-'+str(sys.version_info.major)+'.'+str(sys.version_info.minor)
+sys.path.insert(0,build_path)
+import pytdlpack
 
 # ---------------------------------------------------------------------------------------- 
 # Point stdout to null
