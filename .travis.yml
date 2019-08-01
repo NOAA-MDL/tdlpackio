@@ -25,9 +25,11 @@ addons:
    - gfortran
 
 before_install:
-  - pip install $DEPENDS
+ - pip install $DEPENDS
 
 install:
-  - python setup.py build_ext --fcompiler=$FCOMPILER build
-  - python setup.py test
-  - python setup.py install --prefix=$PREFIX
+ - python setup.py build_ext --fcompiler=$FCOMPILER build
+ - python setup.py install --prefix=$PREFIX
+
+script:
+ - python setup.py test
