@@ -10,3 +10,5 @@ test/*.sq
 test/*.tdlp
 
 *.code-workspace
+
+pytdlpack/version.py

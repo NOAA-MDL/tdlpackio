@@ -1,8 +1,4 @@
 """
-Version 0.9.0
--------------
-- - -
-
 Introduction
 ============
 
@@ -279,7 +275,6 @@ missing value other than what is contained in the record).  For TDLPACK data rec
     >>> record.unpack(data=True,missing_value=-9999.0)
 
 """
-__version__ = '0.9.0'
 
 from copy import deepcopy
 from itertools import count

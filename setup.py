@@ -4,6 +4,20 @@ import glob
 import os
 import sys
 
+VERSION = '0.9.0'
+
+# Write version info
+def write_version_py(filename='pytdlpack/version.py'):
+    cnt = """
+# THIS FILE IS GENERATED FROM PYTDLPACK SETUP.PY
+version = '%(version)s'
+"""
+    a = open(filename,'w')
+    try:
+        a.write(cnt % {'version': VERSION})
+    finally:
+        a.close()
+
 # Define Fortran compiler flags for GNU and Intel Fortran
 if "build" in sys.argv:
     if "--fcompiler=gnu95" in sys.argv:
@@ -77,6 +91,9 @@ class TestCommand(Command):
         import sys, subprocess
         for f in os.listdir('./test/'):
             raise SystemExit(subprocess.call([sys.executable,'./test/'+f]))
+
+# Rewrite the version file everytime
+write_version_py()
 
 # Run setup
 setup(name             = 'pytdlpack',
