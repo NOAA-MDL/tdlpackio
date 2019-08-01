@@ -1,0 +1,26 @@
+language: python
+
+sudo: false
+
+env:
+  global:
+    - DEPENDS="numpy"
+
+python:
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+
+notifications:
+  email: true
+
+before_install:
+  - pip install $DEPENDS
+
+install:
+  - python setup.py build
+  - python setup.py test
+  - python setup.py install
