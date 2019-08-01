@@ -28,9 +28,9 @@ sta.pack()
 # ---------------------------------------------------------------------------------------- 
 # Create TDLPACK data record and pack
 # ---------------------------------------------------------------------------------------- 
-rec = pytdlpack.TdlpackRecord(date=date,dcf=1,id=id,lead=24,plain="GFS WIND SPEED",
+rec = pytdlpack.TdlpackRecord(date=date,id=id,lead=24,plain="GFS WIND SPEED",
                               data=station_data,missing_value=9999.0)
-rec.pack()
+rec.pack(dec_scale=1)
 
 # ---------------------------------------------------------------------------------------- 
 # Open new sequential file and write the records
