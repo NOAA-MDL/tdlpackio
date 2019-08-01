@@ -251,11 +251,46 @@ class open(object):
         Select TDLPACK data record by means of date, lead time, id or any combination
         thereof.
         """
+        #pdb.set_trace()
         recs = []
+        idx = None
+        match_count = 0
+
+        # Perform matching by determining list index values for each list criteria
+        # in the file index dictionary.  These index values are catted together
+        # throughout the matching.
         if date:
+            # Match by date (i.e. reference date)
+            match_count += 1
             idx = np.where(np.array(self._index['date'])==date)[0]
-            for i in idx:
-                recs.append(self.record(i+1,unpack=unpack))
+        if id:
+            # Match by MOS ID (all 4 words)
+            match_count += 4
+            idx1 = np.where(np.array(self._index['id1'])==id[0])[0]
+            idx2 = np.where(np.array(self._index['id2'])==id[1])[0]
+            idx3 = np.where(np.array(self._index['id3'])==id[2])[0]
+            idx4 = np.where(np.array(self._index['id4'])==id[3])[0]
+            if idx is not None:
+                idx = np.concatenate((idx,idx1,idx2,idx3,idx4))
+            else:
+                idx = np.concatenate((idx1,idx2,idx3,idx4))
+        if lead:
+            # Match by lead time
+            match_count += 1
+            if idx is not None:
+                idx = np.concatenate((idx,np.where(np.array(self._index['lead'])==id)[0]))
+            else:
+                idx = np.concatenate((np.where(np.array(self._index['lead'])==id)[0]))
+
+        # Now determine the count of unique index values.  The count needs to match the
+        # value of match_count.  Where this occurs, the index values are extracted.
+        vals,cnts = np.unique(idx,return_counts=True)
+        idx = vals[np.where(cnts==match_count)[0]]
+
+        # Now we iterate over the matching index values and build the list of
+        # records.
+        for i in idx:
+            recs.append(self.record(i+1,unpack=unpack))
         return recs
     
     def tell(self):
