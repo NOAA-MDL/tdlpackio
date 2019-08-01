@@ -13,7 +13,7 @@ A brief introduction to TDLPACK files and data format can be found [here](TDLPAC
 Provide a Python interface for reading and writing TDLPACK files.
 
 ## Requirements
-* Python 2.7+ (Python 3 support coming soon!)
+* Python 2.7, 3.4+
 * NumPy 1.8+
 * Fortran compiler ***Only GNU (gfortran) and Intel (ifort) are supported at this time.***
 

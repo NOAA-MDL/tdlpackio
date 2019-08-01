@@ -1,10 +1,5 @@
 language: python
 
-#sudo: required
-#
-#before_install:
-#  - sudo apt-get install gfortran
-
 env:
  global:
   - DEPENDS="numpy"

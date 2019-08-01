@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import TdlpackIO
 import numpy as np
 import pdb
 import os
@@ -11,6 +10,7 @@ platform = setuptools.distutils.util.get_platform()
 build_path = './build/lib.'+platform+'-'+str(sys.version_info.major)+'.'+str(sys.version_info.minor)
 sys.path.insert(0,build_path)
 import pytdlpack
+import TdlpackIO
 
 # ---------------------------------------------------------------------------------------- 
 # Point stdout to null
@@ -19,19 +19,21 @@ fout = open(os.devnull,'w')
 sys.stdout = fout
 
 # ---------------------------------------------------------------------------------------- 
-# Open TDLPACK file
+# Open vector TDLPACK file; iterate; close
 # ---------------------------------------------------------------------------------------- 
 f = TdlpackIO.open("../../sampledata/hre201701")
 f.seek(0)
-
-# ---------------------------------------------------------------------------------------- 
-# Iterate over the file.  This is testing TdlpackIO.open.__iter__ and __next__ methods.
-# ---------------------------------------------------------------------------------------- 
 for rec in f:
     print(f.recordnumber,type(rec),rec.id)
+f.close()
 
 # ---------------------------------------------------------------------------------------- 
-# Close files.
+# Open gridded TDLPACK file; iterate; close
 # ---------------------------------------------------------------------------------------- 
+f = TdlpackIO.open("../../sampledata/gfspkd47.2017020100.sq")
+f.seek(0)
+for rec in f:
+    print(f.recordnumber,type(rec),rec.id)
 f.close()
+
 fout.close()
