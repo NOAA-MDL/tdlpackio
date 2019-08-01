@@ -246,6 +246,18 @@ class open(object):
                 self._fh.seek(self._index['offset'][offset-1])
                 self.recordnumber = offset-1
     
+    def select(self,date=None,id=None,lead=None,unpack=True):
+        """
+        Select TDLPACK data record by means of date, lead time, id or any combination
+        thereof.
+        """
+        recs = []
+        if date:
+            idx = np.where(np.array(self._index['date'])==date)[0]
+            for i in idx:
+                recs.append(self.record(i+1,unpack=unpack))
+        return recs
+    
     def tell(self):
         """
         Return the position in units of records.
