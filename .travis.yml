@@ -1,10 +1,15 @@
 language: python
 
-sudo: false
+sudo: required
+
+before_install:
+  - sudo apt-get install gfortran
 
 env:
   global:
     - DEPENDS="numpy"
+    - FCOMPILER="gnu95"
+    - PREFIX="/tmp/pytdlpack"
 
 python:
   - "2.7"
@@ -15,12 +20,12 @@ python:
   - "3.7"
 
 notifications:
-  email: false
+  email: true
 
 before_install:
   - pip install $DEPENDS
 
 install:
-  - python setup.py build
+  - python setup.py build_ext --fcompiler=$FCOMPILER build
   - python setup.py test
-  - python setup.py install
+  - python setup.py install --prefix=$PREFIX
