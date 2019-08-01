@@ -21,7 +21,7 @@ sys.stdout = fout
 # ---------------------------------------------------------------------------------------- 
 # Open vector TDLPACK file; iterate; close
 # ---------------------------------------------------------------------------------------- 
-f = TdlpackIO.open("../../sampledata/hre201701")
+f = TdlpackIO.open("sampledata/hre201701")
 f.seek(0)
 for rec in f:
     print(f.recordnumber,type(rec),rec.id)
@@ -30,7 +30,7 @@ f.close()
 # ---------------------------------------------------------------------------------------- 
 # Open gridded TDLPACK file; iterate; close
 # ---------------------------------------------------------------------------------------- 
-f = TdlpackIO.open("../../sampledata/gfspkd47.2017020100.sq")
+f = TdlpackIO.open("sampledata/gfspkd47.2017020100.sq")
 f.seek(0)
 for rec in f:
     print(f.recordnumber,type(rec),rec.id)
