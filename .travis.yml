@@ -1,16 +1,15 @@
-#language: python
-language: c
+language: python
 
-sudo: required
-
-before_install:
-  - sudo apt-get install gfortran
+#sudo: required
+#
+#before_install:
+#  - sudo apt-get install gfortran
 
 env:
-  global:
-    - DEPENDS="numpy"
-    - FCOMPILER="gnu95"
-    - PREFIX="/tmp/pytdlpack"
+ global:
+  - DEPENDS="numpy"
+  - FCOMPILER="gnu95"
+  - PREFIX="/tmp/pytdlpack"
 
 python:
   - "2.7"
@@ -20,8 +19,10 @@ python:
   - "3.6"
   - "3.7"
 
-notifications:
-  email: true
+addons:
+ apt:
+  packages:
+   - gfortran
 
 before_install:
   - pip install $DEPENDS
