@@ -266,10 +266,28 @@ class open(object):
         if id:
             # Match by MOS ID (all 4 words)
             match_count += 4
-            idx1 = np.where(np.array(self._index['id1'])==id[0])[0]
-            idx2 = np.where(np.array(self._index['id2'])==id[1])[0]
-            idx3 = np.where(np.array(self._index['id3'])==id[2])[0]
-            idx4 = np.where(np.array(self._index['id4'])==id[3])[0]
+            allrecs = np.arange(self.records)
+            # ID1
+            if id[0] == -1:
+                idx1 = allrecs
+            elif id[0] >= 0:
+                idx1 = np.where(np.array(self._index['id1'])==id[0])[0]
+            # ID2
+            if id[1] == -1:
+                idx2 = allrecs
+            elif id[1] >= 0:
+                idx2 = np.where(np.array(self._index['id2'])==id[0])[0]
+            # ID3
+            if id[2] == -1:
+                idx3 = allrecs
+            elif id[2] >= 0:
+                idx3 = np.where(np.array(self._index['id3'])==id[0])[0]
+            # ID4
+            if id[3] == -1:
+                idx4 = allrecs
+            elif id[3] >= 0:
+                idx4 = np.where(np.array(self._index['id4'])==id[0])[0]
+
             if idx is not None:
                 idx = np.concatenate((idx,idx1,idx2,idx3,idx4))
             else:
