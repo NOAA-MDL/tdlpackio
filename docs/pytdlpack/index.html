@@ -4,14 +4,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 
     <title>pytdlpack API documentation</title>
-    <meta name="description" content="Version 0.9.0
--------------
-- - -
-
-Introduction
+    <meta name="description" content="Introduction
 ============
 
-pytdlpack is a Python interface to rea..." />
+pytdlpack is a Python interface to reading/writing TDLPACK files via offi..." />
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
   
@@ -1047,10 +1043,18 @@ table {
   <div id="sidebar">
     <h1>Index</h1>
     <ul id="index">
+    <li class="set"><h3><a href="#header-variables">Module variables</a></h3>
+      
+  <ul>
+    <li class="mono"><a href="#pytdlpack.__version__">__version__</a></li>
+  </ul>
+
+    </li>
 
     <li class="set"><h3><a href="#header-functions">Functions</a></h3>
       
   <ul>
+    <li class="mono"><a href="#pytdlpack.create_grid_definition">create_grid_definition</a></li>
     <li class="mono"><a href="#pytdlpack.open">open</a></li>
   </ul>
 
@@ -1121,9 +1125,7 @@ table {
 
   <header id="section-intro">
   <h1 class="title"><span class="name">pytdlpack</span> module</h1>
-  <h2>Version 0.9.0</h2>
-<hr />
-<h1>Introduction</h1>
+  <h1>Introduction</h1>
 <p>pytdlpack is a Python interface to reading/writing TDLPACK files via official
 MOS-2000 (MOS2K) Fortran-based source files.  The necessary MOS2K source files are included
 in this package and are available as module, tdlpack.</p>
@@ -1302,7 +1304,7 @@ By default only 1 record is returned and the TDLPACK indentification sections ar
 
 <p>Here, x will become a list of instances of either <a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a>, 
 <a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a>, or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></a>.</p>
-<p>If the file being read is <code>format='random-access'</code>, then you can also provide the <code>id=</code> 
+<p>If the file being read a TDLPACK random-access (<code>format='random-access'</code>), then you can also provide the <code>id=</code> 
 argument to search for a specific record.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.ra&#39;</span><span class="p">)</span>
@@ -1329,9 +1331,9 @@ instantiation via the traditional **kwargs (see <a href="#pytdlpack.TdlpackStati
 or simply providing <code>ccall = ...</code> <strong><em>(recommended)</em></strong>.  The value passed to the <code>ccall=</code> argument can
 be a single call letter string, list, tuple, or comma-delimited string of station call letter records.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">stations</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">TdlpackStationRecord</span><span class="p">(</span><span class="n">ccall</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;KBWI&#39;</span><span class="p">,</span><span class="s1">&#39;KDCA&#39;</span><span class="p">,</span><span class="s1">&#39;KIAD&#39;</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">stations</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">TdlpackStationRecord</span><span class="p">([</span><span class="s1">&#39;KBWI&#39;</span><span class="p">,</span><span class="s1">&#39;KDCA&#39;</span><span class="p">,</span><span class="s1">&#39;KIAD&#39;</span><span class="p">])</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">stations</span>
-<span class="n">ccall</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;KBWI&#39;</span><span class="p">,</span> <span class="s1">&#39;KDCA&#39;</span><span class="p">,</span> <span class="s1">&#39;KIAD&#39;</span><span class="p">)</span>
+<span class="n">ccall</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KBWI&#39;</span><span class="p">,</span> <span class="s1">&#39;KDCA&#39;</span><span class="p">,</span> <span class="s1">&#39;KIAD&#39;</span><span class="p">]</span>
 <span class="nb">id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">400001000</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span><span class="p">]</span>
 <span class="n">ioctet</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">ipack</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1344,13 +1346,8 @@ be a single call letter string, list, tuple, or comma-delimited string of statio
 indentification arrays, plain language string, and data to the approproiate keyword.  Please
 see <a href="#pytdlpack.TdlpackRecord.__init__"><code>__init__</code></a> for more info.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">is1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">is2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">is4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">plain</span> <span class="o">=</span> <span class="s2">&quot;...&quot;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">record</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">TdlpackRecord</span><span class="p">(</span><span class="n">is1</span><span class="o">=</span><span class="n">is1</span><span class="p">,</span><span class="n">is2</span><span class="o">=</span><span class="n">is2</span><span class="p">,</span><span class="n">is4</span><span class="o">=</span><span class="n">is4</span><span class="p">,</span><span class="n">plain</span><span class="o">=</span><span class="n">plain</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">record</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">TdlpackRecord</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="mi">2019070100</span><span class="p">,</span><span class="n">dcf</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="p">[</span><span class="mi">4210008</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span><span class="n">lead</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+<span class="n">plain</span><span class="o">=</span><span class="s2">&quot;GFS WIND SPEED&quot;</span><span class="p">,</span><span class="n">grid</span><span class="o">=</span><span class="n">grid_def</span><span class="p">,</span><span class="n">data</span><span class="o">=&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span> <span class="n">array</span><span class="o">&gt;</span><span class="p">)</span>
 </pre></div>
 
 
@@ -1380,8 +1377,61 @@ missing value other than what is contained in the record).  For TDLPACK data rec
   </header>
 
   <section id="section-items">
+    <h2 class="section-title" id="header-variables">Module variables</h2>
+      <div class="item">
+      <p id="pytdlpack.__version__" class="name">var <span class="ident">__version__</span></p>
+      
+  
+  <div class="source_cont">
+</div>
+
+      </div>
 
     <h2 class="section-title" id="header-functions">Functions</h2>
+      
+  <div class="item">
+    <div class="name def" id="pytdlpack.create_grid_definition">
+    <p>def <span class="ident">create_grid_definition</span>(</p><p>proj=None, nx=None, ny=None, latll=None, lonll=None, orient_lon=None, std_lat=None, mesh_length=None)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Create a dictionary of grid specs.  The user has the option to 
+populate the dictionary via the args or create an empty dict. </p>
+<h2>Parameters</h2>
+<p><strong><code>proj : int, optional</code></strong></p>
+<p>Map projection of the grid (3 = Lambert Conformal; 5 = Polar Stereographic; 
+7 = Mercator). NOTE: This parameter is optional if data are station-based.</p>
+<p><strong><code>nx : int, optional</code></strong></p>
+<p>Number of points in X-direction (East-West). NOTE: This parameter is optional if
+data are station-based. </p>
+<p><strong><code>ny : int, optional</code></strong></p>
+<p>Number of points in Y-direction (North-South). NOTE: This parameter is optional if
+data are station-based.</p>
+<p><strong><code>latll : float, optional</code></strong></p>
+<p>Latitude in decimal degrees of lower-left grid point.  NOTE: This parameter is optional if
+data are station-based.</p>
+<p><strong><code>lonll : float, optional</code></strong></p>
+<p>Longitude in decimal degrees of lower-left grid point.  NOTE: This parameter is optional if
+data are station-based. </p>
+<p><strong><code>orient_lon : float, optional</code></strong></p>
+<p>Longitude in decimal degrees of the central meridian.  NOTE: This parameter is optional if
+data are station-based.</p>
+<p><strong><code>std_lat : float, optional</code></strong></p>
+<p>Latitude in decimal degrees of the standard latitude.  NOTE: This parameter is optional if
+data are station-based.</p>
+<p><strong><code>mesh_length : float, optional</code></strong></p>
+<p>Distance in meters between grid points.  NOTE: This parameter is optional if
+data are station-based.</p>
+<h2>Returns</h2>
+<p><strong><code>griddict : dict</code></strong></p>
+<p>Dictionary whose keys are the named parameters of this function.</p></div>
+  <div class="source_cont">
+</div>
+
+  </div>
+  
       
   <div class="item">
     <div class="name def" id="pytdlpack.open">
@@ -1449,7 +1499,7 @@ value is -1.</p>
           <h3>Ancestors (in MRO)</h3>
           <ul class="class_list">
           <li><a href="#pytdlpack.TdlpackFile">TdlpackFile</a></li>
-          <li>__builtin__.object</li>
+          <li>builtins.object</li>
           </ul>
           <h3>Class variables</h3>
             <div class="item">
@@ -1462,98 +1512,7 @@ value is -1.</p>
 </div>
 
             </div>
-          <h3>Instance variables</h3>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.byte_order" class="name">var <span class="ident">byte_order</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.data_type" class="name">var <span class="ident">data_type</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.eof" class="name">var <span class="ident">eof</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.format" class="name">var <span class="ident">format</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.fortran_lun" class="name">var <span class="ident">fortran_lun</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.mode" class="name">var <span class="ident">mode</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.name" class="name">var <span class="ident">name</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.position" class="name">var <span class="ident">position</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.ra_master_key" class="name">var <span class="ident">ra_master_key</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-          <h3>Methods</h3>
+          <h3>Static methods</h3>
             
   <div class="item">
     <div class="name def" id="pytdlpack.TdlpackFile.__init__">
@@ -1660,6 +1619,97 @@ or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></
 
   </div>
   
+          <h3>Instance variables</h3>
+            <div class="item">
+            <p id="pytdlpack.TdlpackFile.byte_order" class="name">var <span class="ident">byte_order</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="pytdlpack.TdlpackFile.data_type" class="name">var <span class="ident">data_type</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="pytdlpack.TdlpackFile.eof" class="name">var <span class="ident">eof</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="pytdlpack.TdlpackFile.format" class="name">var <span class="ident">format</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="pytdlpack.TdlpackFile.fortran_lun" class="name">var <span class="ident">fortran_lun</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="pytdlpack.TdlpackFile.mode" class="name">var <span class="ident">mode</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="pytdlpack.TdlpackFile.name" class="name">var <span class="ident">name</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="pytdlpack.TdlpackFile.position" class="name">var <span class="ident">position</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
+            <div class="item">
+            <p id="pytdlpack.TdlpackFile.ra_master_key" class="name">var <span class="ident">ra_master_key</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
       </div>
       </div>
       
@@ -1721,7 +1771,7 @@ or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></
           <h3>Ancestors (in MRO)</h3>
           <ul class="class_list">
           <li><a href="#pytdlpack.TdlpackRecord">TdlpackRecord</a></li>
-          <li>__builtin__.object</li>
+          <li>builtins.object</li>
           </ul>
           <h3>Class variables</h3>
             <div class="item">
@@ -1734,42 +1784,11 @@ or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></
 </div>
 
             </div>
-          <h3>Instance variables</h3>
-            <div class="item">
-            <p id="pytdlpack.TdlpackRecord.nx" class="name">var <span class="ident">nx</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackRecord.ny" class="name">var <span class="ident">ny</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackRecord.plain" class="name">var <span class="ident">plain</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-          <h3>Methods</h3>
+          <h3>Static methods</h3>
             
   <div class="item">
     <div class="name def" id="pytdlpack.TdlpackRecord.__init__">
-    <p>def <span class="ident">__init__</span>(</p><p>self, is1=None, is2=None, is4=None, plain=None, data=None, **kwargs)</p>
+    <p>def <span class="ident">__init__</span>(</p><p>self, date=None, id=None, lead=None, plain=None, grid=None, data=None, missing_value=None, **kwargs)</p>
     </div>
     
 
@@ -1777,20 +1796,25 @@ or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></
   
     <div class="desc"><p>Constructor</p>
 <h2>Parameters</h2>
-<p><strong><code>is1 : array_like, optional</code></strong></p>
-<p>Numpy array with <code>dtype=int32</code> and of shape <code>(pytdlpack.ND7</code>)`.  Contains TDLPACK 
-Identification Section 1 (Product Definition Section).</p>
-<p><strong><code>is2 : array_like, optional</code></strong></p>
-<p>Numpy array with <code>dtypeint32</code> and of shape <code>(pytdlpack.ND7</code>)`.  Contains TDLPACK 
-Identification Section 2 (Grid Definition Section).</p>
-<p><strong><code>is4 : array_like, optional</code></strong></p>
-<p>Numpy array of type <code>int32</code> and of shape <code>(pytdlpack.ND7</code>)`.  Contains 
-TDLPACK Identification Section 4 (Data Section).</p>
+<p><strong><code>date : int, optional</code></strong></p>
+<p>Forecast initialization or observation date in YYYYMMDDHH format.</p>
+<p><strong><code>id : list or 1-D array, optional</code></strong></p>
+<p>List or 1-D array of length 4 containing the 4-word (integer) MOS-2000 ID of the data
+to be put into TdlpackRecord</p>
+<p><strong><code>grid : What should this be?"", optional</code></strong></p>
+<p>Contains the grid specs.</p>
+<p><strong><code>lead : int, optional</code></strong></p>
+<p>Lead time (i.e. forecast projection) in hours of the data.  NOTE: This can be omitted
+if the lead time is already contains in the id.</p>
 <p><strong><code>plain : str, optional</code></strong></p>
 <p>Plain language descriptor.  This is limited to 32 characters, though here 
 the input can be longer (will be cut off when packing).</p>
+<p><strong><code>grid : dict, optional</code></strong></p>
+<p>Dictionary of grid specs (created from create_grid_def_dict)</p>
 <p><strong><code>data : array_like, optional</code></strong></p>
 <p>Data values.</p>
+<p><strong><code>missing_value : float or list of floats, optional</code></strong></p>
+<p>Provide either a primary missing value or primary and secondary as list.</p>
 <p><strong><code>**kwargs : dict, optional</code></strong></p>
 <p>Dictionary of class attributes (keys) and class attributes (values).</p></div>
   <div class="source_cont">
@@ -1820,13 +1844,16 @@ If the record is station, then return is None.</p>
             
   <div class="item">
     <div class="name def" id="pytdlpack.TdlpackRecord.pack">
-    <p>def <span class="ident">pack</span>(</p><p>self)</p>
+    <p>def <span class="ident">pack</span>(</p><p>self, dec_scale=1)</p>
     </div>
     
 
     
   
-    <div class="desc"><p>Pack a TDLPACK record.</p></div>
+    <div class="desc"><p>Pack a TDLPACK record.</p>
+<h2>Parameters</h2>
+<p><strong><code>dec_scale : int, optional, default = 1</code></strong></p>
+<p>Decimal Scale Factor used to when packing TdlpackRecord data [DEFAULT is 1].</p></div>
   <div class="source_cont">
 </div>
 
@@ -1853,6 +1880,17 @@ it will be replaced with this value.</p></div>
 
   </div>
   
+          <h3>Instance variables</h3>
+            <div class="item">
+            <p id="pytdlpack.TdlpackRecord.plain" class="name">var <span class="ident">plain</span></p>
+            
+
+            
+  
+  <div class="source_cont">
+</div>
+
+            </div>
       </div>
       </div>
       
@@ -1862,14 +1900,14 @@ it will be replaced with this value.</p></div>
   
     <div class="desc"><p>Defines a TDLPACK Station Call Letter Record.</p>
 <h2>Attributes</h2>
-<p><strong><code>ccall : tuple</code></strong></p>
-<p>A tuple of station call letters.</p>
+<p><strong><code>station : list</code></strong></p>
+<p>A list of station call letters.</p>
 <p><strong><code>id : array_like</code></strong></p>
 <p>ID of station call letters. Note: This id is only used for random-access IO.</p>
 <p><strong><code>ioctet : int</code></strong></p>
 <p>Size of packed station call letter record in bytes.</p>
 <p><strong><code>ipack : array_like</code></strong></p>
-<p>Packed station call letter record.</p>
+<p>Array containing the packed station call letter record.</p>
 <p><strong><code>number_of_stations: int</code></strong></p>
 <p>Size of station call letter record.</p></div>
   <div class="source_cont">
@@ -1880,7 +1918,7 @@ it will be replaced with this value.</p></div>
           <h3>Ancestors (in MRO)</h3>
           <ul class="class_list">
           <li><a href="#pytdlpack.TdlpackStationRecord">TdlpackStationRecord</a></li>
-          <li>__builtin__.object</li>
+          <li>builtins.object</li>
           </ul>
           <h3>Class variables</h3>
             <div class="item">
@@ -1893,42 +1931,11 @@ it will be replaced with this value.</p></div>
 </div>
 
             </div>
-          <h3>Instance variables</h3>
-            <div class="item">
-            <p id="pytdlpack.TdlpackStationRecord.id" class="name">var <span class="ident">id</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackStationRecord.ioctet" class="name">var <span class="ident">ioctet</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackStationRecord.ipack" class="name">var <span class="ident">ipack</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-          <h3>Methods</h3>
+          <h3>Static methods</h3>
             
   <div class="item">
     <div class="name def" id="pytdlpack.TdlpackStationRecord.__init__">
-    <p>def <span class="ident">__init__</span>(</p><p>self, ccall=None, **kwargs)</p>
+    <p>def <span class="ident">__init__</span>(</p><p>self, stations=None, **kwargs)</p>
     </div>
     
 
@@ -1936,11 +1943,8 @@ it will be replaced with this value.</p></div>
   
     <div class="desc"><p><a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a> Constructor</p>
 <h2>Parameters</h2>
-<p><strong><code>ccall : str or list or tuple, optional</code></strong></p>
-<p>Contains stations call letters.  Can be a string (containing a single call letter
-or a comma-delimited string of multiple); list; or tuple.</p>
-<p><strong><code>**kwargs : dict</code></strong></p>
-<p>Dictionary of class attributes (keys) and class attributes (values).</p></div>
+<p><strong><code>stations : str or list or tuple</code></strong></p>
+<p>String of a single station or a list or tuple of stations.</p></div>
   <div class="source_cont">
 </div>
 
@@ -1992,7 +1996,7 @@ or a comma-delimited string of multiple); list; or tuple.</p>
           <h3>Ancestors (in MRO)</h3>
           <ul class="class_list">
           <li><a href="#pytdlpack.TdlpackTrailerRecord">TdlpackTrailerRecord</a></li>
-          <li>__builtin__.object</li>
+          <li>builtins.object</li>
           </ul>
           <h3>Class variables</h3>
             <div class="item">
@@ -2005,7 +2009,7 @@ or a comma-delimited string of multiple); list; or tuple.</p>
 </div>
 
             </div>
-          <h3>Methods</h3>
+          <h3>Static methods</h3>
             
   <div class="item">
     <div class="name def" id="pytdlpack.TdlpackTrailerRecord.__init__">
