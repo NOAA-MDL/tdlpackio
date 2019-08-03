@@ -4,7 +4,7 @@ import glob
 import os
 import sys
 
-VERSION = '0.9.0'
+VERSION = '0.9.5'
 
 # Write version info
 def write_version_py(filename='pytdlpack/version.py'):
