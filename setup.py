@@ -4,9 +4,14 @@ import glob
 import os
 import sys
 
+# ---------------------------------------------------------------------------------------- 
+# Definitions
+# ---------------------------------------------------------------------------------------- 
 VERSION = '0.9.5'
 
+# ---------------------------------------------------------------------------------------- 
 # Write version info
+# ---------------------------------------------------------------------------------------- 
 def write_version_file(filename='pytdlpack/version.py'):
     cnt = """
 # THIS FILE IS GENERATED FROM PYTDLPACK SETUP.PY
@@ -18,7 +23,9 @@ version = '%(version)s'
     finally:
         a.close()
 
+# ---------------------------------------------------------------------------------------- 
 # Define Fortran compiler flags for GNU and Intel Fortran
+# ---------------------------------------------------------------------------------------- 
 if "build" in sys.argv:
     if "--fcompiler=gnu95" in sys.argv:
         f77_flags = ["-O3",
@@ -69,8 +76,10 @@ else:
     f77_flags = []
     f90_flags = []
 
+# ---------------------------------------------------------------------------------------- 
 # Define Extension object. For Fortran 77 source files, use "extra_f77_compile_args".
 # For Fortran 90+ source files, use "extra_f90_compile_args".
+# ---------------------------------------------------------------------------------------- 
 f77_sources = glob.glob("tdlpack/*.f")
 f90_sources = glob.glob("tdlpack/*.f90")
 all_sources = ["tdlpack/tdlpack.pyf"]+f77_sources+f90_sources
@@ -80,7 +89,9 @@ ext = Extension(name  = 'tdlpack',
                 extra_f90_compile_args = f90_flags
                 )
 
+# ---------------------------------------------------------------------------------------- 
 # Define testing class
+# ---------------------------------------------------------------------------------------- 
 class TestCommand(Command):
     user_options = []
     def initialize_options(self):
@@ -92,10 +103,14 @@ class TestCommand(Command):
         for f in os.listdir('./test/'):
             raise SystemExit(subprocess.call([sys.executable,'./test/'+f]))
 
+# ---------------------------------------------------------------------------------------- 
 # Rewrite the version file everytime
+# ---------------------------------------------------------------------------------------- 
 write_version_file()
 
+# ---------------------------------------------------------------------------------------- 
 # Run setup
+# ---------------------------------------------------------------------------------------- 
 setup(name             = 'pytdlpack',
       author           = "Eric Engle",
       author_email     = "eric.engle@mac.com",
