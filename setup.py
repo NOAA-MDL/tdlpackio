@@ -7,7 +7,7 @@ import sys
 VERSION = '0.9.5'
 
 # Write version info
-def write_version_py(filename='pytdlpack/version.py'):
+def write_version_file(filename='pytdlpack/version.py'):
     cnt = """
 # THIS FILE IS GENERATED FROM PYTDLPACK SETUP.PY
 version = '%(version)s'
@@ -93,7 +93,7 @@ class TestCommand(Command):
             raise SystemExit(subprocess.call([sys.executable,'./test/'+f]))
 
 # Rewrite the version file everytime
-write_version_py()
+write_version_file()
 
 # Run setup
 setup(name             = 'pytdlpack',
