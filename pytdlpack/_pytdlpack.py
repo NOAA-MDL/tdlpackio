@@ -910,8 +910,11 @@ class TdlpackRecord(object):
         # Set attributes from is1[].
         self.lead_time = np.int32(self.is1[10]-((self.is1[10]/1000)*1000))
         if not self.plain:
-            for n in np.nditer(self.is1[22:(22+self.is1[21])]):
-                self.plain += chr(n)
+            if self.is1[21] > 0:
+                for n in np.nditer(self.is1[22:(22+self.is1[21])]):
+                    self.plain += chr(n)
+            else:
+                self.plain = ' '*NCHAR_PLAIN
 
         # Set attributes from is2[].
         if self.is1[1] == 0:
