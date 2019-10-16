@@ -1160,7 +1160,6 @@ def open(name, mode='r', format=None, ra_template=None):
     _ier = np.int32(0)
     name = os.path.abspath(name)
 
-    #pdb.set_trace()
     if format is None: format = 'sequential'
     if mode == 'w' or mode == 'x':
 
