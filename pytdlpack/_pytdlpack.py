@@ -972,9 +972,9 @@ class TdlpackRecord(object):
             if self.type == 'grid':
                 self.data = np.reshape(self.data[0:self.number_of_values],(self.nx,self.ny),order='F')
     
-    def grid(self):
+    def latslons(self):
         """
-        Returns latitudes and lontiude numpy.float32 arrays for the TDLPACK record. 
+        Returns a tuple of latitudes and lontiude numpy.float32 arrays for the TDLPACK record.
         If the record is station, then return is None.
 
         Returns
@@ -994,7 +994,7 @@ class TdlpackRecord(object):
                              self.map_proj,self.grid_length,self.origin_longitude,
                              self.standard_latitude,self.lower_left_latitude,
                              self.lower_left_longitude)
-        return lats,lons
+        return (lats,lons)
 
 class TdlpackStationRecord(object):
     """
