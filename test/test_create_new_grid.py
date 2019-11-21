@@ -26,7 +26,7 @@ grid_data.fill(np.nan)
 # Grid Specs: CONUS Lambert-Conformal 2.5km 2345x1597 
 # ---------------------------------------------------------------------------------------- 
 griddef = pytdlpack.create_grid_definition(proj=3,nx=nx,ny=ny,latll=19.2290,
-          lonll=233.7234,orient_lon=265.,std_lat=25.,mesh_length=2.539703)
+          lonll=233.7234,orientlon=265.,stdlat=25.,meshlength=2.539703)
 
 # ---------------------------------------------------------------------------------------- 
 # Create TDLPACK data record and pack

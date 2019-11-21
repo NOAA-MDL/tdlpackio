@@ -802,9 +802,9 @@ class TdlpackRecord(object):
                 self.is2[3] = np.int32(grid['ny'])
                 self.is2[4] = np.int32(grid['latll']*10000)
                 self.is2[5] = np.int32(grid['lonll']*10000)
-                self.is2[6] = np.int32(grid['orient_lon']*10000)
-                self.is2[7] = np.int32(grid['mesh_length']*1000) # Value in dict is in units of meters.
-                self.is2[8] = np.int32(grid['std_lat']*10000)
+                self.is2[6] = np.int32(grid['orientlon']*10000)
+                self.is2[7] = np.int32(grid['meshlength']*1000) # Value in dict is in units of meters.
+                self.is2[8] = np.int32(grid['stdlat']*10000)
                 self.nx = np.int32(grid['nx'])
                 self.ny = np.int32(grid['ny'])
             if len(data) > 0:
@@ -940,8 +940,8 @@ class TdlpackRecord(object):
             self.standard_latitude = self.is2[8]/10000.
             self.grid_def = create_grid_definition(proj=self.map_proj,nx=self.nx,ny=self.ny,
                             latll=self.lower_left_latitude,lonll=self.lower_left_longitude,
-                            orient_lon=self.origin_longitude,std_lat=self.standard_latitude,
-                            mesh_length=self.grid_length)
+                            orientlon=self.origin_longitude,stdlat=self.standard_latitude,
+                            meshlength=self.grid_length)
        
         # Set attributes from is4[].
         self.number_of_values = self.is4[2]
@@ -1205,14 +1205,18 @@ def open(name, mode='r', format=None, ra_template=None):
 
     return TdlpackFile(**kwargs)
 
-def create_grid_definition(proj=None,nx=None,ny=None,latll=None,lonll=None,
-                         orient_lon=None,std_lat=None,mesh_length=None):
+def create_grid_definition(name=None,proj=None,nx=None,ny=None,latll=None,lonll=None,
+                           orientlon=None,stdlat=None,meshlength=None):
     """
     Create a dictionary of grid specs.  The user has the option to 
     populate the dictionary via the args or create an empty dict. 
 
     Parameters
     ----------
+
+    **`name : str, optional`**
+
+    String that identifies a predefined grid.
 
     **`proj : int, optional`**
 
@@ -1239,17 +1243,17 @@ def create_grid_definition(proj=None,nx=None,ny=None,latll=None,lonll=None,
     Longitude in decimal degrees of lower-left grid point.  NOTE: This parameter is optional if
     data are station-based. 
 
-    **`orient_lon : float, optional`**
+    **`orientlon : float, optional`**
 
     Longitude in decimal degrees of the central meridian.  NOTE: This parameter is optional if
     data are station-based.
 
-    **`std_lat : float, optional`**
+    **`stdlat : float, optional`**
 
     Latitude in decimal degrees of the standard latitude.  NOTE: This parameter is optional if
     data are station-based.
 
-    **`mesh_length : float, optional`**
+    **`meshlength : float, optional`**
 
     Distance in meters between grid points.  NOTE: This parameter is optional if
     data are station-based.
@@ -1262,14 +1266,18 @@ def create_grid_definition(proj=None,nx=None,ny=None,latll=None,lonll=None,
     Dictionary whose keys are the named parameters of this function.
     """
     griddict = {}
-    griddict['proj'] = proj
-    griddict['nx'] = nx
-    griddict['ny'] = ny
-    griddict['latll'] = latll
-    griddict['lonll'] = lonll
-    griddict['orient_lon'] = orient_lon
-    griddict['std_lat'] = std_lat
-    griddict['mesh_length'] = mesh_length
+    if name is not None:
+        import _grid_definitions as grids
+        griddict = grids.grids[name]
+    else:
+        griddict['proj'] = proj
+        griddict['nx'] = nx
+        griddict['ny'] = ny
+        griddict['latll'] = latll
+        griddict['lonll'] = lonll
+        griddict['orientlon'] = orientlon
+        griddict['stdlat'] = stdlat
+        griddict['meshlength'] = meshlength
     return griddict
 
 def _read_ra_master_key(file):
