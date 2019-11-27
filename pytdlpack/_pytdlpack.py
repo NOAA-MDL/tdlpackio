@@ -1267,8 +1267,8 @@ def create_grid_definition(name=None,proj=None,nx=None,ny=None,latll=None,lonll=
     """
     griddict = {}
     if name is not None:
-        import _grid_definitions as grids
-        griddict = grids.grids[name]
+        from ._grid_definitions import grids
+        griddict = grids[name]
     else:
         griddict['proj'] = proj
         griddict['nx'] = nx
