@@ -246,9 +246,9 @@ class open(object):
                 self._fh.seek(self._index['offset'][offset-1])
                 self.recordnumber = offset-1
     
-    def select(self,date=None,id=None,lead=None,unpack=True):
+    def fetch(self,date=None,id=None,lead=None,unpack=True):
         """
-        Select TDLPACK data record by means of date, lead time, id or any combination
+        Fetch TDLPACK data record by means of date, lead time, id or any combination
         thereof.
         """
         #pdb.set_trace()
@@ -259,11 +259,17 @@ class open(object):
         # Perform matching by determining list index values for each list criteria
         # in the file index dictionary.  These index values are catted together
         # throughout the matching.
-        if date:
+        if date is not None:
             # Match by date (i.e. reference date)
             match_count += 1
             idx = np.where(np.array(self._index['date'])==date)[0]
-        if id:
+
+        if id is not None:
+            # Test for type
+            if type(id) is str:
+                # Need all 4 words for now....
+                id = [int(i) for i in list(filter(None,id.split(' ')))]
+                print(id)
             # Match by MOS ID (all 4 words)
             match_count += 4
             allrecs = np.arange(self.records)
@@ -276,29 +282,31 @@ class open(object):
             if id[1] == -1:
                 idx2 = allrecs
             elif id[1] >= 0:
-                idx2 = np.where(np.array(self._index['id2'])==id[0])[0]
+                idx2 = np.where(np.array(self._index['id2'])==id[1])[0]
             # ID3
             if id[2] == -1:
                 idx3 = allrecs
             elif id[2] >= 0:
-                idx3 = np.where(np.array(self._index['id3'])==id[0])[0]
+                idx3 = np.where(np.array(self._index['id3'])==id[2])[0]
             # ID4
             if id[3] == -1:
                 idx4 = allrecs
             elif id[3] >= 0:
-                idx4 = np.where(np.array(self._index['id4'])==id[0])[0]
+                idx4 = np.where(np.array(self._index['id4'])==id[3])[0]
 
             if idx is not None:
                 idx = np.concatenate((idx,idx1,idx2,idx3,idx4))
             else:
                 idx = np.concatenate((idx1,idx2,idx3,idx4))
-        if lead:
+
+        if lead is not None:
             # Match by lead time
             match_count += 1
             if idx is not None:
-                idx = np.concatenate((idx,np.where(np.array(self._index['lead'])==id)[0]))
+                idx = np.concatenate((idx,np.where(np.array(self._index['lead'])==lead)[0]))
             else:
-                idx = np.concatenate((np.where(np.array(self._index['lead'])==id)[0]))
+                #idx = np.concatenate((np.where(np.array(self._index['lead'])==lead)[0]))
+                idx = np.where(np.array(self._index['lead'])==lead)[0]
 
         # Now determine the count of unique index values.  The count needs to match the
         # value of match_count.  Where this occurs, the index values are extracted.
