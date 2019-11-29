@@ -22,7 +22,14 @@ sys.stdout = fout
 # Open vector TDLPACK file; iterate; close
 # ---------------------------------------------------------------------------------------- 
 f = TdlpackIO.open("sampledata/hre201701")
-rec = f.select(date=2017011512)
-f.close()
+recs = f.select(date=2017011512)
+nrec = len(recs)
+if nrec == 0:
+   ret = 1
+elif nrec > 0:
+   ret = 0
 
+f.close()
 fout.close()
+
+exit(ret)
