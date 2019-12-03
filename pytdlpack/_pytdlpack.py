@@ -718,22 +718,18 @@ class TdlpackRecord(object):
         List or 1-D array of length 4 containing the 4-word (integer) MOS-2000 ID of the data
         to be put into TdlpackRecord
 
-        **`grid : What should this be?"", optional`**
-
-        Contains the grid specs.
-
         **`lead : int, optional`**
 
         Lead time (i.e. forecast projection) in hours of the data.  NOTE: This can be omitted
-        if the lead time is already contains in the id.
-        
+
         **`plain : str, optional`**
 
         Plain language descriptor.  This is limited to 32 characters, though here 
         the input can be longer (will be cut off when packing).
 
-        **`grid : dict, optional`**
+        **`grid : dict , optional`**
 
+        A dictionary containing grid definition attributes.  See
         Dictionary of grid specs (created from create_grid_def_dict)
 
         **`data : array_like, optional`**
@@ -818,8 +814,11 @@ class TdlpackRecord(object):
                 self.secondary_missing_value = np.int32(0)
             else:
                 if type(missing_value) is list:
-                    self.primary_missing_value = np.int32(missing_value[0])
-                    self.secondary_missing_value = np.int32(missing_value[1])
+                    if len(missing_value) == 1:
+                        self.primary_missing_value = np.int32(missing_value[0])
+                    elif len(missing_value) == 2:
+                        self.primary_missing_value = np.int32(missing_value[0])
+                        self.secondary_missing_value = np.int32(missing_value[1])
                 else:
                     self.primary_missing_value = np.int32(missing_value)
                     self.secondary_missing_value = np.int32(0)
@@ -837,7 +836,7 @@ class TdlpackRecord(object):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
     
-    def pack(self,dec_scale=1):
+    def pack(self,dec_scale=1,bin_scale=0):
         """
         Pack a TDLPACK record.
 
@@ -847,6 +846,12 @@ class TdlpackRecord(object):
         **`dec_scale : int, optional, default = 1`**
 
         Decimal Scale Factor used to when packing TdlpackRecord data [DEFAULT is 1].
+
+        **`bin_scale : int, optional, default = 0`**
+
+        Binary Scale Factor used to when packing TdlpackRecord data [DEFAULT is 0]. NOTE:
+        binary scale factor is currently NOT SUPPORTED in MOS-2000 software. It is added
+        here for completeness.
         """
         _ier = np.int32(0)
         self.ipack = np.zeros((ND5),dtype=np.int32)
