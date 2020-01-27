@@ -1083,7 +1083,7 @@ table {
           
   <ul>
     <li class="mono"><a href="#pytdlpack.TdlpackRecord.__init__">__init__</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackRecord.latslons">latslons</a></li>
+    <li class="mono"><a href="#pytdlpack.TdlpackRecord.latlons">latlons</a></li>
     <li class="mono"><a href="#pytdlpack.TdlpackRecord.pack">pack</a></li>
     <li class="mono"><a href="#pytdlpack.TdlpackRecord.unpack">unpack</a></li>
   </ul>
@@ -1166,7 +1166,7 @@ occurs.</li>
 </ul>
 <h1>Requires</h1>
 <ul>
-<li>Python 2.7 (Python 3 support coming soon!).</li>
+<li>Python 2.7, 3.4+</li>
 <li><a href="http://numpy.scipy.org">numpy array module</a>, version 1.8.0 or later.</li>
 <li><a href="https://pypi.python.org/pypi/setuptools">setuptools</a>, version 18.0 or later.</li>
 <li>Fortran compiler (if installing from source). <strong><em>Only GNU (gfortran) and Intel (ifort) are supported at this time.</em></strong></li>
@@ -1298,7 +1298,8 @@ By default only 1 record is returned and the TDLPACK indentification sections ar
 </pre></div>
 
 
-<p>You can also configure the <a href="#pytdlpack.TdlpackFile.read"><code>read</code></a> to read the entire file with</p>
+<p>You can also have <a href="#pytdlpack.TdlpackFile.read"><code>read</code></a> to read the entire file with optional keyword
+<code>all = True</code>.  However, reading a large file at once will impact performance.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 
@@ -1773,7 +1774,8 @@ or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></
 <p><strong><code>standard_latitude : float</code></strong></p>
 <p>Latitude at which the grid length applies.</p>
 <p><strong><code>type : {'grid', 'station'}</code></strong></p>
-<p>Identifies the type of data.</p></div>
+<p>Identifies the type of data.  This implies that data are 1D for type = 'station'
+and data are 2D for type = 'grid'.</p></div>
   <div class="source_cont">
 </div>
 
@@ -1833,8 +1835,8 @@ Dictionary of grid specs (created from create_grid_def_dict)</p>
   
             
   <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackRecord.latslons">
-    <p>def <span class="ident">latslons</span>(</p><p>self)</p>
+    <div class="name def" id="pytdlpack.TdlpackRecord.latlons">
+    <p>def <span class="ident">latlons</span>(</p><p>self)</p>
     </div>
     
 
