@@ -1293,6 +1293,20 @@ def _create_proj_string(griddict):
     """
     Returns a string that defines a pyproj.Proj map projection.  If pyproj is not availale,
     then None is returned.
+
+    Parameters
+    ----------
+
+    **`griddict : dict`**
+
+    Dictionary of TDLPACK grid definition parameters
+
+    Returns
+    -------
+
+    **`str`**    
+
+    String containing the pyproj.Proj definition generating by pyproj.Proj.definition_string().
     """
     try:
         import pyproj
