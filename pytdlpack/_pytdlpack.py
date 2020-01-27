@@ -49,7 +49,7 @@ Download
 Requires
 ========
 
-- Python 2.7 (Python 3 support coming soon!).
+- Python 2.7, 3.4+
 - [numpy array module](http://numpy.scipy.org), version 1.8.0 or later.
 - [setuptools](https://pypi.python.org/pypi/setuptools), version 18.0 or later.
 - Fortran compiler (if installing from source). ***Only GNU (gfortran) and Intel (ifort) are supported at this time.***
@@ -190,7 +190,8 @@ Example: Reading a gridded TDLPACK record.
     standard_latitude = 25.0
     type = grid
 
-You can also configure the `pytdlpack.TdlpackFile.read` to read the entire file with
+You can also have `pytdlpack.TdlpackFile.read` to read the entire file with optional keyword
+`all = True`.  However, reading a large file at once will impact performance.
 
     :::python
     >>> x = f.read(all=True)
@@ -698,7 +699,9 @@ class TdlpackRecord(object):
 
     **`type : {'grid', 'station'}`**
 
-    Identifies the type of data. 
+    Identifies the type of data.  This implies that data are 1D for type = 'station'
+    and data are 2D for type = 'grid'.
+
     """
     counter = 0
     def __init__(self,date=None,id=None,lead=None,plain=None,grid=None,data=None,
@@ -947,6 +950,7 @@ class TdlpackRecord(object):
                             latll=self.lower_left_latitude,lonll=self.lower_left_longitude,
                             orientlon=self.origin_longitude,stdlat=self.standard_latitude,
                             meshlength=self.grid_length)
+            self.proj_string = _create_proj_string(self.grid_def)
        
         # Set attributes from is4[].
         self.number_of_values = self.is4[2]
@@ -977,7 +981,7 @@ class TdlpackRecord(object):
             if self.type == 'grid':
                 self.data = np.reshape(self.data[0:self.number_of_values],(self.nx,self.ny),order='F')
     
-    def latslons(self):
+    def latlons(self):
         """
         Returns a tuple of latitudes and lontiude numpy.float32 arrays for the TDLPACK record.
         If the record is station, then return is None.
@@ -1284,6 +1288,36 @@ def create_grid_definition(name=None,proj=None,nx=None,ny=None,latll=None,lonll=
         griddict['stdlat'] = stdlat
         griddict['meshlength'] = meshlength
     return griddict
+
+def _create_proj_string(griddict):
+    """
+    Returns a string that defines a pyproj.Proj map projection.  If pyproj is not availale,
+    then None is returned.
+    """
+    try:
+        import pyproj
+        if griddict['proj'] == 3:
+            p = pyproj.Proj(proj='lcc',
+                            lat_1=griddict['stdlat'],
+                            lat_2=griddict['stdlat'],
+                            lon_0=(360.-griddict['orientlon']))
+            projstring = p.definition_string()
+        elif griddict['proj'] == 5:
+            p = pyproj.Proj(proj='stere',
+                            lat_0=90.0,
+                            lat_ts=griddict['stdlat'],
+                            lon_0=(360.-griddict['orientlon']))
+            projstring = p.definition_string()
+        elif griddict['proj'] == 7:
+            p = pyproj.Proj(proj='merc',
+                            lat_ts=griddict['stdlat'],
+                            lon_0=(360.-griddict['orientlon']))
+            projstring = p.definition_string()
+        else:
+            projstring = None
+    except(ImportError):
+        projstring = None
+    return projstring
 
 def _read_ra_master_key(file):
     """
