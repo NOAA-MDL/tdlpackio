@@ -623,7 +623,12 @@ class TdlpackFile(object):
 
 class TdlpackRecord(object):
     """
-    Defines a TDLPACK data record object.
+    Defines a TDLPACK data record object.  Once data are unpacked (TdlpackRecord.unpack(data=True)),
+    values are accessible using "fancy indexing".
+
+    For gridded records, use grid index values and/or ranges (e.g. rec[0,0]).
+    
+    For station records, use the station ID string: (e.g. rec['KPHL']).
 
     Attributes
     ----------
