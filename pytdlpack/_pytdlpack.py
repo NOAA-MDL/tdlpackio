@@ -475,8 +475,6 @@ class TdlpackFile(object):
         else:
             raise IOError("Trouble closing file. ier = "+str(_ier))
 
-        try:
-    
     def read(self,all=False,unpack=True,id=None):
         """
         Read a record from a TDLPACK file.

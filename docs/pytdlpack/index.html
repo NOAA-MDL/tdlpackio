@@ -1729,7 +1729,10 @@ or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></
       <p id="pytdlpack.TdlpackRecord" class="name">class <span class="ident">TdlpackRecord</span></p>
       
   
-    <div class="desc"><p>Defines a TDLPACK data record object.</p>
+    <div class="desc"><p>Defines a TDLPACK data record object.  Once data are unpacked (TdlpackRecord.unpack(data=True)),
+values are accessible using "fancy indexing".</p>
+<p>For gridded records, use grid index values and/or ranges (e.g. rec[0,0]).</p>
+<p>For station records, use the station ID string: (e.g. rec['KPHL']).</p>
 <h2>Attributes</h2>
 <p><strong><code>data : array_like</code></strong></p>
 <p>Data values.</p>
