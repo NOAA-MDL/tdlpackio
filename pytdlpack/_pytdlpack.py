@@ -320,6 +320,7 @@ ND5_META_MAX = np.int32(32)
 ND7 = _DEFAULT_ND7
 NBYPWD = np.int32(L3264B/8)
 
+_starecdict = {} # Dictionary to store station lists.  Key is the Fortran LUN where list came from.
 _ccall = []
 _ier = np.int32(0)
 _lx = np.int32(0)
@@ -426,6 +427,8 @@ class TdlpackFile(object):
                 if not self.data_type: self.data_type = 'grid'
                 kwargs['id'] = deepcopy(ipack[5:9])
                 kwargs['reference_date'] = deepcopy(ipack[4])
+                kwargs['_filelun'] = self.fortran_lun
+                kwargs['_starecindex'] = len(_starecdict[self.fortran_lun])-1 if len(_starecdict[self.fortran_lun]) > 0 else 0
                 return TdlpackRecord(**kwargs)
             else:
                 if not self.data_type: self.data_type = 'station'
@@ -461,12 +464,18 @@ class TdlpackFile(object):
         elif self.format == 'sequential':
             _ier = tdlpack.closefile(FORTRAN_STDOUT_LUN,self.fortran_lun,np.int32(2))
         if _ier == 0:
+            try:
+                del _starecdict[self.fortran_lun]
+            except(KeyError):
+                pass
             self.eof = False
             self.fortran_lun = -1
             self.position = 0
             type(self).counter -= 1
         else:
             raise IOError("Trouble closing file. ier = "+str(_ier))
+
+        try:
     
     def read(self,all=False,unpack=True,id=None):
         """
@@ -529,11 +538,17 @@ class TdlpackFile(object):
                 elif _ier == -1:
                     self.eof = True
                     break
+
             if unpack: record.unpack()
+
+            if type(record) is TdlpackStationRecord:
+                _starecdict[self.fortran_lun].append(record.stations)
+
             if all:
                 records.append(record)
             else:
                 break
+
         if len(records) > 0:
             return records
         else:
@@ -830,6 +845,33 @@ class TdlpackRecord(object):
             # Instantiate via **kwargs
             for k,v in kwargs.items():
                 setattr(self,k,v)
+
+    def __getitem__(self,indices):
+        """
+        """
+        if self.type == 'grid':
+            if not isinstance(indices,tuple):
+                indices = tuple(indices)
+        elif self.type == 'station':
+            if isinstance(indices,str):
+                indices = tuple([_starecdict[self._filelun][self._starecindex].index(indices)])
+
+        try:
+            return self.data[indices]
+        except(AttributeError):
+            return None
+
+    def __setitem__(self,indices,values):
+        """
+        """
+        if self.type == 'grid':
+            if not isinstance(indices,tuple):
+                indices = tuple(indices)
+        elif self.type == 'station':
+            if isinstance(indices,str):
+                indices = tuple([_starecdict[self._filelun][self._starecindex].index(indices)])
+
+        self.data[indices] = values
 
     def __repr__(self):
         strings = []
@@ -1212,6 +1254,8 @@ def open(name, mode='r', format=None, ra_template=None):
     else:
         raise IOError("Could not open TDLPACK file"+name+". Error return from tdlpack.openfile = "+str(_ier))
 
+    _starecdict[_lun] = []
+
     return TdlpackFile(**kwargs)
 
 def create_grid_definition(name=None,proj=None,nx=None,ny=None,latll=None,lonll=None,
@@ -1315,18 +1359,23 @@ def _create_proj_string(griddict):
                             lat_1=griddict['stdlat'],
                             lat_2=griddict['stdlat'],
                             lon_0=(360.-griddict['orientlon']))
-            projstring = p.definition_string()
+            x,y = p(360.0-griddict['lonll'],griddict['latll'])
+            projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
         elif griddict['proj'] == 5:
             p = pyproj.Proj(proj='stere',
                             lat_0=90.0,
                             lat_ts=griddict['stdlat'],
                             lon_0=(360.-griddict['orientlon']))
-            projstring = p.definition_string()
+            x,y = p(360.0-griddict['lonll'],griddict['latll'])
+            #projstring = p.definition_string()
+            projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
         elif griddict['proj'] == 7:
             p = pyproj.Proj(proj='merc',
                             lat_ts=griddict['stdlat'],
                             lon_0=(360.-griddict['orientlon']))
-            projstring = p.definition_string()
+            x,y = p(360.0-griddict['lonll'],griddict['latll'])
+            #projstring = p.definition_string()
+            projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
         else:
             projstring = None
     except(ImportError):
