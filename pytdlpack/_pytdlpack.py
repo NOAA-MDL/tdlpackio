@@ -92,7 +92,8 @@ To create a TDLPACK file from Python, you call the `pytdlpack.open` function and
 file name and `mode='w' or 'a'`.  For `mode='a'`, this will append to an existing file.  When 
 creating a new file, the default file format is `'sequential'`, but the user can also specify 
 the format with `format='sequential' or 'random-access'`.  If the new file is random-access, 
-then the user can also specify `ra_template='small' or 'large'`.  The default is 'small'.
+then the user can also specify `ra_template='small' or 'large'`.  The default is 'small' and
+'large' is recommended for a high-resolution grids (i.e. ~ > 2M total points).
 
 Example: Create a new sequential file:
 
@@ -106,7 +107,7 @@ Example: Create a new random-access file:
     >>> import pytdlpack
     >>> f = pytdlpack.open('test.sq',mode='w',format='random-access',ra_template='small')
 
-To open an existing TDLPACK file, the user only need to provide the file name.
+To open an existing TDLPACK file, simply provide the filename since the default mode is read.
 
     :::python
     import pytdlpack
@@ -132,9 +133,9 @@ To close a TDLPACK file is straightforward.
 
 ## <div id='section2'>2) Reading a TDLPACK file.
 
-Once a TDLPACK file has been opened, an instance of class `pytdlpack.TdlpackFile` has 
-been created.  To read a record the file, use the class method `pytdlpack.TdlpackFile.read`.  
-By default only 1 record is returned and the TDLPACK indentification sections are unpacked.
+When a TDLPACK file is opened, an instance of class `pytdlpack.TdlpackFile` is created.  
+To read a record the file, use the class method `pytdlpack.TdlpackFile.read`.  By default 
+only 1 record is returned and the TDLPACK indentification sections are unpacked.
 
 Example: Reading a gridded TDLPACK record.
 
@@ -190,8 +191,8 @@ Example: Reading a gridded TDLPACK record.
     standard_latitude = 25.0
     type = grid
 
-You can also have `pytdlpack.TdlpackFile.read` to read the entire file with optional keyword
-`all = True`.  However, reading a large file at once will impact performance.
+You can also have `pytdlpack.TdlpackFile.read` read the entire file with optional keyword
+`all = True`.  Reading all records at once is not recommened if the file is large in size.
 
     :::python
     >>> x = f.read(all=True)
