@@ -1203,7 +1203,8 @@ occurs.</li>
 file name and <code>mode='w' or 'a'</code>.  For <code>mode='a'</code>, this will append to an existing file.  When 
 creating a new file, the default file format is <code>'sequential'</code>, but the user can also specify 
 the format with <code>format='sequential' or 'random-access'</code>.  If the new file is random-access, 
-then the user can also specify <code>ra_template='small' or 'large'</code>.  The default is 'small'.</p>
+then the user can also specify <code>ra_template='small' or 'large'</code>.  The default is 'small' and
+'large' is recommended for a high-resolution grids (i.e. ~ &gt; 2M total points).</p>
 <p>Example: Create a new sequential file:</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.sq&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
@@ -1216,7 +1217,7 @@ then the user can also specify <code>ra_template='small' or 'large'</code>.  The
 </pre></div>
 
 
-<p>To open an existing TDLPACK file, the user only need to provide the file name.</p>
+<p>To open an existing TDLPACK file, simply provide the filename since the default mode is read.</p>
 <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">pytdlpack</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.sq&#39;</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -1241,9 +1242,9 @@ then the user can also specify <code>ra_template='small' or 'large'</code>.  The
 
 
 <h2><div id='section2'>2) Reading a TDLPACK file.</h2>
-<p>Once a TDLPACK file has been opened, an instance of class <a href="#pytdlpack.TdlpackFile"><code>TdlpackFile</code></a> has 
-been created.  To read a record the file, use the class method <a href="#pytdlpack.TdlpackFile.read"><code>read</code></a>.<br />
-By default only 1 record is returned and the TDLPACK indentification sections are unpacked.</p>
+<p>When a TDLPACK file is opened, an instance of class <a href="#pytdlpack.TdlpackFile"><code>TdlpackFile</code></a> is created.<br />
+To read a record the file, use the class method <a href="#pytdlpack.TdlpackFile.read"><code>read</code></a>.  By default 
+only 1 record is returned and the TDLPACK indentification sections are unpacked.</p>
 <p>Example: Reading a gridded TDLPACK record.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">x</span>
@@ -1298,8 +1299,8 @@ By default only 1 record is returned and the TDLPACK indentification sections ar
 </pre></div>
 
 
-<p>You can also have <a href="#pytdlpack.TdlpackFile.read"><code>read</code></a> to read the entire file with optional keyword
-<code>all = True</code>.  However, reading a large file at once will impact performance.</p>
+<p>You can also have <a href="#pytdlpack.TdlpackFile.read"><code>read</code></a> read the entire file with optional keyword
+<code>all = True</code>.  Reading all records at once is not recommened if the file is large in size.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 </pre></div>
 
