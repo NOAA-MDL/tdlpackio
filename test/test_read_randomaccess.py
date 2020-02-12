@@ -12,7 +12,7 @@ build_path = './build/lib.'+platform+'-'+str(sys.version_info.major)+'.'+str(sys
 sys.path.insert(0,build_path)
 import pytdlpack
 
-f = pytdlpack.open('blend.analysisgrconst.co.ra')
+f = pytdlpack.open('sampledata/blend.analysisgrconst.co.ra')
 recs = f.read(all=True)
 for r in recs:
    r.unpack(data=True)
