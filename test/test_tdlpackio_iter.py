@@ -21,7 +21,7 @@ sys.stdout = fout
 # ---------------------------------------------------------------------------------------- 
 # Open vector TDLPACK file; iterate; close
 # ---------------------------------------------------------------------------------------- 
-f = TdlpackIO.open("sampledata/hre201701")
+f = TdlpackIO.open("sampledata/hre201701.sq")
 f.seek(0)
 for rec in f:
     print(f.recordnumber,type(rec),rec.id)
