@@ -114,7 +114,7 @@ To open an existing TDLPACK file, simply provide the filename since the default 
     >>> f = pytdlpack.open('test.sq')
     >>> type(f)
     <class 'pytdlpack._pytdlpack.TdlpackFile'>
-    >>> print f
+    >>> f
     byte_order = >
     data_type =
     eof = False
@@ -141,7 +141,7 @@ Example: Reading a gridded TDLPACK record.
 
     :::python
     >>> x = f.read()
-    >>> print x
+    >>> x
     grid_length = 2539.703
     id = [223254166         0         6         0]
     ioctet = 998656
@@ -233,7 +233,7 @@ be a single call letter string, list, tuple, or comma-delimited string of statio
     :::python
     >>> import pytdlpack
     >>> stations = pytdlpack.TdlpackStationRecord(['KBWI','KDCA','KIAD'])
-    >>> print stations
+    >>> stations
     ccall = ['KBWI', 'KDCA', 'KIAD']
     id = [400001000         0         0         0]
     ioctet = 0
@@ -424,7 +424,7 @@ class TdlpackFile(object):
             header = struct.unpack('>4s',ipack[0].byteswap())[0]
             if _IS_PYTHON3:
                 header = header.decode()
-            if header == "TDLP":
+            if header in ["PLDT","TDLP"] :
                 if not self.data_type: self.data_type = 'grid'
                 kwargs['id'] = deepcopy(ipack[5:9])
                 kwargs['reference_date'] = deepcopy(ipack[4])
@@ -476,7 +476,7 @@ class TdlpackFile(object):
         else:
             raise IOError("Trouble closing file. ier = "+str(_ier))
 
-    def read(self,all=False,unpack=True,id=None):
+    def read(self,all=False,unpack=True,id=[9999,0,0,0]):
         """
         Read a record from a TDLPACK file.
 
@@ -494,7 +494,8 @@ class TdlpackFile(object):
         **`id : array_like or list, optional`**
 
         Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list 
-        with length 4.
+        with length 4.  The default is [9999,0,0,0] which will signal the random access IO reader
+        to sequentially read the file.
         
         Returns
         -------
@@ -514,10 +515,7 @@ class TdlpackFile(object):
             _ioctet = np.int32(0)
             _ier = np.int32(0)
             if self.format == 'random-access':
-                if id is None:
-                    id = np.int32([9999,0,0,0])
-                else:
-                    id = np.int32(id)
+                id = np.int32(id)
                 _nvalue = np.int32(0)
                 _ipack,_nvalue,_ier = tdlpack.rdtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,id,ND5,L3264B)
                 if _ier == 0:
@@ -1371,14 +1369,12 @@ def _create_proj_string(griddict):
                             lat_ts=griddict['stdlat'],
                             lon_0=(360.-griddict['orientlon']))
             x,y = p(360.0-griddict['lonll'],griddict['latll'])
-            #projstring = p.definition_string()
             projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
         elif griddict['proj'] == 7:
             p = pyproj.Proj(proj='merc',
                             lat_ts=griddict['stdlat'],
                             lon_0=(360.-griddict['orientlon']))
             x,y = p(360.0-griddict['lonll'],griddict['latll'])
-            #projstring = p.definition_string()
             projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
         else:
             projstring = None
