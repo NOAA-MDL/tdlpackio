@@ -1222,7 +1222,7 @@ then the user can also specify <code>ra_template='small' or 'large'</code>.  The
 <span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.sq&#39;</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 <span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">pytdlpack</span><span class="o">.</span><span class="n">_pytdlpack</span><span class="o">.</span><span class="n">TdlpackFile</span><span class="s1">&#39;&gt;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">f</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span>
 <span class="n">byte_order</span> <span class="o">=</span> <span class="o">&gt;</span>
 <span class="n">data_type</span> <span class="o">=</span>
 <span class="n">eof</span> <span class="o">=</span> <span class="bp">False</span>
@@ -1247,7 +1247,7 @@ To read a record the file, use the class method <a href="#pytdlpack.TdlpackFile.
 only 1 record is returned and the TDLPACK indentification sections are unpacked.</p>
 <p>Example: Reading a gridded TDLPACK record.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">x</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span>
 <span class="n">grid_length</span> <span class="o">=</span> <span class="mf">2539.703</span>
 <span class="nb">id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">223254166</span>         <span class="mi">0</span>         <span class="mi">6</span>         <span class="mi">0</span><span class="p">]</span>
 <span class="n">ioctet</span> <span class="o">=</span> <span class="mi">998656</span>
@@ -1335,7 +1335,7 @@ or simply providing <code>ccall = ...</code> <strong><em>(recommended)</em></str
 be a single call letter string, list, tuple, or comma-delimited string of station call letter records.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">stations</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">TdlpackStationRecord</span><span class="p">([</span><span class="s1">&#39;KBWI&#39;</span><span class="p">,</span><span class="s1">&#39;KDCA&#39;</span><span class="p">,</span><span class="s1">&#39;KIAD&#39;</span><span class="p">])</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">stations</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">stations</span>
 <span class="n">ccall</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KBWI&#39;</span><span class="p">,</span> <span class="s1">&#39;KDCA&#39;</span><span class="p">,</span> <span class="s1">&#39;KIAD&#39;</span><span class="p">]</span>
 <span class="nb">id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">400001000</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span><span class="p">]</span>
 <span class="n">ioctet</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1574,7 +1574,7 @@ value is -1.</p>
             
   <div class="item">
     <div class="name def" id="pytdlpack.TdlpackFile.read">
-    <p>def <span class="ident">read</span>(</p><p>self, all=False, unpack=True, id=None)</p>
+    <p>def <span class="ident">read</span>(</p><p>self, all=False, unpack=True, id=[9999, 0, 0, 0])</p>
     </div>
     
 
@@ -1588,7 +1588,8 @@ value is -1.</p>
 <p>Unpack TDLPACK identification sections.  Note that data are not unpacked.  The default is True.</p>
 <p><strong><code>id : array_like or list, optional</code></strong></p>
 <p>Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list 
-with length 4.</p>
+with length 4.  The default is [9999,0,0,0] which will signal the random access IO reader
+to sequentially read the file.</p>
 <h2>Returns</h2>
 <p><strong><code>record [records] : instance [list]</code></strong></p>
 <p>An instance of list of instances contaning <a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a>, 
