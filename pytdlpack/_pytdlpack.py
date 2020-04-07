@@ -809,7 +809,7 @@ class TdlpackRecord(object):
                 for n,p in enumerate(plain):
                     self.is1[22+n] = np.int32(ord(p))
 
-            if grid is not None and type(grid) is dict:
+            if grid is not None and type(grid) is dict or data.shape == 2:
                 # Gridded Data
                 self.type = 'grid'
                 self.is1[1] = np.int32(1) # Set IS1[1] = 1
