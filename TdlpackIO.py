@@ -121,7 +121,7 @@ class open(object):
                     self._index['size'].append(temp[1])
                     self._index['type'].append('data')
                     self._index['date'].append(temp[6])
-                    self._index['lead'].append(int(temp[9]-((temp[9]/1000)*1000)))
+                    self._index['lead'].append(int(str(temp[9])[-3:]))
                     self._index['id1'].append(temp[7])
                     self._index['id2'].append(temp[8])
                     self._index['id3'].append(temp[9])
@@ -176,6 +176,8 @@ class open(object):
                 break
 
         self._hasindex = True
+        self.dates = tuple(sorted(set(self._index['date'])))
+        self.leadtimes = tuple(sorted(set(self._index['lead'])))
 
     def close(self):
         """

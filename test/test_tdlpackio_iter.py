@@ -22,6 +22,8 @@ sys.stdout = fout
 # Open vector TDLPACK file; iterate; close
 # ---------------------------------------------------------------------------------------- 
 f = TdlpackIO.open("sampledata/hre201701.sq")
+print(f.dates)
+print(f.leadtimes)
 f.seek(0)
 for rec in f:
     print(f.recordnumber,type(rec),rec.id)
@@ -31,6 +33,8 @@ f.close()
 # Open gridded TDLPACK file; iterate; close
 # ---------------------------------------------------------------------------------------- 
 f = TdlpackIO.open("sampledata/gfspkd47.2017020100.sq")
+print(f.dates)
+print(f.leadtimes)
 f.seek(0)
 for rec in f:
     print(f.recordnumber,type(rec),rec.id)
