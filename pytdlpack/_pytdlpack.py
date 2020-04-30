@@ -428,6 +428,7 @@ class TdlpackFile(object):
                 if not self.data_type: self.data_type = 'grid'
                 kwargs['id'] = deepcopy(ipack[5:9])
                 kwargs['reference_date'] = deepcopy(ipack[4])
+                kwargs['lead_time'] = np.int32(str(ipack[7])[-3:])
                 kwargs['_filelun'] = self.fortran_lun
                 kwargs['_starecindex'] = len(_starecdict[self.fortran_lun])-1 if len(_starecdict[self.fortran_lun]) > 0 else 0
                 return TdlpackRecord(**kwargs)
@@ -960,7 +961,7 @@ class TdlpackRecord(object):
                 self.id = self.is1[8:12]
 
         # Set attributes from is1[].
-        self.lead_time = np.int32(self.is1[10]-((self.is1[10]/1000)*1000))
+        self.lead_time = np.int32(str(self.is1[10])[-3:])
         if not self.plain:
             if self.is1[21] > 0:
                 for n in np.nditer(self.is1[22:(22+self.is1[21])]):
