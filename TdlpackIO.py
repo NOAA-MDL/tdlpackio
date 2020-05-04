@@ -12,6 +12,7 @@ their entirety do not need to be read.
 """
 import logging
 import numpy as np
+import os
 import pdb
 import pytdlpack
 import struct
@@ -52,10 +53,13 @@ class open(object):
         self._fh = builtins.open(filename,mode=mode,buffering=ONE_MB)
         self._hasindex = False
         self._index = {}
+        self.mode = mode
+        self.name = os.path.abspath(filename)
         self.records = 0
         self.recordnumber = 0
+        self.size = os.path.getsize(self.name)
         # Perform indexing on read
-        if 'r' in mode:
+        if 'r' in self.mode:
             self._get_index()
 
     def __enter__(self):
@@ -80,6 +84,14 @@ class open(object):
             return self.read(1)[0]
         else:
             raise StopIteration
+
+    def __repr__(self):
+        strings = []
+        keys = self.__dict__.keys()
+        for k in keys:
+            if not k.startswith('_'):
+                strings.append('%s = %s\n'%(k,self.__dict__[k]))
+        return ''.join(strings)
 
     def _get_index(self):
         """
@@ -261,11 +273,22 @@ class open(object):
         # Perform matching by determining list index values for each list criteria
         # in the file index dictionary.  These index values are catted together
         # throughout the matching.
-        if date is not None:
-            # Match by date (i.e. reference date)
-            match_count += 1
-            idx = np.where(np.array(self._index['date'])==date)[0]
+ 
+        # Match by date.
+        if type(date) is not list:
+           if date is None:
+               date = []
+           else:
+               date = [date]
+        if len(date) > 0: match_count += 1
+        for d in date:
+            if d is not None:
+                if idx is None:
+                    idx = np.where(np.array(self._index['date'])==d)[0]
+                else:
+                    idx = np.concatenate((idx,np.where(np.array(self._index['date'])==d)[0]))
 
+        # Match by ID.
         if id is not None:
             # Test for type
             if type(id) is str:
@@ -301,14 +324,19 @@ class open(object):
             else:
                 idx = np.concatenate((idx1,idx2,idx3,idx4))
 
-        if lead is not None:
-            # Match by lead time
-            match_count += 1
-            if idx is not None:
-                idx = np.concatenate((idx,np.where(np.array(self._index['lead'])==lead)[0]))
+        # Match by lead times(s).
+        if type(lead) is not list:
+            if lead is None:
+                lead = []
             else:
-                #idx = np.concatenate((np.where(np.array(self._index['lead'])==lead)[0]))
-                idx = np.where(np.array(self._index['lead'])==lead)[0]
+                lead = [lead]
+        if len(lead) > 0: match_count += 1
+        for l in lead:
+            if l is not None:
+                if idx is None:
+                    idx = np.where(np.array(self._index['lead'])==l)[0]
+                else:
+                    idx = np.concatenate((idx,np.where(np.array(self._index['lead'])==l)[0]))
 
         # Now determine the count of unique index values.  The count needs to match the
         # value of match_count.  Where this occurs, the index values are extracted.
@@ -317,6 +345,7 @@ class open(object):
 
         # Now we iterate over the matching index values and build the list of
         # records.
+        print("IDX = ",len(idx))
         for i in idx:
             recs.append(self.record(i+1,unpack=unpack))
         return recs
