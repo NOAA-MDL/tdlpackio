@@ -7,7 +7,7 @@ import sys
 # ---------------------------------------------------------------------------------------- 
 # Definitions
 # ---------------------------------------------------------------------------------------- 
-VERSION = '1.0.0'
+VERSION = '1.0.2'
 
 # ---------------------------------------------------------------------------------------- 
 # Write version info
@@ -116,7 +116,7 @@ setup(name             = 'pytdlpack',
       author_email     = "eric.engle@mac.com",
       url              = "https://github.com/eengl/pytdlpack",
       download_url     = "https://github.com/eengl/pytdlpack/releases",
-      version          = "0.9.0",
+      version          = VERSION,
       description      = "Python interface for reading and writing TDLPACK data",
       license          = 'GPL-3.0',
       ext_modules      = [ext],
