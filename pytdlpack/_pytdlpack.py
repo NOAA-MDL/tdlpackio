@@ -905,6 +905,11 @@ class TdlpackRecord(object):
         self.ipack = np.zeros((ND5),dtype=np.int32)
         self.is1[16] = np.int32(dec_scale)
 
+        # Pack plain langauge into IS1 array.
+        self.plain = self.plain.ljust(NCHAR_PLAIN)
+        for n,p in enumerate(self.plain):
+            self.is1[22+n] = np.int32(ord(p))
+
         # Handle potential NaN values
         if self.primary_missing_value == 0:
             self.primary_missing_value == DEFAULT_MISSING_VALUE
