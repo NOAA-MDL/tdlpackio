@@ -410,7 +410,7 @@ class TdlpackFile(object):
 
     def __exit__(self,type,value,traceback):
         self.close()
-    
+
     def _determine_record_type(self,ipack,ioctet):
         kwargs = {}
         if ipack[0] == 0 and ipack[4] == 9999 and ioctet == 24:
@@ -797,7 +797,7 @@ class TdlpackRecord(object):
             self.is1[13] = np.int32(0)
             self.is1[14] = np.int32(self.is1[8]-((self.is1[8]/100)*100))
             self.is1[15] = np.int32(0)
-            self.is1[16] = np.int32(1) # Will default to 1, but user can specify decimal scale factor in pack().
+            self.is1[16] = np.int32(0)
             self.is1[17] = np.int32(0)
             self.is1[18] = np.int32(0)
             self.is1[19] = np.int32(0)
@@ -884,7 +884,7 @@ class TdlpackRecord(object):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
     
-    def pack(self,dec_scale=1,bin_scale=0):
+    def pack(self,dec_scale=None,bin_scale=None):
         """
         Pack a TDLPACK record.
 
@@ -901,9 +901,19 @@ class TdlpackRecord(object):
         binary scale factor is currently NOT SUPPORTED in MOS-2000 software. It is added
         here for completeness.
         """
+
+        # Make sure data are unpacked
+        if not self._data_unpacked:
+            self.unpack(data=True)
+
         _ier = np.int32(0)
         self.ipack = np.zeros((ND5),dtype=np.int32)
-        self.is1[16] = np.int32(dec_scale)
+
+        if dec_scale is not None:
+            self.is1[16] = np.int32(dec_scale)
+
+        if bin_scale is not None:
+            self.is1[17] = np.int32(bin_scale)
 
         # Pack plain langauge into IS1 array.
         self.plain = self.plain.ljust(NCHAR_PLAIN)
