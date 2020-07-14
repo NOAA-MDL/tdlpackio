@@ -1019,7 +1019,7 @@ class TdlpackRecord(object):
 
         if data:
             self._data_unpacked = True
-            _nd5_local = max(self.is4[2],(self.ioctet/NBYPWD))
+            _nd5_local = max(self.is4[2],int(self.ioctet/NBYPWD))
             _iwork = np.zeros((_nd5_local),dtype=np.int32)
             _data = np.zeros((_nd5_local),dtype=np.float32)
             # Check to make sure the size of self.ipack is long enough. If not, then
