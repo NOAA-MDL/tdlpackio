@@ -50,7 +50,7 @@ class open(object):
             mode = mode+'b'
         elif mode == 'a':
             mode = 'wb'
-        self._fh = builtins.open(filename,mode=mode,buffering=ONE_MB)
+        self._filehandle = builtins.open(filename,mode=mode,buffering=ONE_MB)
         self._hasindex = False
         self._index = {}
         self.mode = mode
@@ -86,12 +86,28 @@ class open(object):
             raise StopIteration
 
     def __repr__(self):
+        """
+        """
         strings = []
         keys = self.__dict__.keys()
         for k in keys:
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
+
+    def __getitem__(self,key):
+        """
+        """
+        if isinstance(key,slice):
+            beg, end, inc = key.indices(self.records)
+            self.seek(beg)
+            return [self.record(i+1) for i in range(beg,end,inc)]
+        elif isinstance(key,int):
+            if key == 0: return None
+            self.seek(key)
+            return self.record(key)
+        else:
+            raise KeyError('Key must be an integer record number or a slice')
 
     def _get_index(self):
         """
@@ -117,13 +133,13 @@ class open(object):
                 # First read 4-byte Fortran record header, then read the next
                 # 44 bytes which provides enough information to catalog the
                 # data record.
-                pos = self._fh.tell()
-                fortran_header = struct.unpack('>i',self._fh.read(4))[0]
+                pos = self._filehandle.tell()
+                fortran_header = struct.unpack('>i',self._filehandle.read(4))[0]
                 if fortran_header >= 44:
                     bytes_to_read = 44
                 else:
                     bytes_to_read = fortran_header
-                temp = np.frombuffer(self._fh.read(bytes_to_read),dtype='>i4')
+                temp = np.frombuffer(self._filehandle.read(bytes_to_read),dtype='>i4')
                 _header = struct.unpack('>4s',temp[2])[0].decode()
 
                 # Check to first 4 bytes of the data record to determine the data
@@ -167,8 +183,8 @@ class open(object):
                 # the file. Increment self.records and position the file pointer to
                 # now read the Fortran trailer.
                 self.records += 1 # Includes trailer records
-                self._fh.seek(fortran_header-bytes_to_read,1)
-                fortran_trailer = struct.unpack('>i',self._fh.read(4))[0]
+                self._filehandle.seek(fortran_header-bytes_to_read,1)
+                fortran_trailer = struct.unpack('>i',self._filehandle.read(4))[0]
 
                 # Check Fortran header and trailer for the record.
                 if fortran_header != fortran_trailer:
@@ -184,7 +200,7 @@ class open(object):
                     _last_station_id_record = self.records # This should be OK.
 
             except(struct.error):
-                self._fh.seek(0)
+                self._filehandle.seek(0)
                 break
 
         self._hasindex = True
@@ -195,7 +211,7 @@ class open(object):
         """
         Close the file handle
         """
-        self._fh.close()
+        self._filehandle.close()
 
     def read(self,num=None,unpack=True):
         """
@@ -214,7 +230,7 @@ class open(object):
             kwargs = {}
             self.seek(n)
             kwargs['ioctet'] = self._index['size'][nn]
-            kwargs['ipack'] = np.frombuffer(self._fh.read(self._index['size'][nn]),dtype='>i4')
+            kwargs['ipack'] = np.frombuffer(self._filehandle.read(self._index['size'][nn]),dtype='>i4')
             if self._index['type'][nn] == 'data':
                 kwargs['reference_date'] = self._index['date'][nn]
                 rec = pytdlpack.TdlpackRecord(**kwargs)
@@ -254,10 +270,10 @@ class open(object):
         #pdb.set_trace()
         if self._hasindex:
             if offset == 0:
-                self._fh.seek(self._index['offset'][offset])
+                self._filehandle.seek(self._index['offset'][offset])
                 self.recordnumber = offset
             elif offset > 0:
-                self._fh.seek(self._index['offset'][offset-1])
+                self._filehandle.seek(self._index['offset'][offset-1])
                 self.recordnumber = offset-1
     
     def fetch(self,date=None,id=None,lead=None,unpack=True):
@@ -270,10 +286,6 @@ class open(object):
         idx = None
         match_count = 0
 
-        # Perform matching by determining list index values for each list criteria
-        # in the file index dictionary.  These index values are catted together
-        # throughout the matching.
- 
         # Match by date.
         if type(date) is not list:
            if date is None:
@@ -345,7 +357,6 @@ class open(object):
 
         # Now we iterate over the matching index values and build the list of
         # records.
-        print("IDX = ",len(idx))
         for i in idx:
             recs.append(self.record(i+1,unpack=unpack))
         return recs
