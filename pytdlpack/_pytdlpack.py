@@ -409,7 +409,26 @@ class TdlpackFile(object):
         return self
 
     def __exit__(self,type,value,traceback):
+        """
+        """
         self.close()
+
+    def __iter__(self):
+        """
+        """
+        return self
+
+    def __next__(self):
+        """
+        """
+        if not self.eof:
+            rec = self.read()
+            if self.eof and isinstance(rec,type(None)):
+                raise StopIteration
+            else:
+                return rec
+        else:
+            raise StopIteration
 
     def _determine_record_type(self,ipack,ioctet):
         kwargs = {}
