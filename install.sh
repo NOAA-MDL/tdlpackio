@@ -10,5 +10,5 @@ fi
 FCOMPILER=$1
 PREFIX=$2
 
-python setup.py build_ext --fcompiler=$FCOMPILER build
-python setup.py install --prefix=$PREFIX
+python3 setup.py build_ext --fcompiler=$FCOMPILER build
+python3 setup.py install --prefix=$PREFIX
