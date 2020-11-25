@@ -44,7 +44,8 @@ Download
 ========
 
 - Latest code from [github repository](https://github.com/eengl/pytdlpack).
-- Latest [releases](https://github.com/eengl/pytdlpack/releases) on GitHub. ***PyPI releases coming...***
+- Latest [releases](https://github.com/eengl/pytdlpack/releases) on GitHub.
+- [PyPI](https://pypi.org/project/pytdlpack)
 
 Requires
 ========
