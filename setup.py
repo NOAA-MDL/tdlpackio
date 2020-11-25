@@ -109,6 +109,13 @@ class TestCommand(Command):
 write_version_file()
 
 # ---------------------------------------------------------------------------------------- 
+# Import README.md as PyPi long_description
+# ---------------------------------------------------------------------------------------- 
+this_directory = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
+# ---------------------------------------------------------------------------------------- 
 # Run setup
 # ---------------------------------------------------------------------------------------- 
 setup(name             = 'pytdlpack',
@@ -133,4 +140,7 @@ setup(name             = 'pytdlpack',
                           'Intended Audience :: Science/Research',
                           'Operating System :: OS Independent',
                           'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'],
-      )
+      install_requires  = ['numpy'],
+      python_requires   = '>=3.6',
+      long_description  = long_description,
+      long_description_content_type = 'text/markdown')
