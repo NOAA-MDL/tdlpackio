@@ -1,0 +1,12 @@
+MANIFEST.in
+LICENSE
+recursive-include docs *
+recursive-include tdlpack *
+recursive-include test *
+recursive-include sampledata *
+recursive-include pytdlpack *
+TDLPACK.md
+README.md
+setup.py
+TdlpackIO.py
+create_docs.sh
