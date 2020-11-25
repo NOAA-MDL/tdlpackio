@@ -49,7 +49,7 @@ Download
 Requires
 ========
 
-- Python 2.7, 3.4+
+- Python 3.6+
 - [numpy array module](http://numpy.scipy.org), version 1.8.0 or later.
 - [setuptools](https://pypi.python.org/pypi/setuptools), version 18.0 or later.
 - Fortran compiler (if installing from source). ***Only GNU (gfortran) and Intel (ifort) are supported at this time.***
@@ -61,20 +61,23 @@ Install
 
 First build the tdlpack module.
 
-    :::shell
-    $ python setup.py build_ext --fcompiler=[gnu95|intelem] build
+```shell
+$ python setup.py build_ext --fcompiler=[gnu95|intelem] build
+```
 
 **Install**
 
 System-wide:
 
-    :::shell
-    $ sudo python setup.py install
+```shell
+$ sudo python setup.py install
+```
 
 Locally:
 
-    :::shell
-    $ python setup.py install --prefix=<INSTALL_DIR>
+```shell
+$ python setup.py install --prefix=<INSTALL_DIR>
+```
 
 Tutorial
 ========
@@ -97,39 +100,43 @@ then the user can also specify `ra_template='small' or 'large'`.  The default is
 
 Example: Create a new sequential file:
 
-    :::python
-    >>> import pytdlpack
-    >>> f = pytdlpack.open('test.sq',mode='w')
+```python
+>>> import pytdlpack
+>>> f = pytdlpack.open('test.sq',mode='w')
+```
 
 Example: Create a new random-access file:
 
-    :::python
-    >>> import pytdlpack
-    >>> f = pytdlpack.open('test.sq',mode='w',format='random-access',ra_template='small')
+```python
+>>> import pytdlpack
+>>> f = pytdlpack.open('test.sq',mode='w',format='random-access',ra_template='small')
+```
 
 To open an existing TDLPACK file, simply provide the filename since the default mode is read.
 
-    :::python
-    import pytdlpack
-    >>> f = pytdlpack.open('test.sq')
-    >>> type(f)
-    <class 'pytdlpack._pytdlpack.TdlpackFile'>
-    >>> f
-    byte_order = >
-    data_type =
-    eof = False
-    format = sequential
-    fortran_lun = 65535
-    mode = r
-    name = test.sq
-    position = 0
-    ra_master_key = None
-    size = 998672
+```python
+import pytdlpack
+>>> f = pytdlpack.open('test.sq')
+>>> type(f)
+<class 'pytdlpack._pytdlpack.TdlpackFile'>
+>>> f
+byte_order = >
+data_type =
+eof = False
+format = sequential
+fortran_lun = 65535
+mode = r
+name = test.sq
+position = 0
+ra_master_key = None
+size = 998672
+```
 
 To close a TDLPACK file is straightforward.
 
-    :::python
-    >>> f.close()
+```python
+>>> f.close()
+```
 
 ## <div id='section2'>2) Reading a TDLPACK file.
 
@@ -139,63 +146,65 @@ only 1 record is returned and the TDLPACK indentification sections are unpacked.
 
 Example: Reading a gridded TDLPACK record.
 
-    :::python
-    >>> x = f.read()
-    >>> x
-    grid_length = 2539.703
-    id = [223254166         0         6         0]
-    ioctet = 998656
-    ipack = [1347175508  255654144 1191249890 ...          0          0          0]
-    is0 = [1347175508     998649          0          0          0          0
-              0          0          0          0          0          0
-              0          0          0          0          0          0
-              0          0          0          0          0          0
-              0          0          0          0          0          0
-              0          0          0          0          0          0
-              0          0          0          0          0          0
-              0          0          0          0          0          0
-              0          0          0          0          0          0]
-    is1 = [        71          1       2018         12          4          0
-              0 2018120400  223254166          0          6          0
-              6          0         66          0          1          0
-              0          0          0         32          0          0
-              0          0          0          0          0          0
-              0          0          0          0          0          0
-              0          0          0          0          0          0
-              0          0          0          0          0          0
-              0          0          0          0          0          0]
-    is2 = [     28       3    2345    1597  192290 2337234  950000 2539703  250000
-           0       0       0       0       0       0       0       0       0
-           0       0       0       0       0       0       0       0       0
-           0       0       0       0       0       0       0       0       0
-           0       0       0       0       0       0       0       0       0
-           0       0       0       0       0       0       0       0       0]
-    is4 = [ 998538      12 3744965       0       0       0       0       0       0
-           0       0       0       0       0       0       0       0       0
-           0       0       0       0       0       0       0       0       0
-           0       0       0       0       0       0       0       0       0
-           0       0       0       0       0       0       0       0       0
-           0       0       0       0       0       0       0       0       0]
-    lead_time = 6
-    lower_left_latitude = 19.229
-    lower_left_longitude = 233.7234
-    map_proj = 3
-    number_of_values = 3744965
-    nx = 2345
-    ny = 1597
-    origin_longitude = 95.0
-    plain =
-    primary_missing_value = 0.0
-    reference_date = 2018120400
-    secondary_missing_value = 0.0
-    standard_latitude = 25.0
-    type = grid
+```python
+>>> x = f.read()
+>>> x
+grid_length = 2539.703
+id = [223254166         0         6         0]
+ioctet = 998656
+ipack = [1347175508  255654144 1191249890 ...          0          0          0]
+is0 = [1347175508     998649          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0]
+is1 = [        71          1       2018         12          4          0
+          0 2018120400  223254166          0          6          0
+          6          0         66          0          1          0
+          0          0          0         32          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0]
+is2 = [     28       3    2345    1597  192290 2337234  950000 2539703  250000
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0]
+is4 = [ 998538      12 3744965       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0]
+lead_time = 6
+lower_left_latitude = 19.229
+lower_left_longitude = 233.7234
+map_proj = 3
+number_of_values = 3744965
+nx = 2345
+ny = 1597
+origin_longitude = 95.0
+plain =
+primary_missing_value = 0.0
+reference_date = 2018120400
+secondary_missing_value = 0.0
+standard_latitude = 25.0
+type = grid
+```
 
 You can also have `pytdlpack.TdlpackFile.read` read the entire file with optional keyword
 `all = True`.  Reading all records at once is not recommened if the file is large in size.
 
-    :::python
-    >>> x = f.read(all=True)
+```python
+>>> x = f.read(all=True)
+```
 
 Here, x will become a list of instances of either `pytdlpack.TdlpackStationRecord`, 
 `pytdlpack.TdlpackRecord`, or `pytdlpack.TdlpackTrailerRecord`.
@@ -203,12 +212,13 @@ Here, x will become a list of instances of either `pytdlpack.TdlpackStationRecor
 If the file being read a TDLPACK random-access (`format='random-access'`), then you can also provide the `id=` 
 argument to search for a specific record.
 
-    :::python
-    >>> import pytdlpack
-    >>> f = pytdlpack.open('test.ra')
-    >>> x = f.read(id=[400001000,0,0,0])
-    >>> type(x)
-    <class 'pytdlpack._pytdlpack.TdlpackStationRecord'>
+```python
+>>> import pytdlpack
+>>> f = pytdlpack.open('test.ra')
+>>> x = f.read(id=[400001000,0,0,0])
+>>> type(x)
+<class 'pytdlpack._pytdlpack.TdlpackStationRecord'>
+```
 
 ## <div id='section3'>3) Writing a TDLPACK file.
 
@@ -217,11 +227,12 @@ above, is an instance of `pytdlpack.TdlpackStationRecord` that has been packed.
 
 Example: Write to a new TDLPACK sequential file.
 
-    :::python
-    >>> import pytdlpack
-    >>> f.open("new.sq",mode="w",format="sequential")
-    >>> f.write(x)
-    >>> f.close()
+```python
+>>> import pytdlpack
+>>> f.open("new.sq",mode="w",format="sequential")
+>>> f.write(x)
+>>> f.close()
+```
 
 ## <div id='section4'>4) Creating a TDLPACK Station Record.
 
@@ -230,15 +241,16 @@ instantiation via the traditional **kwargs (see `pytdlpack.TdlpackStationRecord.
 or simply providing `ccall = ...` ***(recommended)***.  The value passed to the `ccall=` argument can
 be a single call letter string, list, tuple, or comma-delimited string of station call letter records.
 
-    :::python
-    >>> import pytdlpack
-    >>> stations = pytdlpack.TdlpackStationRecord(['KBWI','KDCA','KIAD'])
-    >>> stations
-    ccall = ['KBWI', 'KDCA', 'KIAD']
-    id = [400001000         0         0         0]
-    ioctet = 0
-    ipack = []
-    number_of_stations = 3
+```python
+>>> import pytdlpack
+>>> stations = pytdlpack.TdlpackStationRecord(['KBWI','KDCA','KIAD'])
+>>> stations
+ccall = ['KBWI', 'KDCA', 'KIAD']
+id = [400001000         0         0         0]
+ioctet = 0
+ipack = []
+number_of_stations = 3
+```
 
 ## <div id='section5'>5) Creating a TDLPACK Record.
 
@@ -246,10 +258,11 @@ The recommended method for creating a `pytdlpack.TdlpackRecord` is to pass the T
 indentification arrays, plain language string, and data to the approproiate keyword.  Please
 see `pytdlpack.TdlpackRecord.__init__` for more info.
 
-    :::python
-    >>> import numpy as np
-    >>> record = pytdlpack.TdlpackRecord(date=2019070100,dcf=0,id=[4210008, 0, 24, 0],lead=24,
-    plain="GFS WIND SPEED",grid=grid_def,data=<np.float32 array>)
+```python
+>>> import numpy as np
+>>> record = pytdlpack.TdlpackRecord(date=2019070100,id=[4210008, 0, 24, 0],lead=24,
+plain="GFS WIND SPEED",grid=grid_def,data=<np.float32 array>)
+```
 
 The user is encouraged to read the official MOS-2000 documentation (specifically Chapter 5) 
 on construction of these arrays and proper encoding.
@@ -260,21 +273,24 @@ Once any of the three classes of TDLPACK records have been instantiated, you can
 record using the class method `pack`.  Using the example from [Section 5](#section5), `record`
 is now an instance of `pytdlpack.TdlpackRecord`.  You can pack this record with the following:
 
-    :::python
-    >>> record.pack()
+```python
+>>> record.pack()
+```
 
 To unpack a packed TDLPACK record, perform:
 
-    :::python
-    >>> record.unpack()
+```python
+>>> record.unpack()
+```
 
 The `pytdlpack.TdlpackRecord.unpack` class method for TDLPACK data records, contains optional
 arguments `data=` (to control the unpacking of data) and `missing_value=` (to set a different 
 missing value other than what is contained in the record).  For TDLPACK data records, 
 `pytdlpack.TdlpackRecord.unpack` automatically unpacks the TDLPACK meta-data.
 
-    :::python
-    >>> record.unpack(data=True,missing_value=-9999.0)
+```python
+>>> record.unpack(data=True,missing_value=-9999.0)
+```
 
 """
 

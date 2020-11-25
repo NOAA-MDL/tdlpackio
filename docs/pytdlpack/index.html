@@ -1,1157 +1,63 @@
 <!doctype html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-
-    <title>pytdlpack API documentation</title>
-    <meta name="description" content="Introduction
-============
-
-pytdlpack is a Python interface to reading/writing TDLPACK files via offi..." />
-
-  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
-  
-  <style type="text/css">
-  
-* {
-  box-sizing: border-box;
-}
-/*! normalize.css v1.1.1 | MIT License | git.io/normalize */
-
-/* ==========================================================================
-   HTML5 display definitions
-   ========================================================================== */
-
-/**
- * Correct `block` display not defined in IE 6/7/8/9 and Firefox 3.
- */
-
-article,
-aside,
-details,
-figcaption,
-figure,
-footer,
-header,
-hgroup,
-main,
-nav,
-section,
-summary {
-    display: block;
-}
-
-/**
- * Correct `inline-block` display not defined in IE 6/7/8/9 and Firefox 3.
- */
-
-audio,
-canvas,
-video {
-    display: inline-block;
-    *display: inline;
-    *zoom: 1;
-}
-
-/**
- * Prevent modern browsers from displaying `audio` without controls.
- * Remove excess height in iOS 5 devices.
- */
-
-audio:not([controls]) {
-    display: none;
-    height: 0;
-}
-
-/**
- * Address styling not present in IE 7/8/9, Firefox 3, and Safari 4.
- * Known issue: no IE 6 support.
- */
-
-[hidden] {
-    display: none;
-}
-
-/* ==========================================================================
-   Base
-   ========================================================================== */
-
-/**
- * 1. Prevent system color scheme's background color being used in Firefox, IE,
- *    and Opera.
- * 2. Prevent system color scheme's text color being used in Firefox, IE, and
- *    Opera.
- * 3. Correct text resizing oddly in IE 6/7 when body `font-size` is set using
- *    `em` units.
- * 4. Prevent iOS text size adjust after orientation change, without disabling
- *    user zoom.
- */
-
-html {
-    background: #fff; /* 1 */
-    color: #000; /* 2 */
-    font-size: 100%; /* 3 */
-    -webkit-text-size-adjust: 100%; /* 4 */
-    -ms-text-size-adjust: 100%; /* 4 */
-}
-
-/**
- * Address `font-family` inconsistency between `textarea` and other form
- * elements.
- */
-
-html,
-button,
-input,
-select,
-textarea {
-    font-family: sans-serif;
-}
-
-/**
- * Address margins handled incorrectly in IE 6/7.
- */
-
-body {
-    margin: 0;
-}
-
-/* ==========================================================================
-   Links
-   ========================================================================== */
-
-/**
- * Address `outline` inconsistency between Chrome and other browsers.
- */
-
-a:focus {
-    outline: thin dotted;
-}
-
-/**
- * Improve readability when focused and also mouse hovered in all browsers.
- */
-
-a:active,
-a:hover {
-    outline: 0;
-}
-
-/* ==========================================================================
-   Typography
-   ========================================================================== */
-
-/**
- * Address font sizes and margins set differently in IE 6/7.
- * Address font sizes within `section` and `article` in Firefox 4+, Safari 5,
- * and Chrome.
- */
-
-h1 {
-    font-size: 2em;
-    margin: 0.67em 0;
-}
-
-h2 {
-    font-size: 1.5em;
-    margin: 0.83em 0;
-}
-
-h3 {
-    font-size: 1.17em;
-    margin: 1em 0;
-}
-
-h4 {
-    font-size: 1em;
-    margin: 1.33em 0;
-}
-
-h5 {
-    font-size: 0.83em;
-    margin: 1.67em 0;
-}
-
-h6 {
-    font-size: 0.67em;
-    margin: 2.33em 0;
-}
-
-/**
- * Address styling not present in IE 7/8/9, Safari 5, and Chrome.
- */
-
-abbr[title] {
-    border-bottom: 1px dotted;
-}
-
-/**
- * Address style set to `bolder` in Firefox 3+, Safari 4/5, and Chrome.
- */
-
-b,
-strong {
-    font-weight: bold;
-}
-
-blockquote {
-    margin: 1em 40px;
-}
-
-/**
- * Address styling not present in Safari 5 and Chrome.
- */
-
-dfn {
-    font-style: italic;
-}
-
-/**
- * Address differences between Firefox and other browsers.
- * Known issue: no IE 6/7 normalization.
- */
-
-hr {
-    -moz-box-sizing: content-box;
-    box-sizing: content-box;
-    height: 0;
-}
-
-/**
- * Address styling not present in IE 6/7/8/9.
- */
-
-mark {
-    background: #ff0;
-    color: #000;
-}
-
-/**
- * Address margins set differently in IE 6/7.
- */
-
-p,
-pre {
-    margin: 1em 0;
-}
-
-/**
- * Correct font family set oddly in IE 6, Safari 4/5, and Chrome.
- */
-
-code,
-kbd,
-pre,
-samp {
-    font-family: monospace, serif;
-    _font-family: 'courier new', monospace;
-    font-size: 1em;
-}
-
-/**
- * Improve readability of pre-formatted text in all browsers.
- */
-
-pre {
-    white-space: pre;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-
-/**
- * Address CSS quotes not supported in IE 6/7.
- */
-
-q {
-    quotes: none;
-}
-
-/**
- * Address `quotes` property not supported in Safari 4.
- */
-
-q:before,
-q:after {
-    content: '';
-    content: none;
-}
-
-/**
- * Address inconsistent and variable font size in all browsers.
- */
-
-small {
-    font-size: 80%;
-}
-
-/**
- * Prevent `sub` and `sup` affecting `line-height` in all browsers.
- */
-
-sub,
-sup {
-    font-size: 75%;
-    line-height: 0;
-    position: relative;
-    vertical-align: baseline;
-}
-
-sup {
-    top: -0.5em;
-}
-
-sub {
-    bottom: -0.25em;
-}
-
-/* ==========================================================================
-   Lists
-   ========================================================================== */
-
-/**
- * Address margins set differently in IE 6/7.
- */
-
-dl,
-menu,
-ol,
-ul {
-    margin: 1em 0;
-}
-
-dd {
-    margin: 0 0 0 40px;
-}
-
-/**
- * Address paddings set differently in IE 6/7.
- */
-
-menu,
-ol,
-ul {
-    padding: 0 0 0 40px;
-}
-
-/**
- * Correct list images handled incorrectly in IE 7.
- */
-
-nav ul,
-nav ol {
-    list-style: none;
-    list-style-image: none;
-}
-
-/* ==========================================================================
-   Embedded content
-   ========================================================================== */
-
-/**
- * 1. Remove border when inside `a` element in IE 6/7/8/9 and Firefox 3.
- * 2. Improve image quality when scaled in IE 7.
- */
-
-img {
-    border: 0; /* 1 */
-    -ms-interpolation-mode: bicubic; /* 2 */
-}
-
-/**
- * Correct overflow displayed oddly in IE 9.
- */
-
-svg:not(:root) {
-    overflow: hidden;
-}
-
-/* ==========================================================================
-   Figures
-   ========================================================================== */
-
-/**
- * Address margin not present in IE 6/7/8/9, Safari 5, and Opera 11.
- */
-
-figure {
-    margin: 0;
-}
-
-/* ==========================================================================
-   Forms
-   ========================================================================== */
-
-/**
- * Correct margin displayed oddly in IE 6/7.
- */
-
-form {
-    margin: 0;
-}
-
-/**
- * Define consistent border, margin, and padding.
- */
-
-fieldset {
-    border: 1px solid #c0c0c0;
-    margin: 0 2px;
-    padding: 0.35em 0.625em 0.75em;
-}
-
-/**
- * 1. Correct color not being inherited in IE 6/7/8/9.
- * 2. Correct text not wrapping in Firefox 3.
- * 3. Correct alignment displayed oddly in IE 6/7.
- */
-
-legend {
-    border: 0; /* 1 */
-    padding: 0;
-    white-space: normal; /* 2 */
-    *margin-left: -7px; /* 3 */
-}
-
-/**
- * 1. Correct font size not being inherited in all browsers.
- * 2. Address margins set differently in IE 6/7, Firefox 3+, Safari 5,
- *    and Chrome.
- * 3. Improve appearance and consistency in all browsers.
- */
-
-button,
-input,
-select,
-textarea {
-    font-size: 100%; /* 1 */
-    margin: 0; /* 2 */
-    vertical-align: baseline; /* 3 */
-    *vertical-align: middle; /* 3 */
-}
-
-/**
- * Address Firefox 3+ setting `line-height` on `input` using `!important` in
- * the UA stylesheet.
- */
-
-button,
-input {
-    line-height: normal;
-}
-
-/**
- * Address inconsistent `text-transform` inheritance for `button` and `select`.
- * All other form control elements do not inherit `text-transform` values.
- * Correct `button` style inheritance in Chrome, Safari 5+, and IE 6+.
- * Correct `select` style inheritance in Firefox 4+ and Opera.
- */
-
-button,
-select {
-    text-transform: none;
-}
-
-/**
- * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
- *    and `video` controls.
- * 2. Correct inability to style clickable `input` types in iOS.
- * 3. Improve usability and consistency of cursor style between image-type
- *    `input` and others.
- * 4. Remove inner spacing in IE 7 without affecting normal text inputs.
- *    Known issue: inner spacing remains in IE 6.
- */
-
-button,
-html input[type="button"], /* 1 */
-input[type="reset"],
-input[type="submit"] {
-    -webkit-appearance: button; /* 2 */
-    cursor: pointer; /* 3 */
-    *overflow: visible;  /* 4 */
-}
-
-/**
- * Re-set default cursor for disabled elements.
- */
-
-button[disabled],
-html input[disabled] {
-    cursor: default;
-}
-
-/**
- * 1. Address box sizing set to content-box in IE 8/9.
- * 2. Remove excess padding in IE 8/9.
- * 3. Remove excess padding in IE 7.
- *    Known issue: excess padding remains in IE 6.
- */
-
-input[type="checkbox"],
-input[type="radio"] {
-    box-sizing: border-box; /* 1 */
-    padding: 0; /* 2 */
-    *height: 13px; /* 3 */
-    *width: 13px; /* 3 */
-}
-
-/**
- * 1. Address `appearance` set to `searchfield` in Safari 5 and Chrome.
- * 2. Address `box-sizing` set to `border-box` in Safari 5 and Chrome
- *    (include `-moz` to future-proof).
- */
-
-input[type="search"] {
-    -webkit-appearance: textfield; /* 1 */
-    -moz-box-sizing: content-box;
-    -webkit-box-sizing: content-box; /* 2 */
-    box-sizing: content-box;
-}
-
-/**
- * Remove inner padding and search cancel button in Safari 5 and Chrome
- * on OS X.
- */
-
-input[type="search"]::-webkit-search-cancel-button,
-input[type="search"]::-webkit-search-decoration {
-    -webkit-appearance: none;
-}
-
-/**
- * Remove inner padding and border in Firefox 3+.
- */
-
-button::-moz-focus-inner,
-input::-moz-focus-inner {
-    border: 0;
-    padding: 0;
-}
-
-/**
- * 1. Remove default vertical scrollbar in IE 6/7/8/9.
- * 2. Improve readability and alignment in all browsers.
- */
-
-textarea {
-    overflow: auto; /* 1 */
-    vertical-align: top; /* 2 */
-}
-
-/* ==========================================================================
-   Tables
-   ========================================================================== */
-
-/**
- * Remove most spacing between table cells.
- */
-
-table {
-    border-collapse: collapse;
-    border-spacing: 0;
-}
-
-  </style>
-
-  <style type="text/css">
-  
-  html, body {
-    margin: 0;
-    padding: 0;
-    min-height: 100%;
-  }
-  body {
-    background: #fff;
-    font-family: "Source Sans Pro", "Helvetica Neueue", Helvetica, sans;
-    font-weight: 300;
-    font-size: 16px;
-    line-height: 1.6em;
-  }
-  #content {
-    width: 70%;
-    max-width: 850px;
-    float: left;
-    padding: 30px 60px;
-    border-left: 1px solid #ddd;
-  }
-  #sidebar {
-    width: 25%;
-    float: left;
-    padding: 30px;
-    overflow: hidden;
-  }
-  #nav {
-    font-size: 130%;
-    margin: 0 0 15px 0;
-  }
-
-  #top {
-    display: block;
-    position: fixed;
-    bottom: 5px;
-    left: 5px;
-    font-size: .85em;
-    text-transform: uppercase;
-  }
-
-  #footer {
-    font-size: .75em;
-    padding: 5px 30px;
-    border-top: 1px solid #ddd;
-    text-align: right;
-  }
-    #footer p {
-      margin: 0 0 0 30px;
-      display: inline-block;
-    }
-
-  h1, h2, h3, h4, h5 {
-    font-weight: 300;
-  }
-  h1 {
-    font-size: 2.5em;
-    line-height: 1.1em;
-    margin: 0 0 .50em 0;
-  }
-
-  h2 {
-    font-size: 1.75em;
-    margin: 1em 0 .50em 0;
-  }
-
-  h3 {
-    margin: 25px 0 10px 0;
-  }
-
-  h4 {
-    margin: 0;
-    font-size: 105%;
-  }
-
-  a {
-    color: #058;
-    text-decoration: none;
-    transition: color .3s ease-in-out;
-  }
-
-  a:hover {
-    color: #e08524;
-    transition: color .3s ease-in-out;
-  }
-
-  pre, code, .mono, .name {
-    font-family: "Ubuntu Mono", "Cousine", "DejaVu Sans Mono", monospace;
-  }
-
-  .title .name {
-    font-weight: bold;
-  }
-  .section-title {
-    margin-top: 2em;
-  }
-  .ident {
-    color: #900;
-  }
-
-  code {
-    background: #f9f9f9;
-  } 
-
-  pre {
-    background: #fefefe;
-    border: 1px solid #ddd;
-    box-shadow: 2px 2px 0 #f3f3f3;
-    margin: 0 30px;
-    padding: 15px 30px;
-  }
-
-  .codehilite {
-    margin: 0 30px 10px 30px;
-  }
-
-    .codehilite pre {
-      margin: 0;
-    }
-    .codehilite .err { background: #ff3300; color: #fff !important; } 
-
-  table#module-list {
-    font-size: 110%;
-  }
-
-    table#module-list tr td:first-child {
-      padding-right: 10px;
-      white-space: nowrap;
-    }
-
-    table#module-list td {
-      vertical-align: top;
-      padding-bottom: 8px;
-    }
-
-      table#module-list td p {
-        margin: 0 0 7px 0;
-      }
-
-  .def {
-    display: table;
-  }
-
-    .def p {
-      display: table-cell;
-      vertical-align: top;
-      text-align: left;
-    }
-
-    .def p:first-child {
-      white-space: nowrap;
-    }
-
-    .def p:last-child {
-      width: 100%;
-    }
-
-
-  #index {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-  }
-    ul#index .class_name {
-      /* font-size: 110%; */
-      font-weight: bold;
-    }
-    #index ul {
-      margin: 0;
-    }
-
-  .item {
-    margin: 0 0 15px 0;
-  }
-
-    .item .class {
-      margin: 0 0 25px 30px;
-    }
-
-      .item .class ul.class_list {
-        margin: 0 0 20px 0;
-      }
-
-    .item .name {
-      background: #fafafa;
-      margin: 0;
-      font-weight: bold;
-      padding: 5px 10px;
-      border-radius: 3px;
-      display: inline-block;
-      min-width: 40%;
-    }
-      .item .name:hover {
-        background: #f6f6f6;
-      }
-
-    .item .empty_desc {
-      margin: 0 0 5px 0;
-      padding: 0;
-    }
-
-    .item .inheritance {
-      margin: 3px 0 0 30px;
-    }
-
-    .item .inherited {
-      color: #666;
-    }
-
-    .item .desc {
-      padding: 0 8px;
-      margin: 0;
-    }
-
-      .item .desc p {
-        margin: 0 0 10px 0;
-      }
-
-    .source_cont {
-      margin: 0;
-      padding: 0;
-    }
-
-    .source_link a {
-      background: #ffc300;
-      font-weight: 400;
-      font-size: .75em;
-      text-transform: uppercase;
-      color: #fff;
-      text-shadow: 1px 1px 0 #f4b700;
-      
-      padding: 3px 8px;
-      border-radius: 2px;
-      transition: background .3s ease-in-out;
-    }
-      .source_link a:hover {
-        background: #FF7200;
-        text-shadow: none;
-        transition: background .3s ease-in-out;
-      }
-
-    .source {
-      display: none;
-      max-height: 600px;
-      overflow-y: scroll;
-      margin-bottom: 15px;
-    }
-
-      .source .codehilite {
-        margin: 0;
-      }
-
-  .desc h1, .desc h2, .desc h3 {
-    font-size: 100% !important;
-  }
-  .clear {
-    clear: both;
-  }
-
-  @media all and (max-width: 950px) {
-    #sidebar {
-      width: 35%;
-    }
-    #content {
-      width: 65%;
-    }
-  }
-  @media all and (max-width: 650px) {
-    #top {
-      display: none;
-    }
-    #sidebar {
-      float: none;
-      width: auto;
-    }
-    #content {
-      float: none;
-      width: auto;
-      padding: 30px;
-    }
-
-    #index ul {
-      padding: 0;
-      margin-bottom: 15px;
-    }
-    #index ul li {
-      display: inline-block;
-      margin-right: 30px;
-    }
-    #footer {
-      text-align: left;
-    }
-    #footer p {
-      display: block;
-      margin: inherit;
-    }
-  }
-
-  /*****************************/
-
-  </style>
-
-  <style type="text/css">
-  .codehilite .hll { background-color: #ffffcc }
-.codehilite  { background: #f8f8f8; }
-.codehilite .c { color: #408080; font-style: italic } /* Comment */
-.codehilite .err { border: 1px solid #FF0000 } /* Error */
-.codehilite .k { color: #008000; font-weight: bold } /* Keyword */
-.codehilite .o { color: #666666 } /* Operator */
-.codehilite .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
-.codehilite .cm { color: #408080; font-style: italic } /* Comment.Multiline */
-.codehilite .cp { color: #BC7A00 } /* Comment.Preproc */
-.codehilite .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
-.codehilite .c1 { color: #408080; font-style: italic } /* Comment.Single */
-.codehilite .cs { color: #408080; font-style: italic } /* Comment.Special */
-.codehilite .gd { color: #A00000 } /* Generic.Deleted */
-.codehilite .ge { font-style: italic } /* Generic.Emph */
-.codehilite .gr { color: #FF0000 } /* Generic.Error */
-.codehilite .gh { color: #000080; font-weight: bold } /* Generic.Heading */
-.codehilite .gi { color: #00A000 } /* Generic.Inserted */
-.codehilite .go { color: #888888 } /* Generic.Output */
-.codehilite .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
-.codehilite .gs { font-weight: bold } /* Generic.Strong */
-.codehilite .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
-.codehilite .gt { color: #0044DD } /* Generic.Traceback */
-.codehilite .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
-.codehilite .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
-.codehilite .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
-.codehilite .kp { color: #008000 } /* Keyword.Pseudo */
-.codehilite .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
-.codehilite .kt { color: #B00040 } /* Keyword.Type */
-.codehilite .m { color: #666666 } /* Literal.Number */
-.codehilite .s { color: #BA2121 } /* Literal.String */
-.codehilite .na { color: #7D9029 } /* Name.Attribute */
-.codehilite .nb { color: #008000 } /* Name.Builtin */
-.codehilite .nc { color: #0000FF; font-weight: bold } /* Name.Class */
-.codehilite .no { color: #880000 } /* Name.Constant */
-.codehilite .nd { color: #AA22FF } /* Name.Decorator */
-.codehilite .ni { color: #999999; font-weight: bold } /* Name.Entity */
-.codehilite .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
-.codehilite .nf { color: #0000FF } /* Name.Function */
-.codehilite .nl { color: #A0A000 } /* Name.Label */
-.codehilite .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
-.codehilite .nt { color: #008000; font-weight: bold } /* Name.Tag */
-.codehilite .nv { color: #19177C } /* Name.Variable */
-.codehilite .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
-.codehilite .w { color: #bbbbbb } /* Text.Whitespace */
-.codehilite .mb { color: #666666 } /* Literal.Number.Bin */
-.codehilite .mf { color: #666666 } /* Literal.Number.Float */
-.codehilite .mh { color: #666666 } /* Literal.Number.Hex */
-.codehilite .mi { color: #666666 } /* Literal.Number.Integer */
-.codehilite .mo { color: #666666 } /* Literal.Number.Oct */
-.codehilite .sa { color: #BA2121 } /* Literal.String.Affix */
-.codehilite .sb { color: #BA2121 } /* Literal.String.Backtick */
-.codehilite .sc { color: #BA2121 } /* Literal.String.Char */
-.codehilite .dl { color: #BA2121 } /* Literal.String.Delimiter */
-.codehilite .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
-.codehilite .s2 { color: #BA2121 } /* Literal.String.Double */
-.codehilite .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
-.codehilite .sh { color: #BA2121 } /* Literal.String.Heredoc */
-.codehilite .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
-.codehilite .sx { color: #008000 } /* Literal.String.Other */
-.codehilite .sr { color: #BB6688 } /* Literal.String.Regex */
-.codehilite .s1 { color: #BA2121 } /* Literal.String.Single */
-.codehilite .ss { color: #19177C } /* Literal.String.Symbol */
-.codehilite .bp { color: #008000 } /* Name.Builtin.Pseudo */
-.codehilite .fm { color: #0000FF } /* Name.Function.Magic */
-.codehilite .vc { color: #19177C } /* Name.Variable.Class */
-.codehilite .vg { color: #19177C } /* Name.Variable.Global */
-.codehilite .vi { color: #19177C } /* Name.Variable.Instance */
-.codehilite .vm { color: #19177C } /* Name.Variable.Magic */
-.codehilite .il { color: #666666 } /* Literal.Number.Integer.Long */
-  </style>
-
-  <style type="text/css">
-  
-/* ==========================================================================
-   EXAMPLE Media Queries for Responsive Design.
-   These examples override the primary ('mobile first') styles.
-   Modify as content requires.
-   ========================================================================== */
-
-@media only screen and (min-width: 35em) {
-    /* Style adjustments for viewports that meet the condition */
-}
-
-@media print,
-       (-o-min-device-pixel-ratio: 5/4),
-       (-webkit-min-device-pixel-ratio: 1.25),
-       (min-resolution: 120dpi) {
-    /* Style adjustments for high resolution devices */
-}
-
-/* ==========================================================================
-   Print styles.
-   Inlined to avoid required HTTP connection: h5bp.com/r
-   ========================================================================== */
-
-@media print {
-    * {
-        background: transparent !important;
-        color: #000 !important; /* Black prints faster: h5bp.com/s */
-        box-shadow: none !important;
-        text-shadow: none !important;
-    }
-
-    a,
-    a:visited {
-        text-decoration: underline;
-    }
-
-    a[href]:after {
-        content: " (" attr(href) ")";
-    }
-
-    abbr[title]:after {
-        content: " (" attr(title) ")";
-    }
-
-    /*
-     * Don't show links for images, or javascript/internal links
-     */
-
-    .ir a:after,
-    a[href^="javascript:"]:after,
-    a[href^="#"]:after {
-        content: "";
-    }
-
-    pre,
-    blockquote {
-        border: 1px solid #999;
-        page-break-inside: avoid;
-    }
-
-    thead {
-        display: table-header-group; /* h5bp.com/t */
-    }
-
-    tr,
-    img {
-        page-break-inside: avoid;
-    }
-
-    img {
-        max-width: 100% !important;
-    }
-
-    @page {
-        margin: 0.5cm;
-    }
-
-    p,
-    h2,
-    h3 {
-        orphans: 3;
-        widows: 3;
-    }
-
-    h2,
-    h3 {
-        page-break-after: avoid;
-    }
-}
-
-  </style>
-
-  <script type="text/javascript">
-  function toggle(id, $link) {
-    $node = document.getElementById(id);
-    if (!$node)
-    return;
-    if (!$node.style.display || $node.style.display == 'none') {
-    $node.style.display = 'block';
-    $link.innerHTML = 'Hide source &nequiv;';
-    } else {
-    $node.style.display = 'none';
-    $link.innerHTML = 'Show source &equiv;';
-    }
-  }
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>pytdlpack API documentation</title>
+<meta name="description" content="Introduction
+…" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
 </head>
 <body>
-<a href="#" id="top">Top</a>
-
-<div id="container">
-    
-  
-  <div id="sidebar">
-    <h1>Index</h1>
-    <ul id="index">
-    <li class="set"><h3><a href="#header-variables">Module variables</a></h3>
-      
-  <ul>
-    <li class="mono"><a href="#pytdlpack.__version__">__version__</a></li>
-    <li class="mono"><a href="#pytdlpack.grids">grids</a></li>
-  </ul>
-
-    </li>
-
-    <li class="set"><h3><a href="#header-functions">Functions</a></h3>
-      
-  <ul>
-    <li class="mono"><a href="#pytdlpack.create_grid_definition">create_grid_definition</a></li>
-    <li class="mono"><a href="#pytdlpack.open">open</a></li>
-  </ul>
-
-    </li>
-
-    <li class="set"><h3><a href="#header-classes">Classes</a></h3>
-      <ul>
-        <li class="mono">
-        <span class="class_name"><a href="#pytdlpack.TdlpackFile">TdlpackFile</a></span>
-        
-          
-  <ul>
-    <li class="mono"><a href="#pytdlpack.TdlpackFile.__init__">__init__</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackFile.backspace">backspace</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackFile.close">close</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackFile.read">read</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackFile.rewind">rewind</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackFile.write">write</a></li>
-  </ul>
-
-        </li>
-        <li class="mono">
-        <span class="class_name"><a href="#pytdlpack.TdlpackRecord">TdlpackRecord</a></span>
-        
-          
-  <ul>
-    <li class="mono"><a href="#pytdlpack.TdlpackRecord.__init__">__init__</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackRecord.latlons">latlons</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackRecord.pack">pack</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackRecord.unpack">unpack</a></li>
-  </ul>
-
-        </li>
-        <li class="mono">
-        <span class="class_name"><a href="#pytdlpack.TdlpackStationRecord">TdlpackStationRecord</a></span>
-        
-          
-  <ul>
-    <li class="mono"><a href="#pytdlpack.TdlpackStationRecord.__init__">__init__</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackStationRecord.pack">pack</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackStationRecord.unpack">unpack</a></li>
-  </ul>
-
-        </li>
-        <li class="mono">
-        <span class="class_name"><a href="#pytdlpack.TdlpackTrailerRecord">TdlpackTrailerRecord</a></span>
-        
-          
-  <ul>
-    <li class="mono"><a href="#pytdlpack.TdlpackTrailerRecord.__init__">__init__</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackTrailerRecord.pack">pack</a></li>
-    <li class="mono"><a href="#pytdlpack.TdlpackTrailerRecord.unpack">unpack</a></li>
-  </ul>
-
-        </li>
-      </ul>
-    </li>
-
-    </ul>
-  </div>
-
-    <article id="content">
-      
-  
-
-  
-
-
-  <header id="section-intro">
-  <h1 class="title"><span class="name">pytdlpack</span> module</h1>
-  <h1>Introduction</h1>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Package <code>pytdlpack</code></h1>
+</header>
+<section id="section-intro">
+<h1 id="introduction">Introduction</h1>
 <p>pytdlpack is a Python interface to reading/writing TDLPACK files via official
-MOS-2000 (MOS2K) Fortran-based source files.  The necessary MOS2K source files are included
+MOS-2000 (MOS2K) Fortran-based source files.
+The necessary MOS2K source files are included
 in this package and are available as module, tdlpack.</p>
-<p>TDLPACK is a GRIB-like binary data format that is exclusive to MOS2K Fortran-based 
-sofftware system.  This software system was developed at the Meteorological Development 
-Laboratory (MDL) within NOAA/NWS and its primary purpose is to perform statistical 
+<p>TDLPACK is a GRIB-like binary data format that is exclusive to MOS2K Fortran-based
+sofftware system.
+This software system was developed at the Meteorological Development
+Laboratory (MDL) within NOAA/NWS and its primary purpose is to perform statistical
 post-processing of meteorological data.</p>
 <p>TDLPACK-formatted data are contained in two type of Fortran-based files;
-sequential or random-access.  Sequential files are variable length, record-based, and unformatted.
-Random-access files are fixed-length and direct-access.  pytdlpack accommodates reading
+sequential or random-access.
+Sequential files are variable length, record-based, and unformatted.
+Random-access files are fixed-length and direct-access.
+pytdlpack accommodates reading
 and writing of both types of TDLPACK files.</p>
 <p>TDLPACK format is based on the World Meteorological Organizations (WMO) GRIdded Binary (GRIB)
-code, but has been tailored to MDL needs for data -- mainly the ability to store 1D (vector),
+code, but has been tailored to MDL needs for data &ndash; mainly the ability to store 1D (vector),
 datasets such as station observations, along with 2D grids.</p>
 <p>There also exists two other types of records in a TDLPACK file: station call letter record
-and trailer record.  A station call letter record can exist in both types of TDLPACK files
-and contains a stream of alphanumeric characters (<code>CHARACTER(LEN=8)</code>).  A trailer record exists
+and trailer record.
+A station call letter record can exist in both types of TDLPACK files
+and contains a stream of alphanumeric characters (<code>CHARACTER(LEN=8)</code>).
+A trailer record exists
 to signal the MOS2K system that another station call letter record is about to be read or we
-have reached the end of the file (EOF).  A trailer record is not written to a random-access
+have reached the end of the file (EOF).
+A trailer record is not written to a random-access
 file.</p>
 <p>For more information on the MOS-2000 software system and TDLPACK foremat, user is
 referred to the official <a href="https://www.weather.gov/media/mdl/TDL_OfficeNote00-1.pdf">MOS-2000 documentation</a>.</p>
 <p>In order for pytdlpack to read/write TDLPACK files, we need to compile the necessary MOS2K
-Fortran source code into a shared object library.  This is handled by the setup process as the
-Fortran source is compiled with f2py (included with Numpy).  The following are some important
+Fortran source code into a shared object library.
+This is handled by the setup process as the
+Fortran source is compiled with f2py (included with Numpy).
+The following are some important
 items to note regarding MOS2K source files included:</p>
 <ul>
 <li>Several Fortran 90+ source files have been created to better interface to MOS2K Fortran 77 code.</li>
@@ -1159,37 +65,31 @@ items to note regarding MOS2K source files included:</p>
 <code>CHARACTER*60</code> to <code>CHARACTER*1024</code> in the appropropriate subroutines where random-access file IO
 occurs.</li>
 </ul>
-<h1>Download</h1>
+<h1 id="download">Download</h1>
 <ul>
 <li>Latest code from <a href="https://github.com/eengl/pytdlpack">github repository</a>.</li>
-<li>Latest <a href="https://github.com/eengl/pytdlpack/releases">releases</a> on GitHub. <strong><em>PyPI releases coming...</em></strong></li>
+<li>Latest <a href="https://github.com/eengl/pytdlpack/releases">releases</a> on GitHub. <strong><em>PyPI releases coming&hellip;</em></strong></li>
 </ul>
-<h1>Requires</h1>
+<h1 id="requires">Requires</h1>
 <ul>
-<li>Python 2.7, 3.4+</li>
+<li>Python 3.6+</li>
 <li><a href="http://numpy.scipy.org">numpy array module</a>, version 1.8.0 or later.</li>
 <li><a href="https://pypi.python.org/pypi/setuptools">setuptools</a>, version 18.0 or later.</li>
 <li>Fortran compiler (if installing from source). <strong><em>Only GNU (gfortran) and Intel (ifort) are supported at this time.</em></strong></li>
 </ul>
-<h1>Install</h1>
+<h1 id="install">Install</h1>
 <p><strong>Build</strong></p>
 <p>First build the tdlpack module.</p>
-<div class="codehilite"><pre><span></span>$ python setup.py build_ext --fcompiler<span class="o">=[</span>gnu95<span class="p">|</span>intelem<span class="o">]</span> build
-</pre></div>
-
-
+<pre><code class="language-shell">$ python setup.py build_ext --fcompiler=[gnu95|intelem] build
+</code></pre>
 <p><strong>Install</strong></p>
 <p>System-wide:</p>
-<div class="codehilite"><pre><span></span>$ sudo python setup.py install
-</pre></div>
-
-
+<pre><code class="language-shell">$ sudo python setup.py install
+</code></pre>
 <p>Locally:</p>
-<div class="codehilite"><pre><span></span>$ python setup.py install --prefix<span class="o">=</span>&lt;INSTALL_DIR&gt;
-</pre></div>
-
-
-<h1>Tutorial</h1>
+<pre><code class="language-shell">$ python setup.py install --prefix=&lt;INSTALL_DIR&gt;
+</code></pre>
+<h1 id="tutorial">Tutorial</h1>
 <ol>
 <li><a href="#section1">Creating/Opening/Closing a TDLPACK file.</a></li>
 <li><a href="#section2">Reading a TDLPACK file.</a></li>
@@ -1198,223 +98,213 @@ occurs.</li>
 <li><a href="#section5">Creating a TDLPACK Record.</a></li>
 <li><a href="#section6">Packing/Unpacking a TDLPACK Record.</a></li>
 </ol>
-<h2><div id='section1'>1) Creating/Opening/Closing a TDLPACK file.</h2>
-<p>To create a TDLPACK file from Python, you call the <a href="#pytdlpack.open"><code>open</code></a> function and provide the
-file name and <code>mode='w' or 'a'</code>.  For <code>mode='a'</code>, this will append to an existing file.  When 
-creating a new file, the default file format is <code>'sequential'</code>, but the user can also specify 
-the format with <code>format='sequential' or 'random-access'</code>.  If the new file is random-access, 
-then the user can also specify <code>ra_template='small' or 'large'</code>.  The default is 'small' and
+<h2 id="1-creatingopeningclosing-a-tdlpack-file"><div id='section1'>1) Creating/Opening/Closing a TDLPACK file.</h2>
+<p>To create a TDLPACK file from Python, you call the <code><a title="pytdlpack.open" href="#pytdlpack.open">open()</a></code> function and provide the
+file name and <code>mode='w' or 'a'</code>.
+For <code>mode='a'</code>, this will append to an existing file.
+When
+creating a new file, the default file format is <code>'sequential'</code>, but the user can also specify
+the format with <code>format='sequential' or 'random-access'</code>.
+If the new file is random-access,
+then the user can also specify <code>ra_template='small' or 'large'</code>.
+The default is 'small' and
 'large' is recommended for a high-resolution grids (i.e. ~ &gt; 2M total points).</p>
 <p>Example: Create a new sequential file:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.sq&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
-</pre></div>
-
-
+<pre><code class="language-python">&gt;&gt;&gt; import pytdlpack
+&gt;&gt;&gt; f = pytdlpack.open('test.sq',mode='w')
+</code></pre>
 <p>Example: Create a new random-access file:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.sq&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s1">&#39;random-access&#39;</span><span class="p">,</span><span class="n">ra_template</span><span class="o">=</span><span class="s1">&#39;small&#39;</span><span class="p">)</span>
-</pre></div>
-
-
+<pre><code class="language-python">&gt;&gt;&gt; import pytdlpack
+&gt;&gt;&gt; f = pytdlpack.open('test.sq',mode='w',format='random-access',ra_template='small')
+</code></pre>
 <p>To open an existing TDLPACK file, simply provide the filename since the default mode is read.</p>
-<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">pytdlpack</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.sq&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-<span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">pytdlpack</span><span class="o">.</span><span class="n">_pytdlpack</span><span class="o">.</span><span class="n">TdlpackFile</span><span class="s1">&#39;&gt;</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span>
-<span class="n">byte_order</span> <span class="o">=</span> <span class="o">&gt;</span>
-<span class="n">data_type</span> <span class="o">=</span>
-<span class="n">eof</span> <span class="o">=</span> <span class="bp">False</span>
-<span class="n">format</span> <span class="o">=</span> <span class="n">sequential</span>
-<span class="n">fortran_lun</span> <span class="o">=</span> <span class="mi">65535</span>
-<span class="n">mode</span> <span class="o">=</span> <span class="n">r</span>
-<span class="n">name</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">sq</span>
-<span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">ra_master_key</span> <span class="o">=</span> <span class="bp">None</span>
-<span class="n">size</span> <span class="o">=</span> <span class="mi">998672</span>
-</pre></div>
-
-
+<pre><code class="language-python">import pytdlpack
+&gt;&gt;&gt; f = pytdlpack.open('test.sq')
+&gt;&gt;&gt; type(f)
+&lt;class 'pytdlpack._pytdlpack.TdlpackFile'&gt;
+&gt;&gt;&gt; f
+byte_order = &gt;
+data_type =
+eof = False
+format = sequential
+fortran_lun = 65535
+mode = r
+name = test.sq
+position = 0
+ra_master_key = None
+size = 998672
+</code></pre>
 <p>To close a TDLPACK file is straightforward.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</pre></div>
-
-
-<h2><div id='section2'>2) Reading a TDLPACK file.</h2>
-<p>When a TDLPACK file is opened, an instance of class <a href="#pytdlpack.TdlpackFile"><code>TdlpackFile</code></a> is created.<br />
-To read a record the file, use the class method <a href="#pytdlpack.TdlpackFile.read"><code>read</code></a>.  By default 
+<pre><code class="language-python">&gt;&gt;&gt; f.close()
+</code></pre>
+<h2 id="2-reading-a-tdlpack-file"><div id='section2'>2) Reading a TDLPACK file.</h2>
+<p>When a TDLPACK file is opened, an instance of class <code><a title="pytdlpack.TdlpackFile" href="#pytdlpack.TdlpackFile">TdlpackFile</a></code> is created.<br>
+To read a record the file, use the class method <code><a title="pytdlpack.TdlpackFile.read" href="#pytdlpack.TdlpackFile.read">TdlpackFile.read()</a></code>.
+By default
 only 1 record is returned and the TDLPACK indentification sections are unpacked.</p>
 <p>Example: Reading a gridded TDLPACK record.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span>
-<span class="n">grid_length</span> <span class="o">=</span> <span class="mf">2539.703</span>
-<span class="nb">id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">223254166</span>         <span class="mi">0</span>         <span class="mi">6</span>         <span class="mi">0</span><span class="p">]</span>
-<span class="n">ioctet</span> <span class="o">=</span> <span class="mi">998656</span>
-<span class="n">ipack</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1347175508</span>  <span class="mi">255654144</span> <span class="mi">1191249890</span> <span class="o">...</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span><span class="p">]</span>
-<span class="n">is0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1347175508</span>     <span class="mi">998649</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span><span class="p">]</span>
-<span class="n">is1</span> <span class="o">=</span> <span class="p">[</span>        <span class="mi">71</span>          <span class="mi">1</span>       <span class="mi">2018</span>         <span class="mi">12</span>          <span class="mi">4</span>          <span class="mi">0</span>
-          <span class="mi">0</span> <span class="mi">2018120400</span>  <span class="mi">223254166</span>          <span class="mi">0</span>          <span class="mi">6</span>          <span class="mi">0</span>
-          <span class="mi">6</span>          <span class="mi">0</span>         <span class="mi">66</span>          <span class="mi">0</span>          <span class="mi">1</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>         <span class="mi">32</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
-          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span><span class="p">]</span>
-<span class="n">is2</span> <span class="o">=</span> <span class="p">[</span>     <span class="mi">28</span>       <span class="mi">3</span>    <span class="mi">2345</span>    <span class="mi">1597</span>  <span class="mi">192290</span> <span class="mi">2337234</span>  <span class="mi">950000</span> <span class="mi">2539703</span>  <span class="mi">250000</span>
-       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
-       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
-       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
-       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
-       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span><span class="p">]</span>
-<span class="n">is4</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">998538</span>      <span class="mi">12</span> <span class="mi">3744965</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
-       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
-       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
-       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
-       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
-       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span><span class="p">]</span>
-<span class="n">lead_time</span> <span class="o">=</span> <span class="mi">6</span>
-<span class="n">lower_left_latitude</span> <span class="o">=</span> <span class="mf">19.229</span>
-<span class="n">lower_left_longitude</span> <span class="o">=</span> <span class="mf">233.7234</span>
-<span class="n">map_proj</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">number_of_values</span> <span class="o">=</span> <span class="mi">3744965</span>
-<span class="n">nx</span> <span class="o">=</span> <span class="mi">2345</span>
-<span class="n">ny</span> <span class="o">=</span> <span class="mi">1597</span>
-<span class="n">origin_longitude</span> <span class="o">=</span> <span class="mf">95.0</span>
-<span class="n">plain</span> <span class="o">=</span>
-<span class="n">primary_missing_value</span> <span class="o">=</span> <span class="mf">0.0</span>
-<span class="n">reference_date</span> <span class="o">=</span> <span class="mi">2018120400</span>
-<span class="n">secondary_missing_value</span> <span class="o">=</span> <span class="mf">0.0</span>
-<span class="n">standard_latitude</span> <span class="o">=</span> <span class="mf">25.0</span>
-<span class="nb">type</span> <span class="o">=</span> <span class="n">grid</span>
-</pre></div>
-
-
-<p>You can also have <a href="#pytdlpack.TdlpackFile.read"><code>read</code></a> read the entire file with optional keyword
-<code>all = True</code>.  Reading all records at once is not recommened if the file is large in size.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</pre></div>
-
-
-<p>Here, x will become a list of instances of either <a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a>, 
-<a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a>, or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></a>.</p>
-<p>If the file being read a TDLPACK random-access (<code>format='random-access'</code>), then you can also provide the <code>id=</code> 
+<pre><code class="language-python">&gt;&gt;&gt; x = f.read()
+&gt;&gt;&gt; x
+grid_length = 2539.703
+id = [223254166         0         6         0]
+ioctet = 998656
+ipack = [1347175508  255654144 1191249890 ...          0          0          0]
+is0 = [1347175508     998649          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0]
+is1 = [        71          1       2018         12          4          0
+          0 2018120400  223254166          0          6          0
+          6          0         66          0          1          0
+          0          0          0         32          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0
+          0          0          0          0          0          0]
+is2 = [     28       3    2345    1597  192290 2337234  950000 2539703  250000
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0]
+is4 = [ 998538      12 3744965       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0
+       0       0       0       0       0       0       0       0       0]
+lead_time = 6
+lower_left_latitude = 19.229
+lower_left_longitude = 233.7234
+map_proj = 3
+number_of_values = 3744965
+nx = 2345
+ny = 1597
+origin_longitude = 95.0
+plain =
+primary_missing_value = 0.0
+reference_date = 2018120400
+secondary_missing_value = 0.0
+standard_latitude = 25.0
+type = grid
+</code></pre>
+<p>You can also have <code><a title="pytdlpack.TdlpackFile.read" href="#pytdlpack.TdlpackFile.read">TdlpackFile.read()</a></code> read the entire file with optional keyword
+<code>all = True</code>.
+Reading all records at once is not recommened if the file is large in size.</p>
+<pre><code class="language-python">&gt;&gt;&gt; x = f.read(all=True)
+</code></pre>
+<p>Here, x will become a list of instances of either <code><a title="pytdlpack.TdlpackStationRecord" href="#pytdlpack.TdlpackStationRecord">TdlpackStationRecord</a></code>,
+<code><a title="pytdlpack.TdlpackRecord" href="#pytdlpack.TdlpackRecord">TdlpackRecord</a></code>, or <code><a title="pytdlpack.TdlpackTrailerRecord" href="#pytdlpack.TdlpackTrailerRecord">TdlpackTrailerRecord</a></code>.</p>
+<p>If the file being read a TDLPACK random-access (<code>format='random-access'</code>), then you can also provide the <code>id=</code>
 argument to search for a specific record.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.ra&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="p">[</span><span class="mi">400001000</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">pytdlpack</span><span class="o">.</span><span class="n">_pytdlpack</span><span class="o">.</span><span class="n">TdlpackStationRecord</span><span class="s1">&#39;&gt;</span>
-</pre></div>
-
-
-<h2><div id='section3'>3) Writing a TDLPACK file.</h2>
-<p>Writing to a TDLPACK file is as easy as reading.  The following uses variable x, from 
-above, is an instance of <a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a> that has been packed.</p>
+<pre><code class="language-python">&gt;&gt;&gt; import pytdlpack
+&gt;&gt;&gt; f = pytdlpack.open('test.ra')
+&gt;&gt;&gt; x = f.read(id=[400001000,0,0,0])
+&gt;&gt;&gt; type(x)
+&lt;class 'pytdlpack._pytdlpack.TdlpackStationRecord'&gt;
+</code></pre>
+<h2 id="3-writing-a-tdlpack-file"><div id='section3'>3) Writing a TDLPACK file.</h2>
+<p>Writing to a TDLPACK file is as easy as reading.
+The following uses variable x, from
+above, is an instance of <code><a title="pytdlpack.TdlpackStationRecord" href="#pytdlpack.TdlpackStationRecord">TdlpackStationRecord</a></code> that has been packed.</p>
 <p>Example: Write to a new TDLPACK sequential file.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;new.sq&quot;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s2">&quot;sequential&quot;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</pre></div>
-
-
-<h2><div id='section4'>4) Creating a TDLPACK Station Record.</h2>
-<p>The constructor for <a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a> provides two methods of
-instantiation via the traditional **kwargs (see <a href="#pytdlpack.TdlpackStationRecord.__init__"><code>__init__</code></a>) 
-or simply providing <code>ccall = ...</code> <strong><em>(recommended)</em></strong>.  The value passed to the <code>ccall=</code> argument can
+<pre><code class="language-python">&gt;&gt;&gt; import pytdlpack
+&gt;&gt;&gt; f.open(&quot;new.sq&quot;,mode=&quot;w&quot;,format=&quot;sequential&quot;)
+&gt;&gt;&gt; f.write(x)
+&gt;&gt;&gt; f.close()
+</code></pre>
+<h2 id="4-creating-a-tdlpack-station-record"><div id='section4'>4) Creating a TDLPACK Station Record.</h2>
+<p>The constructor for <code><a title="pytdlpack.TdlpackStationRecord" href="#pytdlpack.TdlpackStationRecord">TdlpackStationRecord</a></code> provides two methods of
+instantiation via the traditional <strong>kwargs (see <code><a title="pytdlpack.TdlpackStationRecord" href="#pytdlpack.TdlpackStationRecord">TdlpackStationRecord</a></code>)
+or simply providing <code>ccall = ...</code> </strong><em>(recommended)</em>**.
+The value passed to the <code>ccall=</code> argument can
 be a single call letter string, list, tuple, or comma-delimited string of station call letter records.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">stations</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">TdlpackStationRecord</span><span class="p">([</span><span class="s1">&#39;KBWI&#39;</span><span class="p">,</span><span class="s1">&#39;KDCA&#39;</span><span class="p">,</span><span class="s1">&#39;KIAD&#39;</span><span class="p">])</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">stations</span>
-<span class="n">ccall</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KBWI&#39;</span><span class="p">,</span> <span class="s1">&#39;KDCA&#39;</span><span class="p">,</span> <span class="s1">&#39;KIAD&#39;</span><span class="p">]</span>
-<span class="nb">id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">400001000</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span><span class="p">]</span>
-<span class="n">ioctet</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">ipack</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">number_of_stations</span> <span class="o">=</span> <span class="mi">3</span>
-</pre></div>
-
-
-<h2><div id='section5'>5) Creating a TDLPACK Record.</h2>
-<p>The recommended method for creating a <a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a> is to pass the TDLPACK 
-indentification arrays, plain language string, and data to the approproiate keyword.  Please
-see <a href="#pytdlpack.TdlpackRecord.__init__"><code>__init__</code></a> for more info.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">record</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">TdlpackRecord</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="mi">2019070100</span><span class="p">,</span><span class="n">dcf</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="p">[</span><span class="mi">4210008</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span><span class="n">lead</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
-<span class="n">plain</span><span class="o">=</span><span class="s2">&quot;GFS WIND SPEED&quot;</span><span class="p">,</span><span class="n">grid</span><span class="o">=</span><span class="n">grid_def</span><span class="p">,</span><span class="n">data</span><span class="o">=&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span> <span class="n">array</span><span class="o">&gt;</span><span class="p">)</span>
-</pre></div>
-
-
-<p>The user is encouraged to read the official MOS-2000 documentation (specifically Chapter 5) 
+<pre><code class="language-python">&gt;&gt;&gt; import pytdlpack
+&gt;&gt;&gt; stations = pytdlpack.TdlpackStationRecord(['KBWI','KDCA','KIAD'])
+&gt;&gt;&gt; stations
+ccall = ['KBWI', 'KDCA', 'KIAD']
+id = [400001000         0         0         0]
+ioctet = 0
+ipack = []
+number_of_stations = 3
+</code></pre>
+<h2 id="5-creating-a-tdlpack-record"><div id='section5'>5) Creating a TDLPACK Record.</h2>
+<p>The recommended method for creating a <code><a title="pytdlpack.TdlpackRecord" href="#pytdlpack.TdlpackRecord">TdlpackRecord</a></code> is to pass the TDLPACK
+indentification arrays, plain language string, and data to the approproiate keyword.
+Please
+see <code><a title="pytdlpack.TdlpackRecord" href="#pytdlpack.TdlpackRecord">TdlpackRecord</a></code> for more info.</p>
+<pre><code class="language-python">&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; record = pytdlpack.TdlpackRecord(date=2019070100,id=[4210008, 0, 24, 0],lead=24,
+plain=&quot;GFS WIND SPEED&quot;,grid=grid_def,data=&lt;np.float32 array&gt;)
+</code></pre>
+<p>The user is encouraged to read the official MOS-2000 documentation (specifically Chapter 5)
 on construction of these arrays and proper encoding.</p>
-<h2><div id='section6'>6) Packing/Unpacking a TDLPACK Record.</h2>
+<h2 id="6-packingunpacking-a-tdlpack-record"><div id='section6'>6) Packing/Unpacking a TDLPACK Record.</h2>
 <p>Once any of the three classes of TDLPACK records have been instantiated, you can pack the
-record using the class method <code>pack</code>.  Using the example from <a href="#section5">Section 5</a>, <code>record</code>
-is now an instance of <a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a>.  You can pack this record with the following:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">record</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
-</pre></div>
-
-
+record using the class method <code>pack</code>.
+Using the example from <a href="#section5">Section 5</a>, <code>record</code>
+is now an instance of <code><a title="pytdlpack.TdlpackRecord" href="#pytdlpack.TdlpackRecord">TdlpackRecord</a></code>.
+You can pack this record with the following:</p>
+<pre><code class="language-python">&gt;&gt;&gt; record.pack()
+</code></pre>
 <p>To unpack a packed TDLPACK record, perform:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">record</span><span class="o">.</span><span class="n">unpack</span><span class="p">()</span>
-</pre></div>
+<pre><code class="language-python">&gt;&gt;&gt; record.unpack()
+</code></pre>
+<p>The <code><a title="pytdlpack.TdlpackRecord.unpack" href="#pytdlpack.TdlpackRecord.unpack">TdlpackRecord.unpack()</a></code> class method for TDLPACK data records, contains optional
+arguments <code>data=</code> (to control the unpacking of data) and <code>missing_value=</code> (to set a different
+missing value other than what is contained in the record).
+For TDLPACK data records,
+<code><a title="pytdlpack.TdlpackRecord.unpack" href="#pytdlpack.TdlpackRecord.unpack">TdlpackRecord.unpack()</a></code> automatically unpacks the TDLPACK meta-data.</p>
+<pre><code class="language-python">&gt;&gt;&gt; record.unpack(data=True,missing_value=-9999.0)
+</code></pre>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python"># init for pytdlpack package
+from ._pytdlpack import *
+from ._pytdlpack import __doc__,__pdoc__
 
+from ._grid_definitions import grids
 
-<p>The <a href="#pytdlpack.TdlpackRecord.unpack"><code>unpack</code></a> class method for TDLPACK data records, contains optional
-arguments <code>data=</code> (to control the unpacking of data) and <code>missing_value=</code> (to set a different 
-missing value other than what is contained in the record).  For TDLPACK data records, 
-<a href="#pytdlpack.TdlpackRecord.unpack"><code>unpack</code></a> automatically unpacks the TDLPACK meta-data.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">record</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">missing_value</span><span class="o">=-</span><span class="mf">9999.0</span><span class="p">)</span>
-</pre></div>
-  
+from .version import version as __version__
 
-  </header>
-
-  <section id="section-items">
-    <h2 class="section-title" id="header-variables">Module variables</h2>
-      <div class="item">
-      <p id="pytdlpack.__version__" class="name">var <span class="ident">__version__</span></p>
-      
-  
-  <div class="source_cont">
-</div>
-
-      </div>
-      <div class="item">
-      <p id="pytdlpack.grids" class="name">var <span class="ident">grids</span></p>
-      
-  
-  <div class="source_cont">
-</div>
-
-      </div>
-
-    <h2 class="section-title" id="header-functions">Functions</h2>
-      
-  <div class="item">
-    <div class="name def" id="pytdlpack.create_grid_definition">
-    <p>def <span class="ident">create_grid_definition</span>(</p><p>name=None, proj=None, nx=None, ny=None, latll=None, lonll=None, orientlon=None, stdlat=None, meshlength=None)</p>
-    </div>
-    
-
-    
-  
-    <div class="desc"><p>Create a dictionary of grid specs.  The user has the option to 
+__all__ = [&#39;__version__&#39;,&#39;TdlpackFile&#39;,&#39;TdlpackRecord&#39;,&#39;TdlpackStationRecord&#39;,&#39;TdlpackTrailerRecord&#39;,
+           &#39;open&#39;,&#39;create_grid_definition&#39;,&#39;grids&#39;]</code></pre>
+</details>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="pytdlpack.version" href="version.html">pytdlpack.version</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="pytdlpack.create_grid_definition"><code class="name flex">
+<span>def <span class="ident">create_grid_definition</span></span>(<span>name=None, proj=None, nx=None, ny=None, latll=None, lonll=None, orientlon=None, stdlat=None, meshlength=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a dictionary of grid specs.
+The user has the option to
 populate the dictionary via the args or create an empty dict. </p>
-<h2>Parameters</h2>
+<h2 id="parameters">Parameters</h2>
 <p><strong><code>name : str, optional</code></strong></p>
 <p>String that identifies a predefined grid.</p>
 <p><strong><code>proj : int, optional</code></strong></p>
-<p>Map projection of the grid (3 = Lambert Conformal; 5 = Polar Stereographic; 
+<p>Map projection of the grid (3 = Lambert Conformal; 5 = Polar Stereographic;
 7 = Mercator). NOTE: This parameter is optional if data are station-based.</p>
 <p><strong><code>nx : int, optional</code></strong></p>
 <p>Number of points in X-direction (East-West). NOTE: This parameter is optional if
@@ -1423,68 +313,234 @@ data are station-based. </p>
 <p>Number of points in Y-direction (North-South). NOTE: This parameter is optional if
 data are station-based.</p>
 <p><strong><code>latll : float, optional</code></strong></p>
-<p>Latitude in decimal degrees of lower-left grid point.  NOTE: This parameter is optional if
+<p>Latitude in decimal degrees of lower-left grid point.
+NOTE: This parameter is optional if
 data are station-based.</p>
 <p><strong><code>lonll : float, optional</code></strong></p>
-<p>Longitude in decimal degrees of lower-left grid point.  NOTE: This parameter is optional if
+<p>Longitude in decimal degrees of lower-left grid point.
+NOTE: This parameter is optional if
 data are station-based. </p>
 <p><strong><code>orientlon : float, optional</code></strong></p>
-<p>Longitude in decimal degrees of the central meridian.  NOTE: This parameter is optional if
+<p>Longitude in decimal degrees of the central meridian.
+NOTE: This parameter is optional if
 data are station-based.</p>
 <p><strong><code>stdlat : float, optional</code></strong></p>
-<p>Latitude in decimal degrees of the standard latitude.  NOTE: This parameter is optional if
+<p>Latitude in decimal degrees of the standard latitude.
+NOTE: This parameter is optional if
 data are station-based.</p>
 <p><strong><code>meshlength : float, optional</code></strong></p>
-<p>Distance in meters between grid points.  NOTE: This parameter is optional if
+<p>Distance in meters between grid points.
+NOTE: This parameter is optional if
 data are station-based.</p>
-<h2>Returns</h2>
+<h2 id="returns">Returns</h2>
 <p><strong><code>griddict : dict</code></strong></p>
 <p>Dictionary whose keys are the named parameters of this function.</p></div>
-  <div class="source_cont">
-</div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_grid_definition(name=None,proj=None,nx=None,ny=None,latll=None,lonll=None,
+                           orientlon=None,stdlat=None,meshlength=None):
+    &#34;&#34;&#34;
+    Create a dictionary of grid specs.  The user has the option to 
+    populate the dictionary via the args or create an empty dict. 
 
-  </div>
-  
-      
-  <div class="item">
-    <div class="name def" id="pytdlpack.open">
-    <p>def <span class="ident">open</span>(</p><p>name, mode=&#39;r&#39;, format=None, ra_template=None)</p>
-    </div>
-    
+    Parameters
+    ----------
 
-    
-  
-    <div class="desc"><p>Opens a TDLPACK File for reading/writing.</p>
-<h2>Parameters</h2>
+    **`name : str, optional`**
+
+    String that identifies a predefined grid.
+
+    **`proj : int, optional`**
+
+    Map projection of the grid (3 = Lambert Conformal; 5 = Polar Stereographic; 
+    7 = Mercator). NOTE: This parameter is optional if data are station-based.
+
+    **`nx : int, optional`**
+
+    Number of points in X-direction (East-West). NOTE: This parameter is optional if
+    data are station-based. 
+
+    **`ny : int, optional`**
+
+    Number of points in Y-direction (North-South). NOTE: This parameter is optional if
+    data are station-based.
+
+    **`latll : float, optional`**
+
+    Latitude in decimal degrees of lower-left grid point.  NOTE: This parameter is optional if
+    data are station-based.
+
+    **`lonll : float, optional`**
+
+    Longitude in decimal degrees of lower-left grid point.  NOTE: This parameter is optional if
+    data are station-based. 
+
+    **`orientlon : float, optional`**
+
+    Longitude in decimal degrees of the central meridian.  NOTE: This parameter is optional if
+    data are station-based.
+
+    **`stdlat : float, optional`**
+
+    Latitude in decimal degrees of the standard latitude.  NOTE: This parameter is optional if
+    data are station-based.
+
+    **`meshlength : float, optional`**
+
+    Distance in meters between grid points.  NOTE: This parameter is optional if
+    data are station-based.
+
+    Returns
+    -------
+
+    **`griddict : dict`**
+
+    Dictionary whose keys are the named parameters of this function.
+    &#34;&#34;&#34;
+    griddict = {}
+    if name is not None:
+        from ._grid_definitions import grids
+        griddict = grids[name]
+    else:
+        griddict[&#39;proj&#39;] = proj
+        griddict[&#39;nx&#39;] = nx
+        griddict[&#39;ny&#39;] = ny
+        griddict[&#39;latll&#39;] = latll
+        griddict[&#39;lonll&#39;] = lonll
+        griddict[&#39;orientlon&#39;] = orientlon
+        griddict[&#39;stdlat&#39;] = stdlat
+        griddict[&#39;meshlength&#39;] = meshlength
+    return griddict</code></pre>
+</details>
+</dd>
+<dt id="pytdlpack.open"><code class="name flex">
+<span>def <span class="ident">open</span></span>(<span>name, mode='r', format=None, ra_template=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Opens a TDLPACK File for reading/writing.</p>
+<h2 id="parameters">Parameters</h2>
 <p><strong><code>name : str</code></strong></p>
-<p>TDLPACK file name.  This string is expanded into an absolute path via os.path.abspath().</p>
+<p>TDLPACK file name.
+This string is expanded into an absolute path via os.path.abspath().</p>
 <p><strong><code>mode : {'r', 'w', 'a', 'x'}, optional</code></strong></p>
 <p>Access mode. <code>'r'</code> means read only; <code>'w'</code> means write (existing file is overwritten);
 <code>'a'</code> means to append to the existing file; <code>'x'</code> means to write to a new file (if
 the file exists, an error is raised).</p>
 <p><strong><code>format : {'sequential', 'random-access'}, optional</code></strong></p>
-<p>Type of TDLPACK File when creating a new file.  This parameter is ignored if the
+<p>Type of TDLPACK File when creating a new file.
+This parameter is ignored if the
 file access mode is <code>'r'</code> or <code>'a'</code>.</p>
 <p><strong><code>ra_template : {'small', 'large'}, optional</code></strong></p>
-<p>Template used to create new random-access file. The default is 'small'.  This parameter
+<p>Template used to create new random-access file. The default is 'small'.
+This parameter
 is ignored if the file access mode is <code>'r'</code> or <code>'a'</code> or if the file format is <code>'sequential'</code>.</p>
-<h2>Returns</h2>
-<p><strong><a href="#pytdlpack.TdlpackFile"><code>TdlpackFile</code></a></strong></p>
+<h2 id="returns">Returns</h2>
+<p><strong><code><a title="pytdlpack.TdlpackFile" href="#pytdlpack.TdlpackFile">TdlpackFile</a></code></strong></p>
 <p>Instance of class TdlpackFile.</p></div>
-  <div class="source_cont">
-</div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def open(name, mode=&#39;r&#39;, format=None, ra_template=None):
+    &#34;&#34;&#34;
+    Opens a TDLPACK File for reading/writing.
 
-  </div>
-  
+    Parameters
+    ----------
+    **`name : str`**
 
-    <h2 class="section-title" id="header-classes">Classes</h2>
-      
-      <div class="item">
-      <p id="pytdlpack.TdlpackFile" class="name">class <span class="ident">TdlpackFile</span></p>
-      
-  
-    <div class="desc"><p>TDLPACK File with associated information.</p>
-<h2>Attributes</h2>
+    TDLPACK file name.  This string is expanded into an absolute path via os.path.abspath().
+
+    **`mode : {&#39;r&#39;, &#39;w&#39;, &#39;a&#39;, &#39;x&#39;}, optional`**
+
+    Access mode. `&#39;r&#39;` means read only; `&#39;w&#39;` means write (existing file is overwritten);
+    `&#39;a&#39;` means to append to the existing file; `&#39;x&#39;` means to write to a new file (if
+    the file exists, an error is raised).
+
+    **`format : {&#39;sequential&#39;, &#39;random-access&#39;}, optional`**
+
+    Type of TDLPACK File when creating a new file.  This parameter is ignored if the
+    file access mode is `&#39;r&#39;` or `&#39;a&#39;`.
+
+    **`ra_template : {&#39;small&#39;, &#39;large&#39;}, optional`**
+
+    Template used to create new random-access file. The default is &#39;small&#39;.  This parameter
+    is ignored if the file access mode is `&#39;r&#39;` or `&#39;a&#39;` or if the file format is `&#39;sequential&#39;`.
+    
+    Returns
+    -------
+    **`pytdlpack.TdlpackFile`**
+
+    Instance of class TdlpackFile.
+    &#34;&#34;&#34;
+    _byteorder = np.int32(0)
+    _filetype = np.int32(0)
+    _lun = np.int32(0)
+    _ier = np.int32(0)
+    name = os.path.abspath(name)
+
+    if format is None: format = &#39;sequential&#39;
+    if mode == &#39;w&#39; or mode == &#39;x&#39;:
+
+        if format == &#39;random-access&#39;:
+            if not ra_template: ra_template = &#39;small&#39;
+            if ra_template == &#39;small&#39;:
+                _maxent = np.int32(300)
+                _nbytes = np.int32(2000)
+            elif ra_template == &#39;large&#39;:
+                _maxent = np.int32(840)
+                _nbytes = np.int32(20000)
+            _filetype = np.int32(1)
+            _lun,_byteorder,_filetype,_ier = tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype,
+                                             ra_maxent=_maxent,ra_nbytes=_nbytes)
+        elif format == &#39;sequential&#39;:
+            _filetype = np.int32(2)
+            _lun,_byteorder,_filetype,_ier = tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
+
+    elif mode == &#39;r&#39; or mode == &#39;a&#39;:
+        if os.path.isfile(name):
+            _lun,_byteorder,_filetype,_ier = tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
+        else:
+            raise IOError(&#34;File not found.&#34;)
+
+    if _ier == 0:
+        kwargs = {}
+        if _byteorder == -1:
+            kwargs[&#39;byte_order&#39;] = &#39;&lt;&#39;
+        elif _byteorder == 1:
+            kwargs[&#39;byte_order&#39;] = &#39;&gt;&#39;
+        if _filetype == 1:
+            kwargs[&#39;format&#39;] = &#39;random-access&#39;
+            kwargs[&#39;ra_master_key&#39;] = _read_ra_master_key(name)
+        elif _filetype == 2:
+            kwargs[&#39;format&#39;] = &#39;sequential&#39;
+        kwargs[&#39;fortran_lun&#39;] = deepcopy(_lun)
+        kwargs[&#39;mode&#39;] = mode
+        kwargs[&#39;name&#39;] = name
+        kwargs[&#39;position&#39;] = np.int32(0)
+        if mode == &#39;r&#39; or mode == &#39;a&#39;: kwargs[&#39;size&#39;] = os.path.getsize(name)
+    else:
+        raise IOError(&#34;Could not open TDLPACK file&#34;+name+&#34;. Error return from tdlpack.openfile = &#34;+str(_ier))
+
+    _starecdict[_lun] = []
+
+    return TdlpackFile(**kwargs)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pytdlpack.TdlpackFile"><code class="flex name class">
+<span>class <span class="ident">TdlpackFile</span></span>
+<span>(</span><span>**kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>TDLPACK File with associated information.</p>
+<h2 id="attributes">Attributes</h2>
 <p><strong><code>byte_order : str</code></strong></p>
 <p>Byte order of TDLPACK file using definitions as defined by Python built-in struct module.</p>
 <p><strong><code>data_type : {'grid', 'station'}</code></strong></p>
@@ -1503,239 +559,588 @@ is ignored if the file access mode is <code>'r'</code> or <code>'a'</code> or if
 <p>The current record being read from file. If the file type is 'random-access', then this
 value is -1.</p>
 <p><strong><code>size : int</code></strong></p>
-<p>File size in units of bytes.</p></div>
-  <div class="source_cont">
-</div>
+<p>File size in units of bytes.</p>
+<dl>
+<dt><strong><code>Contructor</code></strong></dt>
+<dd>&nbsp;</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TdlpackFile(object):
+    &#34;&#34;&#34;
+    TDLPACK File with associated information.
 
+    Attributes
+    ----------
 
-      <div class="class">
-          <h3>Ancestors (in MRO)</h3>
-          <ul class="class_list">
-          <li><a href="#pytdlpack.TdlpackFile">TdlpackFile</a></li>
-          <li>builtins.object</li>
-          </ul>
-          <h3>Class variables</h3>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.counter" class="name">var <span class="ident">counter</span></p>
+    **`byte_order : str`**
+
+    Byte order of TDLPACK file using definitions as defined by Python built-in struct module.
+
+    **`data_type : {&#39;grid&#39;, &#39;station&#39;}`**
+
+    Type of data contained in the file.
+
+    **`eof : bool`**
+
+    True if we have reached end of file.
+
+    **`format : {&#39;random-access&#39;, &#39;sequential&#39;}`**
+
+    File format of TDLPACK file.
+
+    **`fortran_lun : np.int32`**
+
+    Fortran unit number for file access. If the file is not open, then this value is -1. 
+
+    **`mode : str`**
+
+    Access mode (see pytdlpack.open() docstring).
+
+    **`name : str`**
+
+    File name.
+
+    **`position : int`**
+
+    The current record being read from file. If the file type is &#39;random-access&#39;, then this
+    value is -1.
+
+    **`size : int`**
+
+    File size in units of bytes.
+    &#34;&#34;&#34;
+    counter = 0
+    def __init__(self,**kwargs):
+        &#34;&#34;&#34;Contructor&#34;&#34;&#34;
+        type(self).counter += 1
+        self.byte_order = &#39;&#39;
+        self.data_type = &#39;&#39;
+        self.eof = False
+        self.format = &#39;&#39;
+        self.fortran_lun = np.int32(-1)
+        self.mode = &#39;&#39;
+        self.name = &#39;&#39;
+        self.position = np.int32(0)
+        self.ra_master_key = None
+        for k, v in kwargs.items():
+            setattr(self,k,v)
+
+    def __repr__(self):
+        strings = []
+        keys = self.__dict__.keys()
+        for k in keys:
+            if not k.startswith(&#39;_&#39;):
+                strings.append(&#39;%s = %s\n&#39;%(k,self.__dict__[k]))
+        return &#39;&#39;.join(strings)
+
+    def __enter__(self):
+        &#34;&#34;&#34;no additional setup as opening with context manager is not required&#34;&#34;&#34;
+        return self
+
+    def __exit__(self,type,value,traceback):
+        &#34;&#34;&#34;
+        &#34;&#34;&#34;
+        self.close()
+
+    def __iter__(self):
+        &#34;&#34;&#34;
+        &#34;&#34;&#34;
+        return self
+
+    def __next__(self):
+        &#34;&#34;&#34;
+        &#34;&#34;&#34;
+        if not self.eof:
+            rec = self.read()
+            if self.eof and isinstance(rec,type(None)):
+                raise StopIteration
+            else:
+                return rec
+        else:
+            raise StopIteration
+
+    def _determine_record_type(self,ipack,ioctet):
+        kwargs = {}
+        if ipack[0] == 0 and ipack[4] == 9999 and ioctet == 24:
+            kwargs[&#39;ipack&#39;] = deepcopy(ipack)
+            kwargs[&#39;ioctet&#39;] = deepcopy(ioctet)
+            kwargs[&#39;id&#39;] = np.int32([0,0,0,0])
+            return TdlpackTrailerRecord(**kwargs)
+        if ipack[0] &gt; 0:
+            kwargs[&#39;ipack&#39;] = deepcopy(ipack)
+            kwargs[&#39;ioctet&#39;] = deepcopy(ioctet)
+            header = struct.unpack(&#39;&gt;4s&#39;,ipack[0].byteswap())[0]
+            if _IS_PYTHON3:
+                header = header.decode()
+            if header in [&#34;PLDT&#34;,&#34;TDLP&#34;] :
+                if not self.data_type: self.data_type = &#39;grid&#39;
+                kwargs[&#39;id&#39;] = deepcopy(ipack[5:9])
+                kwargs[&#39;reference_date&#39;] = deepcopy(ipack[4])
+                kwargs[&#39;lead_time&#39;] = np.int32(str(ipack[7])[-3:])
+                kwargs[&#39;_filelun&#39;] = self.fortran_lun
+                kwargs[&#39;_starecindex&#39;] = len(_starecdict[self.fortran_lun])-1 if len(_starecdict[self.fortran_lun]) &gt; 0 else 0
+                return TdlpackRecord(**kwargs)
+            else:
+                if not self.data_type: self.data_type = &#39;station&#39;
+                kwargs[&#39;id&#39;] = np.int32([400001000,0,0,0])
+                kwargs[&#39;number_of_stations&#39;] = np.int32(deepcopy(ioctet/NCHAR))
+                return TdlpackStationRecord(**kwargs)
+        else:
+            #raise
+            pass #for now
+
+    def backspace(self):
+        &#34;&#34;&#34;
+        Position file backwards by one record.
+        &#34;&#34;&#34;
+        if self.fortran_lun == -1:
+            raise IOError(&#34;File is not opened.&#34;)
+
+        if self.format == &#39;sequential&#39;:
+            _ier = np.int32(0)
+            _ier = tdlpack.backspacefile(self.fortran_lun)
+            if _ier == 0:
+                self.position -= 1
+            else:
+                raise IOError(&#34;Could not backspace file. ier = &#34;+str(_ier))
+
+    def close(self):
+        &#34;&#34;&#34;
+        Close a TDLPACK file.
+        &#34;&#34;&#34;
+        _ier = np.int32(0)
+        if self.format == &#39;random-access&#39;:
+            _ier = tdlpack.clfilm(FORTRAN_STDOUT_LUN,self.fortran_lun)
+        elif self.format == &#39;sequential&#39;:
+            _ier = tdlpack.closefile(FORTRAN_STDOUT_LUN,self.fortran_lun,np.int32(2))
+        if _ier == 0:
+            try:
+                del _starecdict[self.fortran_lun]
+            except(KeyError):
+                pass
+            self.eof = False
+            self.fortran_lun = -1
+            self.position = 0
+            type(self).counter -= 1
+        else:
+            raise IOError(&#34;Trouble closing file. ier = &#34;+str(_ier))
+
+    def read(self,all=False,unpack=True,id=[9999,0,0,0]):
+        &#34;&#34;&#34;
+        Read a record from a TDLPACK file.
+
+        Parameters
+        ----------
+
+        **`all : bool, optional`**
+
+        Read all records from file. The default is False.
+
+        **`unpack : bool, optional`**
+
+        Unpack TDLPACK identification sections.  Note that data are not unpacked.  The default is True.
             
+        **`id : array_like or list, optional`**
 
-            
-  
-  <div class="source_cont">
-</div>
+        Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list 
+        with length 4.  The default is [9999,0,0,0] which will signal the random access IO reader
+        to sequentially read the file.
+        
+        Returns
+        -------
 
-            </div>
-          <h3>Static methods</h3>
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackFile.__init__">
-    <p>def <span class="ident">__init__</span>(</p><p>self, **kwargs)</p>
-    </div>
+        **`record [records] : instance [list]`**
+
+        An instance of list of instances contaning `pytdlpack.TdlpackStationRecord`, 
+        `pytdlpack.TdlpackRecord`, or `pytdlpack.TdlpackTrailerRecord`
+        &#34;&#34;&#34;
+        if self.fortran_lun == -1:
+            raise IOError(&#34;File is not opened.&#34;)
+
+        record = None
+        records = []
+        while True:
+            _ipack = np.array((),dtype=np.int32)
+            _ioctet = np.int32(0)
+            _ier = np.int32(0)
+            if self.format == &#39;random-access&#39;:
+                id = np.int32(id)
+                _nvalue = np.int32(0)
+                _ipack,_nvalue,_ier = tdlpack.rdtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,id,ND5,L3264B)
+                if _ier == 0:
+                    _ioctet = _nvalue*NBYPWD
+                    record = self._determine_record_type(_ipack,_ioctet)
+                elif _ier == 153:
+                    self.eof = True
+                    break
+                else:
+                    #raise
+                    pass # for now
+            elif self.format == &#39;sequential&#39;:
+                _ioctet,_ipack,_ier = tdlpack.readfile(FORTRAN_STDOUT_LUN,self.name,self.fortran_lun,ND5,L3264B,np.int32(2))
+                if _ier == 0:
+                    record = self._determine_record_type(_ipack,_ioctet)
+                    self.position += 1
+                elif _ier == -1:
+                    self.eof = True
+                    break
+
+            if unpack: record.unpack()
+
+            if type(record) is TdlpackStationRecord:
+                _starecdict[self.fortran_lun].append(record.stations)
+
+            if all:
+                records.append(record)
+            else:
+                break
+
+        if len(records) &gt; 0:
+            return records
+        else:
+            return record
     
+    def rewind(self):
+        &#34;&#34;&#34;
+        Position file to the beginning.
+        &#34;&#34;&#34;
+        if self.fortran_lun == -1:
+            raise IOError(&#34;File is not opened.&#34;)
 
-    
-  
-    <div class="desc"><p>Contructor</p></div>
-  <div class="source_cont">
-</div>
+        if self.format == &#39;sequential&#39;:
+            _ier = np.int32(0)
+            _ier = tdlpack.rewindfile(self.fortran_lun)
+            if _ier == 0:
+                self.position = 0
+            else:
+                raise IOError(&#34;Could not rewind file. ier = &#34;+str(_ier))
 
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackFile.backspace">
-    <p>def <span class="ident">backspace</span>(</p><p>self)</p>
-    </div>
-    
+    def write(self,record):
+        &#34;&#34;&#34;
+        Write a packed TDLPACK record to file.
 
-    
-  
-    <div class="desc"><p>Position file backwards by one record.</p></div>
-  <div class="source_cont">
-</div>
+        Parameters
+        ----------
 
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackFile.close">
-    <p>def <span class="ident">close</span>(</p><p>self)</p>
-    </div>
-    
+        **`record : instance`**
 
-    
-  
-    <div class="desc"><p>Close a TDLPACK file.</p></div>
-  <div class="source_cont">
-</div>
+        An instance of either `pytdlpack.TdlpackStationRecord`, `pytdlpack.TdlpackRecord`, 
+        or `pytdlpack.TdlpackTrailerRecord`.  `record` should contain a packed data.
+        &#34;&#34;&#34;
+        #pdb.set_trace()
+        if self.fortran_lun == -1:
+            raise IOError(&#34;File is not opened.&#34;)
+        if self.mode == &#34;r&#34;:
+            raise IOError(&#34;File is read-only.&#34;)
 
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackFile.read">
-    <p>def <span class="ident">read</span>(</p><p>self, all=False, unpack=True, id=[9999, 0, 0, 0])</p>
-    </div>
-    
+        _ier = np.int32(0)
+        _ntotby = np.int32(0)
+        _ntotrc = np.int32(0)
+        _nreplace = np.int32(0)
+        _ncheck = np.int32(0)
 
-    
-  
-    <div class="desc"><p>Read a record from a TDLPACK file.</p>
-<h2>Parameters</h2>
+        if type(record) is TdlpackStationRecord:
+            if self.position == 0: self.data_type = &#39;station&#39;
+            _nwords = record.number_of_stations*2
+            if self.format == &#39;random-access&#39;:
+                _ier = tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
+                                       record.id,record.ipack[0:_nwords],_nreplace,
+                                       _ncheck,L3264B)
+            elif self.format == &#39;sequential&#39;:
+                _ntotby,_ntotrc,_ier = tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,
+                                       record.ipack[0:_nwords],_ntotby,_ntotrc,L3264B)
+        elif type(record) is TdlpackRecord:
+            if self.position == 0: self.data_type = &#39;grid&#39;
+            _nwords = np.int32(record.ioctet/NBYPWD)
+            if self.format == &#39;random-access&#39;:
+                record.ipack[0] = record.ipack[0].byteswap()
+                _ier = tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
+                                       record.id,record.ipack[0:_nwords],_nreplace,
+                                       _ncheck,L3264B)
+            elif self.format == &#39;sequential&#39;:
+                _ntotby,_ntotrc,_ier = tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,
+                                       record.ipack[0:_nwords],_ntotby,_ntotrc,L3264B)
+        elif type(record) is TdlpackTrailerRecord:
+            _ier = tdlpack.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,L3264W,_ntotby,
+                           _ntotrc)
+        if _ier == 0:
+            self.position += 1
+            self.size = os.path.getsize(self.name)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="pytdlpack.TdlpackFile.counter"><code class="name">var <span class="ident">counter</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pytdlpack.TdlpackFile.backspace"><code class="name flex">
+<span>def <span class="ident">backspace</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Position file backwards by one record.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def backspace(self):
+    &#34;&#34;&#34;
+    Position file backwards by one record.
+    &#34;&#34;&#34;
+    if self.fortran_lun == -1:
+        raise IOError(&#34;File is not opened.&#34;)
+
+    if self.format == &#39;sequential&#39;:
+        _ier = np.int32(0)
+        _ier = tdlpack.backspacefile(self.fortran_lun)
+        if _ier == 0:
+            self.position -= 1
+        else:
+            raise IOError(&#34;Could not backspace file. ier = &#34;+str(_ier))</code></pre>
+</details>
+</dd>
+<dt id="pytdlpack.TdlpackFile.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Close a TDLPACK file.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def close(self):
+    &#34;&#34;&#34;
+    Close a TDLPACK file.
+    &#34;&#34;&#34;
+    _ier = np.int32(0)
+    if self.format == &#39;random-access&#39;:
+        _ier = tdlpack.clfilm(FORTRAN_STDOUT_LUN,self.fortran_lun)
+    elif self.format == &#39;sequential&#39;:
+        _ier = tdlpack.closefile(FORTRAN_STDOUT_LUN,self.fortran_lun,np.int32(2))
+    if _ier == 0:
+        try:
+            del _starecdict[self.fortran_lun]
+        except(KeyError):
+            pass
+        self.eof = False
+        self.fortran_lun = -1
+        self.position = 0
+        type(self).counter -= 1
+    else:
+        raise IOError(&#34;Trouble closing file. ier = &#34;+str(_ier))</code></pre>
+</details>
+</dd>
+<dt id="pytdlpack.TdlpackFile.read"><code class="name flex">
+<span>def <span class="ident">read</span></span>(<span>self, all=False, unpack=True, id=[9999, 0, 0, 0])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read a record from a TDLPACK file.</p>
+<h2 id="parameters">Parameters</h2>
 <p><strong><code>all : bool, optional</code></strong></p>
 <p>Read all records from file. The default is False.</p>
 <p><strong><code>unpack : bool, optional</code></strong></p>
-<p>Unpack TDLPACK identification sections.  Note that data are not unpacked.  The default is True.</p>
+<p>Unpack TDLPACK identification sections.
+Note that data are not unpacked.
+The default is True.</p>
 <p><strong><code>id : array_like or list, optional</code></strong></p>
-<p>Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list 
-with length 4.  The default is [9999,0,0,0] which will signal the random access IO reader
+<p>Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list
+with length 4.
+The default is [9999,0,0,0] which will signal the random access IO reader
 to sequentially read the file.</p>
-<h2>Returns</h2>
+<h2 id="returns">Returns</h2>
 <p><strong><code>record [records] : instance [list]</code></strong></p>
-<p>An instance of list of instances contaning <a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a>, 
-<a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a>, or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></a></p></div>
-  <div class="source_cont">
-</div>
+<p>An instance of list of instances contaning <code><a title="pytdlpack.TdlpackStationRecord" href="#pytdlpack.TdlpackStationRecord">TdlpackStationRecord</a></code>,
+<code><a title="pytdlpack.TdlpackRecord" href="#pytdlpack.TdlpackRecord">TdlpackRecord</a></code>, or <code><a title="pytdlpack.TdlpackTrailerRecord" href="#pytdlpack.TdlpackTrailerRecord">TdlpackTrailerRecord</a></code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read(self,all=False,unpack=True,id=[9999,0,0,0]):
+    &#34;&#34;&#34;
+    Read a record from a TDLPACK file.
 
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackFile.rewind">
-    <p>def <span class="ident">rewind</span>(</p><p>self)</p>
-    </div>
-    
+    Parameters
+    ----------
 
-    
-  
-    <div class="desc"><p>Position file to the beginning.</p></div>
-  <div class="source_cont">
-</div>
+    **`all : bool, optional`**
 
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackFile.write">
-    <p>def <span class="ident">write</span>(</p><p>self, record)</p>
-    </div>
-    
+    Read all records from file. The default is False.
 
+    **`unpack : bool, optional`**
+
+    Unpack TDLPACK identification sections.  Note that data are not unpacked.  The default is True.
+        
+    **`id : array_like or list, optional`**
+
+    Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list 
+    with length 4.  The default is [9999,0,0,0] which will signal the random access IO reader
+    to sequentially read the file.
     
-  
-    <div class="desc"><p>Write a packed TDLPACK record to file.</p>
-<h2>Parameters</h2>
+    Returns
+    -------
+
+    **`record [records] : instance [list]`**
+
+    An instance of list of instances contaning `pytdlpack.TdlpackStationRecord`, 
+    `pytdlpack.TdlpackRecord`, or `pytdlpack.TdlpackTrailerRecord`
+    &#34;&#34;&#34;
+    if self.fortran_lun == -1:
+        raise IOError(&#34;File is not opened.&#34;)
+
+    record = None
+    records = []
+    while True:
+        _ipack = np.array((),dtype=np.int32)
+        _ioctet = np.int32(0)
+        _ier = np.int32(0)
+        if self.format == &#39;random-access&#39;:
+            id = np.int32(id)
+            _nvalue = np.int32(0)
+            _ipack,_nvalue,_ier = tdlpack.rdtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,id,ND5,L3264B)
+            if _ier == 0:
+                _ioctet = _nvalue*NBYPWD
+                record = self._determine_record_type(_ipack,_ioctet)
+            elif _ier == 153:
+                self.eof = True
+                break
+            else:
+                #raise
+                pass # for now
+        elif self.format == &#39;sequential&#39;:
+            _ioctet,_ipack,_ier = tdlpack.readfile(FORTRAN_STDOUT_LUN,self.name,self.fortran_lun,ND5,L3264B,np.int32(2))
+            if _ier == 0:
+                record = self._determine_record_type(_ipack,_ioctet)
+                self.position += 1
+            elif _ier == -1:
+                self.eof = True
+                break
+
+        if unpack: record.unpack()
+
+        if type(record) is TdlpackStationRecord:
+            _starecdict[self.fortran_lun].append(record.stations)
+
+        if all:
+            records.append(record)
+        else:
+            break
+
+    if len(records) &gt; 0:
+        return records
+    else:
+        return record</code></pre>
+</details>
+</dd>
+<dt id="pytdlpack.TdlpackFile.rewind"><code class="name flex">
+<span>def <span class="ident">rewind</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Position file to the beginning.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def rewind(self):
+    &#34;&#34;&#34;
+    Position file to the beginning.
+    &#34;&#34;&#34;
+    if self.fortran_lun == -1:
+        raise IOError(&#34;File is not opened.&#34;)
+
+    if self.format == &#39;sequential&#39;:
+        _ier = np.int32(0)
+        _ier = tdlpack.rewindfile(self.fortran_lun)
+        if _ier == 0:
+            self.position = 0
+        else:
+            raise IOError(&#34;Could not rewind file. ier = &#34;+str(_ier))</code></pre>
+</details>
+</dd>
+<dt id="pytdlpack.TdlpackFile.write"><code class="name flex">
+<span>def <span class="ident">write</span></span>(<span>self, record)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Write a packed TDLPACK record to file.</p>
+<h2 id="parameters">Parameters</h2>
 <p><strong><code>record : instance</code></strong></p>
-<p>An instance of either <a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a>, <a href="#pytdlpack.TdlpackRecord"><code>TdlpackRecord</code></a>, 
-or <a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></a>.  <code>record</code> should contain a packed data.</p></div>
-  <div class="source_cont">
-</div>
+<p>An instance of either <code><a title="pytdlpack.TdlpackStationRecord" href="#pytdlpack.TdlpackStationRecord">TdlpackStationRecord</a></code>, <code><a title="pytdlpack.TdlpackRecord" href="#pytdlpack.TdlpackRecord">TdlpackRecord</a></code>,
+or <code><a title="pytdlpack.TdlpackTrailerRecord" href="#pytdlpack.TdlpackTrailerRecord">TdlpackTrailerRecord</a></code>.
+<code>record</code> should contain a packed data.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write(self,record):
+    &#34;&#34;&#34;
+    Write a packed TDLPACK record to file.
 
-  </div>
-  
-          <h3>Instance variables</h3>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.byte_order" class="name">var <span class="ident">byte_order</span></p>
-            
+    Parameters
+    ----------
 
-            
-  
-  <div class="source_cont">
-</div>
+    **`record : instance`**
 
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.data_type" class="name">var <span class="ident">data_type</span></p>
-            
+    An instance of either `pytdlpack.TdlpackStationRecord`, `pytdlpack.TdlpackRecord`, 
+    or `pytdlpack.TdlpackTrailerRecord`.  `record` should contain a packed data.
+    &#34;&#34;&#34;
+    #pdb.set_trace()
+    if self.fortran_lun == -1:
+        raise IOError(&#34;File is not opened.&#34;)
+    if self.mode == &#34;r&#34;:
+        raise IOError(&#34;File is read-only.&#34;)
 
-            
-  
-  <div class="source_cont">
-</div>
+    _ier = np.int32(0)
+    _ntotby = np.int32(0)
+    _ntotrc = np.int32(0)
+    _nreplace = np.int32(0)
+    _ncheck = np.int32(0)
 
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.eof" class="name">var <span class="ident">eof</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.format" class="name">var <span class="ident">format</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.fortran_lun" class="name">var <span class="ident">fortran_lun</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.mode" class="name">var <span class="ident">mode</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.name" class="name">var <span class="ident">name</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.position" class="name">var <span class="ident">position</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-            <div class="item">
-            <p id="pytdlpack.TdlpackFile.ra_master_key" class="name">var <span class="ident">ra_master_key</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-      </div>
-      </div>
-      
-      <div class="item">
-      <p id="pytdlpack.TdlpackRecord" class="name">class <span class="ident">TdlpackRecord</span></p>
-      
-  
-    <div class="desc"><p>Defines a TDLPACK data record object.  Once data are unpacked (TdlpackRecord.unpack(data=True)),
+    if type(record) is TdlpackStationRecord:
+        if self.position == 0: self.data_type = &#39;station&#39;
+        _nwords = record.number_of_stations*2
+        if self.format == &#39;random-access&#39;:
+            _ier = tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
+                                   record.id,record.ipack[0:_nwords],_nreplace,
+                                   _ncheck,L3264B)
+        elif self.format == &#39;sequential&#39;:
+            _ntotby,_ntotrc,_ier = tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,
+                                   record.ipack[0:_nwords],_ntotby,_ntotrc,L3264B)
+    elif type(record) is TdlpackRecord:
+        if self.position == 0: self.data_type = &#39;grid&#39;
+        _nwords = np.int32(record.ioctet/NBYPWD)
+        if self.format == &#39;random-access&#39;:
+            record.ipack[0] = record.ipack[0].byteswap()
+            _ier = tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
+                                   record.id,record.ipack[0:_nwords],_nreplace,
+                                   _ncheck,L3264B)
+        elif self.format == &#39;sequential&#39;:
+            _ntotby,_ntotrc,_ier = tdlpack.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,
+                                   record.ipack[0:_nwords],_ntotby,_ntotrc,L3264B)
+    elif type(record) is TdlpackTrailerRecord:
+        _ier = tdlpack.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,L3264W,_ntotby,
+                       _ntotrc)
+    if _ier == 0:
+        self.position += 1
+        self.size = os.path.getsize(self.name)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pytdlpack.TdlpackRecord"><code class="flex name class">
+<span>class <span class="ident">TdlpackRecord</span></span>
+<span>(</span><span>date=None, id=None, lead=None, plain=None, grid=None, data=None, missing_value=None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Defines a TDLPACK data record object.
+Once data are unpacked (TdlpackRecord.unpack(data=True)),
 values are accessible using "fancy indexing".</p>
 <p>For gridded records, use grid index values and/or ranges (e.g. rec[0,0]).</p>
 <p>For station records, use the station ID string: (e.g. rec['KPHL']).</p>
-<h2>Attributes</h2>
+<h2 id="attributes">Attributes</h2>
 <p><strong><code>data : array_like</code></strong></p>
 <p>Data values.</p>
 <p><strong><code>grid_length : float</code></strong></p>
@@ -1779,53 +1184,29 @@ values are accessible using "fancy indexing".</p>
 <p><strong><code>standard_latitude : float</code></strong></p>
 <p>Latitude at which the grid length applies.</p>
 <p><strong><code>type : {'grid', 'station'}</code></strong></p>
-<p>Identifies the type of data.  This implies that data are 1D for type = 'station'
-and data are 2D for type = 'grid'.</p></div>
-  <div class="source_cont">
-</div>
-
-
-      <div class="class">
-          <h3>Ancestors (in MRO)</h3>
-          <ul class="class_list">
-          <li><a href="#pytdlpack.TdlpackRecord">TdlpackRecord</a></li>
-          <li>builtins.object</li>
-          </ul>
-          <h3>Class variables</h3>
-            <div class="item">
-            <p id="pytdlpack.TdlpackRecord.counter" class="name">var <span class="ident">counter</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-          <h3>Static methods</h3>
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackRecord.__init__">
-    <p>def <span class="ident">__init__</span>(</p><p>self, date=None, id=None, lead=None, plain=None, grid=None, data=None, missing_value=None, **kwargs)</p>
-    </div>
-    
-
-    
-  
-    <div class="desc"><p>Constructor</p>
-<h2>Parameters</h2>
+<p>Identifies the type of data.
+This implies that data are 1D for type = 'station'
+and data are 2D for type = 'grid'.</p>
+<dl>
+<dt><strong><code>Constructor</code></strong></dt>
+<dd>&nbsp;</dd>
+</dl>
+<h2 id="parameters">Parameters</h2>
 <p><strong><code>date : int, optional</code></strong></p>
 <p>Forecast initialization or observation date in YYYYMMDDHH format.</p>
 <p><strong><code>id : list or 1-D array, optional</code></strong></p>
 <p>List or 1-D array of length 4 containing the 4-word (integer) MOS-2000 ID of the data
 to be put into TdlpackRecord</p>
 <p><strong><code>lead : int, optional</code></strong></p>
-<p>Lead time (i.e. forecast projection) in hours of the data.  NOTE: This can be omitted</p>
+<p>Lead time (i.e. forecast projection) in hours of the data.
+NOTE: This can be omitted</p>
 <p><strong><code>plain : str, optional</code></strong></p>
-<p>Plain language descriptor.  This is limited to 32 characters, though here 
+<p>Plain language descriptor.
+This is limited to 32 characters, though here
 the input can be longer (will be cut off when packing).</p>
 <p><strong><code>grid : dict , optional</code></strong></p>
-<p>A dictionary containing grid definition attributes.  See
+<p>A dictionary containing grid definition attributes.
+See
 Dictionary of grid specs (created from create_grid_def_dict)</p>
 <p><strong><code>data : array_like, optional</code></strong></p>
 <p>Data values.</p>
@@ -1833,93 +1214,703 @@ Dictionary of grid specs (created from create_grid_def_dict)</p>
 <p>Provide either a primary missing value or primary and secondary as list.</p>
 <p><strong><code>**kwargs : dict, optional</code></strong></p>
 <p>Dictionary of class attributes (keys) and class attributes (values).</p></div>
-  <div class="source_cont">
-</div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TdlpackRecord(object):
+    &#34;&#34;&#34;
+    Defines a TDLPACK data record object.  Once data are unpacked (TdlpackRecord.unpack(data=True)),
+    values are accessible using &#34;fancy indexing&#34;.
 
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackRecord.latlons">
-    <p>def <span class="ident">latlons</span>(</p><p>self)</p>
-    </div>
+    For gridded records, use grid index values and/or ranges (e.g. rec[0,0]).
     
+    For station records, use the station ID string: (e.g. rec[&#39;KPHL&#39;]).
 
+    Attributes
+    ----------
+
+    **`data : array_like`**
+
+    Data values.
+
+    **`grid_length : float`**
+
+    Distance between grid points in units of meters.
+
+    **`id : array_like`**
+
+    ID of the TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.
+
+    **`ioctet : int`**
+
+    Size of the packed TDLPACK data record in bytes.
+
+    **`ipack : array_like`**
+
+    Packed TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.
+
+    **`is0 : array_like`**
+
+    TDLPACK Section 0 (Indicator Section).
+
+    **`is1 : array_like`**
+
+    TDLPACK Section 1 (Product Definition Section).
+
+    **`is2 : array_like`**
+
+    TDLPACK Section 2 (Grid Definition Section)
+
+    **`is4 : array_like`**
+
+    TDLPACK Section 4 (Data Section).
+
+    **`lead_time : int`**
+
+    Forecast lead time in units of hours.
+
+    **`lower_left_latitude : float`**
+
+    Latitude of lower left grid point
+
+    **`lower_left_longitude : float`**
+
+    Longitude of lower left grid point
+
+    **`number_of_values : int`**
+
+    Number of data values.
+
+    **`nx : int`**
+
+    Number of points in the x-direction (West-East).
+
+    **`ny : int`**
+
+    Number of points in the y-direction (West-East).
+
+    **`origin_longitude : float`**
+
+    Originating longitude of projected grid.
+
+    **`plain : str`**
+
+    Plain language description of TDLPACK record.
+
+    **`primary_missing_value : float`**
+
+    Primary missing value.
+
+    **`reference_date : int`**
+
+    Reference date from the TDLPACK data record in YYYYMMDDHH format.
+
+    **`secondary_missing_value : float`**
+
+    Secondary missing value.
+
+    **`standard_latitude : float`**
+
+    Latitude at which the grid length applies.
+
+    **`type : {&#39;grid&#39;, &#39;station&#39;}`**
+
+    Identifies the type of data.  This implies that data are 1D for type = &#39;station&#39;
+    and data are 2D for type = &#39;grid&#39;.
+
+    &#34;&#34;&#34;
+    counter = 0
+    def __init__(self,date=None,id=None,lead=None,plain=None,grid=None,data=None,
+                 missing_value=None,**kwargs):
+        &#34;&#34;&#34;
+        Constructor
+
+        Parameters
+        ----------
+
+        **`date : int, optional`**
+
+        Forecast initialization or observation date in YYYYMMDDHH format.
+
+        **`id : list or 1-D array, optional`**
+
+        List or 1-D array of length 4 containing the 4-word (integer) MOS-2000 ID of the data
+        to be put into TdlpackRecord
+
+        **`lead : int, optional`**
+
+        Lead time (i.e. forecast projection) in hours of the data.  NOTE: This can be omitted
+
+        **`plain : str, optional`**
+
+        Plain language descriptor.  This is limited to 32 characters, though here 
+        the input can be longer (will be cut off when packing).
+
+        **`grid : dict , optional`**
+
+        A dictionary containing grid definition attributes.  See
+        Dictionary of grid specs (created from create_grid_def_dict)
+
+        **`data : array_like, optional`**
+
+        Data values.
+
+        **`missing_value : float or list of floats, optional`**
+
+        Provide either a primary missing value or primary and secondary as list.
+
+        **`**kwargs : dict, optional`**
+
+        Dictionary of class attributes (keys) and class attributes (values).
+        &#34;&#34;&#34;
+        type(self).counter += 1
+        self._metadata_unpacked = False
+        self._data_unpacked = False
+        self.plain = &#39;&#39;
+        if len(kwargs) == 0:
+            # Means we are creating TdlpackRecord instance from the other function
+            # input, NOT the kwargs Dict.
+            self.id = id
+            self.reference_date = date
+            self.type = &#39;station&#39;
+            self.is0 = np.zeros(ND7,dtype=np.int32)
+            self.is1 = np.zeros(ND7,dtype=np.int32)
+            self.is2 = np.zeros(ND7,dtype=np.int32)
+            self.is4 = np.zeros(ND7,dtype=np.int32)
+
+            self.is1[2] = np.int32(date/1000000)
+            self.is1[3] = np.int32((date/10000)-(self.is1[2]*100))
+            self.is1[4] = np.int32((date/100)-(self.is1[2]*10000)-(self.is1[3]*100))
+            self.is1[5] = np.int32(date-((date/100)*100))
+            self.is1[6] = np.int32(0)
+            self.is1[7] = np.int32(date)
+            self.is1[8] = np.int32(id[0])
+            self.is1[9] = np.int32(id[1])
+            self.is1[10] = np.int32(id[2])
+            self.is1[11] = np.int32(id[3])
+            if lead is None:
+                self.is1[12] = np.int32(self.is1[10]-((self.is1[10]/1000)*1000))
+            else:
+                self.is1[12] = np.int32(lead)
+            self.is1[13] = np.int32(0)
+            self.is1[14] = np.int32(self.is1[8]-((self.is1[8]/100)*100))
+            self.is1[15] = np.int32(0)
+            self.is1[16] = np.int32(0)
+            self.is1[17] = np.int32(0)
+            self.is1[18] = np.int32(0)
+            self.is1[19] = np.int32(0)
+            self.is1[20] = np.int32(0)
+            self.is1[21] = NCHAR_PLAIN
+            if plain is None:
+                self.plain = &#39; &#39;*NCHAR_PLAIN
+            else:
+                self.plain = plain
+                for n,p in enumerate(plain):
+                    self.is1[22+n] = np.int32(ord(p))
+
+            if grid is not None and type(grid) is dict or data.shape == 2:
+                # Gridded Data
+                self.type = &#39;grid&#39;
+                self.is1[1] = np.int32(1) # Set IS1[1] = 1
+                self.is2[1] = np.int32(grid[&#39;proj&#39;])
+                self.is2[2] = np.int32(grid[&#39;nx&#39;])
+                self.is2[3] = np.int32(grid[&#39;ny&#39;])
+                self.is2[4] = np.int32(grid[&#39;latll&#39;]*10000)
+                self.is2[5] = np.int32(grid[&#39;lonll&#39;]*10000)
+                self.is2[6] = np.int32(grid[&#39;orientlon&#39;]*10000)
+                self.is2[7] = np.int32(grid[&#39;meshlength&#39;]*1000) # Value in dict is in units of meters.
+                self.is2[8] = np.int32(grid[&#39;stdlat&#39;]*10000)
+                self.nx = np.int32(grid[&#39;nx&#39;])
+                self.ny = np.int32(grid[&#39;ny&#39;])
+            if len(data) &gt; 0:
+                self.data = np.array(data,dtype=np.float32)
+                self.number_of_values = len(data)
+            else:
+                raise ValueError
+
+            if missing_value is None:
+                self.primary_missing_value = np.int32(0)
+                self.secondary_missing_value = np.int32(0)
+            else:
+                if type(missing_value) is list:
+                    if len(missing_value) == 1:
+                        self.primary_missing_value = np.int32(missing_value[0])
+                    elif len(missing_value) == 2:
+                        self.primary_missing_value = np.int32(missing_value[0])
+                        self.secondary_missing_value = np.int32(missing_value[1])
+                else:
+                    self.primary_missing_value = np.int32(missing_value)
+                    self.secondary_missing_value = np.int32(0)
+
+        else:
+            # Instantiate via **kwargs
+            for k,v in kwargs.items():
+                setattr(self,k,v)
+
+    def __getitem__(self,indices):
+        &#34;&#34;&#34;
+        &#34;&#34;&#34;
+        if self.type == &#39;grid&#39;:
+            if not isinstance(indices,tuple):
+                indices = tuple(indices)
+        elif self.type == &#39;station&#39;:
+            if isinstance(indices,str):
+                indices = tuple([_starecdict[self._filelun][self._starecindex].index(indices)])
+
+        try:
+            return self.data[indices]
+        except(AttributeError):
+            return None
+
+    def __setitem__(self,indices,values):
+        &#34;&#34;&#34;
+        &#34;&#34;&#34;
+        if self.type == &#39;grid&#39;:
+            if not isinstance(indices,tuple):
+                indices = tuple(indices)
+        elif self.type == &#39;station&#39;:
+            if isinstance(indices,str):
+                indices = tuple([_starecdict[self._filelun][self._starecindex].index(indices)])
+
+        self.data[indices] = values
+
+    def __repr__(self):
+        strings = []
+        keys = self.__dict__.keys()
+        for k in keys:
+            if not k.startswith(&#39;_&#39;):
+                strings.append(&#39;%s = %s\n&#39;%(k,self.__dict__[k]))
+        return &#39;&#39;.join(strings)
     
-  
-    <div class="desc"><p>Returns a tuple of latitudes and lontiude numpy.float32 arrays for the TDLPACK record.
+    def pack(self,dec_scale=None,bin_scale=None):
+        &#34;&#34;&#34;
+        Pack a TDLPACK record.
+
+        Parameters
+        ----------
+
+        **`dec_scale : int, optional, default = 1`**
+
+        Decimal Scale Factor used to when packing TdlpackRecord data [DEFAULT is 1].
+
+        **`bin_scale : int, optional, default = 0`**
+
+        Binary Scale Factor used to when packing TdlpackRecord data [DEFAULT is 0]. NOTE:
+        binary scale factor is currently NOT SUPPORTED in MOS-2000 software. It is added
+        here for completeness.
+        &#34;&#34;&#34;
+
+        # Make sure data are unpacked
+        if not self._data_unpacked:
+            self.unpack(data=True)
+
+        _ier = np.int32(0)
+        self.ipack = np.zeros((ND5),dtype=np.int32)
+
+        if dec_scale is not None:
+            self.is1[16] = np.int32(dec_scale)
+
+        if bin_scale is not None:
+            self.is1[17] = np.int32(bin_scale)
+
+        # Pack plain langauge into IS1 array.
+        self.plain = self.plain.ljust(NCHAR_PLAIN)
+        for n,p in enumerate(self.plain):
+            self.is1[22+n] = np.int32(ord(p))
+
+        # Handle potential NaN values
+        if self.primary_missing_value == 0:
+            self.primary_missing_value == DEFAULT_MISSING_VALUE
+        self.data = np.where(np.isnan(self.data),np.float32(self.primary_missing_value),
+                             self.data)
+
+        if self.type == &#39;grid&#39;:
+            _a = np.zeros((self.nx,self.ny),dtype=np.float32,order=&#39;F&#39;)
+            _ia = np.zeros((self.nx,self.ny),dtype=np.int32,order=&#39;F&#39;)
+            _ic = np.zeros((self.nx*self.ny),dtype=np.int32)
+            self.ioctet,_ier = tdlpack.pack2d(FORTRAN_STDOUT_LUN,self.data,_ia,_ic,self.is0,
+                               self.is1,self.is2,self.is4,self.primary_missing_value,
+                               self.secondary_missing_value,self.ipack,MINPK,_lx,L3264B)
+        elif self.type == &#39;station&#39;:
+            _ic = np.zeros((self.number_of_values),dtype=np.int32)
+            self.ioctet,_ier = tdlpack.pack1d(FORTRAN_STDOUT_LUN,self.data,_ic,self.is0,
+                               self.is1,self.is2,self.is4,self.primary_missing_value,
+                               self.secondary_missing_value,self.ipack,MINPK,
+                               _lx,L3264B)
+    
+    def unpack(self,data=False,missing_value=None):
+        &#34;&#34;&#34;
+        Unpacks the TDLPACK identification sections and data (optional).
+
+        Parameters
+        ----------
+
+        **`data : bool, optional`**
+
+        If True, unpack data values. The default is False.
+
+        **`missing_value : float, optional`**
+        
+        Set a missing value. If a missing value exists for the TDLPACK data record,
+        it will be replaced with this value.
+        &#34;&#34;&#34;
+        _ier = np.int32(0)
+        if not self._metadata_unpacked:
+            if self.ipack.shape[0] &lt; ND5_META_MAX:
+                _nd5_local = ND5_META_MIN
+            else:
+                _nd5_local = ND5_META_MAX
+            _data_meta = np.zeros((_nd5_local),dtype=np.int32)
+            _iwork_meta = np.zeros((_nd5_local),dtype=np.int32)
+            _data_meta,_ier = tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:_nd5_local],
+                              _iwork_meta,_is0,_is1,_is2,_is4,_misspx,
+                              _misssx,np.int32(1),L3264B)
+            if _ier == 0:
+                self._metadata_unpacked = True
+                self.is0 = deepcopy(_is0)
+                self.is1 = deepcopy(_is1)
+                self.is2 = deepcopy(_is2)
+                self.is4 = deepcopy(_is4)
+                self.id = self.is1[8:12]
+
+        # Set attributes from is1[].
+        self.lead_time = np.int32(str(self.is1[10])[-3:])
+        if not self.plain:
+            if self.is1[21] &gt; 0:
+                for n in np.nditer(self.is1[22:(22+self.is1[21])]):
+                    self.plain += chr(n)
+            else:
+                self.plain = &#39; &#39;*NCHAR_PLAIN
+
+        # Set attributes from is2[].
+        if self.is1[1] == 0:
+            self.type = &#39;station&#39;
+            self.map_proj = None
+            self.nx = None
+            self.ny = None
+            self.lower_left_latitude = None
+            self.lower_left_longitude = None
+            self.origin_longitude = None
+            self.grid_length = None
+            self.standard_latitude = None
+            if np.sum(self.is2) &gt; 0: self.is2 = np.zeros((ND7),dtype=np.int32)
+        elif self.is1[1] == 1:
+            self.type = &#39;grid&#39;
+            self.map_proj = self.is2[1]
+            self.nx = self.is2[2]
+            self.ny = self.is2[3]
+            self.lower_left_latitude = self.is2[4]/10000.
+            self.lower_left_longitude = self.is2[5]/10000.
+            self.origin_longitude = self.is2[6]/10000.
+            self.grid_length = self.is2[7]/1000.
+            self.standard_latitude = self.is2[8]/10000.
+            self.grid_def = create_grid_definition(proj=self.map_proj,nx=self.nx,ny=self.ny,
+                            latll=self.lower_left_latitude,lonll=self.lower_left_longitude,
+                            orientlon=self.origin_longitude,stdlat=self.standard_latitude,
+                            meshlength=self.grid_length)
+            self.proj_string = _create_proj_string(self.grid_def)
+       
+        # Set attributes from is4[].
+        self.number_of_values = self.is4[2]
+        self.primary_missing_value = deepcopy(np.float32(self.is4[3]))
+        self.secondary_missing_value = deepcopy(np.float32(self.is4[4]))
+
+        if data:
+            self._data_unpacked = True
+            _nd5_local = max(self.is4[2],int(self.ioctet/NBYPWD))
+            _iwork = np.zeros((_nd5_local),dtype=np.int32)
+            _data = np.zeros((_nd5_local),dtype=np.float32)
+            # Check to make sure the size of self.ipack is long enough. If not, then
+            # we will &#34;append&#34; to self.ipack.
+            if self.ipack.shape[0] &lt; _nd5_local:
+                pad = np.zeros((_nd5_local-self.ipack.shape[0]),dtype=np.int32)
+                self.ipack = np.append(self.ipack,pad)
+            _data,_ier = tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:_nd5_local],
+                                         _iwork,self.is0,self.is1,self.is2,self.is4,
+                                         _misspx,_misssx,np.int32(2),L3264B)
+            if _ier == 0:
+                _data = deepcopy(_data[0:self.number_of_values+1])
+            else:
+                _data = np.zeros((self.number_of_values),dtype=np.float32)+DEFAULT_MISSING_VALUE
+            self.data = deepcopy(_data[0:self.number_of_values])
+            if missing_value is not None:
+                self.data = np.where(self.data==self.primary_missing_value,np.float32(missing_value),self.data)
+                self.primary_missing_value = np.float32(missing_value)
+            if self.type == &#39;grid&#39;:
+                self.data = np.reshape(self.data[0:self.number_of_values],(self.nx,self.ny),order=&#39;F&#39;)
+    
+    def latlons(self):
+        &#34;&#34;&#34;
+        Returns a tuple of latitudes and lontiude numpy.float32 arrays for the TDLPACK record.
+        If the record is station, then return is None.
+
+        Returns
+        -------
+
+        **`lats,lons : array_like`**
+        
+        Numpy.float32 arrays of grid latitudes and longitudes.  If `self.grid = &#39;station&#39;`, then None are returned.
+        &#34;&#34;&#34;
+        lats = None
+        lons = None
+        if self.type == &#39;grid&#39;:
+            _ier = np.int32(0)
+            lats = np.zeros((self.nx,self.ny),dtype=np.float32,order=&#39;F&#39;)
+            lons = np.zeros((self.nx,self.ny),dtype=np.float32,order=&#39;F&#39;)
+            lats,lons,_ier = tdlpack.gridij_to_latlon(FORTRAN_STDOUT_LUN,self.nx,self.ny,
+                             self.map_proj,self.grid_length,self.origin_longitude,
+                             self.standard_latitude,self.lower_left_latitude,
+                             self.lower_left_longitude)
+        return (lats,lons)</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="pytdlpack.TdlpackRecord.counter"><code class="name">var <span class="ident">counter</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pytdlpack.TdlpackRecord.latlons"><code class="name flex">
+<span>def <span class="ident">latlons</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a tuple of latitudes and lontiude numpy.float32 arrays for the TDLPACK record.
 If the record is station, then return is None.</p>
-<h2>Returns</h2>
+<h2 id="returns">Returns</h2>
 <p><strong><code>lats,lons : array_like</code></strong></p>
-<p>Numpy.float32 arrays of grid latitudes and longitudes.  If <code>self.grid = 'station'</code>, then None are returned.</p></div>
-  <div class="source_cont">
-</div>
+<p>Numpy.float32 arrays of grid latitudes and longitudes.
+If <code>self.grid = 'station'</code>, then None are returned.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def latlons(self):
+    &#34;&#34;&#34;
+    Returns a tuple of latitudes and lontiude numpy.float32 arrays for the TDLPACK record.
+    If the record is station, then return is None.
 
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackRecord.pack">
-    <p>def <span class="ident">pack</span>(</p><p>self, dec_scale=1, bin_scale=0)</p>
-    </div>
-    
+    Returns
+    -------
 
+    **`lats,lons : array_like`**
     
-  
-    <div class="desc"><p>Pack a TDLPACK record.</p>
-<h2>Parameters</h2>
+    Numpy.float32 arrays of grid latitudes and longitudes.  If `self.grid = &#39;station&#39;`, then None are returned.
+    &#34;&#34;&#34;
+    lats = None
+    lons = None
+    if self.type == &#39;grid&#39;:
+        _ier = np.int32(0)
+        lats = np.zeros((self.nx,self.ny),dtype=np.float32,order=&#39;F&#39;)
+        lons = np.zeros((self.nx,self.ny),dtype=np.float32,order=&#39;F&#39;)
+        lats,lons,_ier = tdlpack.gridij_to_latlon(FORTRAN_STDOUT_LUN,self.nx,self.ny,
+                         self.map_proj,self.grid_length,self.origin_longitude,
+                         self.standard_latitude,self.lower_left_latitude,
+                         self.lower_left_longitude)
+    return (lats,lons)</code></pre>
+</details>
+</dd>
+<dt id="pytdlpack.TdlpackRecord.pack"><code class="name flex">
+<span>def <span class="ident">pack</span></span>(<span>self, dec_scale=None, bin_scale=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Pack a TDLPACK record.</p>
+<h2 id="parameters">Parameters</h2>
 <p><strong><code>dec_scale : int, optional, default = 1</code></strong></p>
 <p>Decimal Scale Factor used to when packing TdlpackRecord data [DEFAULT is 1].</p>
 <p><strong><code>bin_scale : int, optional, default = 0</code></strong></p>
 <p>Binary Scale Factor used to when packing TdlpackRecord data [DEFAULT is 0]. NOTE:
 binary scale factor is currently NOT SUPPORTED in MOS-2000 software. It is added
 here for completeness.</p></div>
-  <div class="source_cont">
-</div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pack(self,dec_scale=None,bin_scale=None):
+    &#34;&#34;&#34;
+    Pack a TDLPACK record.
 
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackRecord.unpack">
-    <p>def <span class="ident">unpack</span>(</p><p>self, data=False, missing_value=None)</p>
-    </div>
-    
+    Parameters
+    ----------
 
-    
-  
-    <div class="desc"><p>Unpacks the TDLPACK identification sections and data (optional).</p>
-<h2>Parameters</h2>
+    **`dec_scale : int, optional, default = 1`**
+
+    Decimal Scale Factor used to when packing TdlpackRecord data [DEFAULT is 1].
+
+    **`bin_scale : int, optional, default = 0`**
+
+    Binary Scale Factor used to when packing TdlpackRecord data [DEFAULT is 0]. NOTE:
+    binary scale factor is currently NOT SUPPORTED in MOS-2000 software. It is added
+    here for completeness.
+    &#34;&#34;&#34;
+
+    # Make sure data are unpacked
+    if not self._data_unpacked:
+        self.unpack(data=True)
+
+    _ier = np.int32(0)
+    self.ipack = np.zeros((ND5),dtype=np.int32)
+
+    if dec_scale is not None:
+        self.is1[16] = np.int32(dec_scale)
+
+    if bin_scale is not None:
+        self.is1[17] = np.int32(bin_scale)
+
+    # Pack plain langauge into IS1 array.
+    self.plain = self.plain.ljust(NCHAR_PLAIN)
+    for n,p in enumerate(self.plain):
+        self.is1[22+n] = np.int32(ord(p))
+
+    # Handle potential NaN values
+    if self.primary_missing_value == 0:
+        self.primary_missing_value == DEFAULT_MISSING_VALUE
+    self.data = np.where(np.isnan(self.data),np.float32(self.primary_missing_value),
+                         self.data)
+
+    if self.type == &#39;grid&#39;:
+        _a = np.zeros((self.nx,self.ny),dtype=np.float32,order=&#39;F&#39;)
+        _ia = np.zeros((self.nx,self.ny),dtype=np.int32,order=&#39;F&#39;)
+        _ic = np.zeros((self.nx*self.ny),dtype=np.int32)
+        self.ioctet,_ier = tdlpack.pack2d(FORTRAN_STDOUT_LUN,self.data,_ia,_ic,self.is0,
+                           self.is1,self.is2,self.is4,self.primary_missing_value,
+                           self.secondary_missing_value,self.ipack,MINPK,_lx,L3264B)
+    elif self.type == &#39;station&#39;:
+        _ic = np.zeros((self.number_of_values),dtype=np.int32)
+        self.ioctet,_ier = tdlpack.pack1d(FORTRAN_STDOUT_LUN,self.data,_ic,self.is0,
+                           self.is1,self.is2,self.is4,self.primary_missing_value,
+                           self.secondary_missing_value,self.ipack,MINPK,
+                           _lx,L3264B)</code></pre>
+</details>
+</dd>
+<dt id="pytdlpack.TdlpackRecord.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self, data=False, missing_value=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Unpacks the TDLPACK identification sections and data (optional).</p>
+<h2 id="parameters">Parameters</h2>
 <p><strong><code>data : bool, optional</code></strong></p>
 <p>If True, unpack data values. The default is False.</p>
 <p><strong><code>missing_value : float, optional</code></strong></p>
 <p>Set a missing value. If a missing value exists for the TDLPACK data record,
 it will be replaced with this value.</p></div>
-  <div class="source_cont">
-</div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def unpack(self,data=False,missing_value=None):
+    &#34;&#34;&#34;
+    Unpacks the TDLPACK identification sections and data (optional).
 
-  </div>
-  
-          <h3>Instance variables</h3>
-            <div class="item">
-            <p id="pytdlpack.TdlpackRecord.plain" class="name">var <span class="ident">plain</span></p>
-            
+    Parameters
+    ----------
 
-            
-  
-  <div class="source_cont">
-</div>
+    **`data : bool, optional`**
 
-            </div>
-      </div>
-      </div>
-      
-      <div class="item">
-      <p id="pytdlpack.TdlpackStationRecord" class="name">class <span class="ident">TdlpackStationRecord</span></p>
-      
-  
-    <div class="desc"><p>Defines a TDLPACK Station Call Letter Record.</p>
-<h2>Attributes</h2>
+    If True, unpack data values. The default is False.
+
+    **`missing_value : float, optional`**
+    
+    Set a missing value. If a missing value exists for the TDLPACK data record,
+    it will be replaced with this value.
+    &#34;&#34;&#34;
+    _ier = np.int32(0)
+    if not self._metadata_unpacked:
+        if self.ipack.shape[0] &lt; ND5_META_MAX:
+            _nd5_local = ND5_META_MIN
+        else:
+            _nd5_local = ND5_META_MAX
+        _data_meta = np.zeros((_nd5_local),dtype=np.int32)
+        _iwork_meta = np.zeros((_nd5_local),dtype=np.int32)
+        _data_meta,_ier = tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:_nd5_local],
+                          _iwork_meta,_is0,_is1,_is2,_is4,_misspx,
+                          _misssx,np.int32(1),L3264B)
+        if _ier == 0:
+            self._metadata_unpacked = True
+            self.is0 = deepcopy(_is0)
+            self.is1 = deepcopy(_is1)
+            self.is2 = deepcopy(_is2)
+            self.is4 = deepcopy(_is4)
+            self.id = self.is1[8:12]
+
+    # Set attributes from is1[].
+    self.lead_time = np.int32(str(self.is1[10])[-3:])
+    if not self.plain:
+        if self.is1[21] &gt; 0:
+            for n in np.nditer(self.is1[22:(22+self.is1[21])]):
+                self.plain += chr(n)
+        else:
+            self.plain = &#39; &#39;*NCHAR_PLAIN
+
+    # Set attributes from is2[].
+    if self.is1[1] == 0:
+        self.type = &#39;station&#39;
+        self.map_proj = None
+        self.nx = None
+        self.ny = None
+        self.lower_left_latitude = None
+        self.lower_left_longitude = None
+        self.origin_longitude = None
+        self.grid_length = None
+        self.standard_latitude = None
+        if np.sum(self.is2) &gt; 0: self.is2 = np.zeros((ND7),dtype=np.int32)
+    elif self.is1[1] == 1:
+        self.type = &#39;grid&#39;
+        self.map_proj = self.is2[1]
+        self.nx = self.is2[2]
+        self.ny = self.is2[3]
+        self.lower_left_latitude = self.is2[4]/10000.
+        self.lower_left_longitude = self.is2[5]/10000.
+        self.origin_longitude = self.is2[6]/10000.
+        self.grid_length = self.is2[7]/1000.
+        self.standard_latitude = self.is2[8]/10000.
+        self.grid_def = create_grid_definition(proj=self.map_proj,nx=self.nx,ny=self.ny,
+                        latll=self.lower_left_latitude,lonll=self.lower_left_longitude,
+                        orientlon=self.origin_longitude,stdlat=self.standard_latitude,
+                        meshlength=self.grid_length)
+        self.proj_string = _create_proj_string(self.grid_def)
+   
+    # Set attributes from is4[].
+    self.number_of_values = self.is4[2]
+    self.primary_missing_value = deepcopy(np.float32(self.is4[3]))
+    self.secondary_missing_value = deepcopy(np.float32(self.is4[4]))
+
+    if data:
+        self._data_unpacked = True
+        _nd5_local = max(self.is4[2],int(self.ioctet/NBYPWD))
+        _iwork = np.zeros((_nd5_local),dtype=np.int32)
+        _data = np.zeros((_nd5_local),dtype=np.float32)
+        # Check to make sure the size of self.ipack is long enough. If not, then
+        # we will &#34;append&#34; to self.ipack.
+        if self.ipack.shape[0] &lt; _nd5_local:
+            pad = np.zeros((_nd5_local-self.ipack.shape[0]),dtype=np.int32)
+            self.ipack = np.append(self.ipack,pad)
+        _data,_ier = tdlpack.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:_nd5_local],
+                                     _iwork,self.is0,self.is1,self.is2,self.is4,
+                                     _misspx,_misssx,np.int32(2),L3264B)
+        if _ier == 0:
+            _data = deepcopy(_data[0:self.number_of_values+1])
+        else:
+            _data = np.zeros((self.number_of_values),dtype=np.float32)+DEFAULT_MISSING_VALUE
+        self.data = deepcopy(_data[0:self.number_of_values])
+        if missing_value is not None:
+            self.data = np.where(self.data==self.primary_missing_value,np.float32(missing_value),self.data)
+            self.primary_missing_value = np.float32(missing_value)
+        if self.type == &#39;grid&#39;:
+            self.data = np.reshape(self.data[0:self.number_of_values],(self.nx,self.ny),order=&#39;F&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pytdlpack.TdlpackStationRecord"><code class="flex name class">
+<span>class <span class="ident">TdlpackStationRecord</span></span>
+<span>(</span><span>stations=None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Defines a TDLPACK Station Call Letter Record.</p>
+<h2 id="attributes">Attributes</h2>
 <p><strong><code>station : list</code></strong></p>
 <p>A list of station call letters.</p>
 <p><strong><code>id : array_like</code></strong></p>
@@ -1929,168 +1920,327 @@ it will be replaced with this value.</p></div>
 <p><strong><code>ipack : array_like</code></strong></p>
 <p>Array containing the packed station call letter record.</p>
 <p><strong><code>number_of_stations: int</code></strong></p>
-<p>Size of station call letter record.</p></div>
-  <div class="source_cont">
-</div>
-
-
-      <div class="class">
-          <h3>Ancestors (in MRO)</h3>
-          <ul class="class_list">
-          <li><a href="#pytdlpack.TdlpackStationRecord">TdlpackStationRecord</a></li>
-          <li>builtins.object</li>
-          </ul>
-          <h3>Class variables</h3>
-            <div class="item">
-            <p id="pytdlpack.TdlpackStationRecord.counter" class="name">var <span class="ident">counter</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-          <h3>Static methods</h3>
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackStationRecord.__init__">
-    <p>def <span class="ident">__init__</span>(</p><p>self, stations=None, **kwargs)</p>
-    </div>
-    
-
-    
-  
-    <div class="desc"><p><a href="#pytdlpack.TdlpackStationRecord"><code>TdlpackStationRecord</code></a> Constructor</p>
-<h2>Parameters</h2>
+<p>Size of station call letter record.</p>
+<p><code><a title="pytdlpack.TdlpackStationRecord" href="#pytdlpack.TdlpackStationRecord">TdlpackStationRecord</a></code> Constructor</p>
+<h2 id="parameters">Parameters</h2>
 <p><strong><code>stations : str or list or tuple</code></strong></p>
 <p>String of a single station or a list or tuple of stations.</p></div>
-  <div class="source_cont">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TdlpackStationRecord(object):
+    &#34;&#34;&#34;
+    Defines a TDLPACK Station Call Letter Record.
+
+    Attributes
+    ----------
+
+    **`station : list`**
+
+    A list of station call letters.
+
+    **`id : array_like`**
+
+    ID of station call letters. Note: This id is only used for random-access IO.
+
+    **`ioctet : int`**
+
+    Size of packed station call letter record in bytes.
+
+    **`ipack : array_like`**
+
+    Array containing the packed station call letter record.
+
+    **`number_of_stations: int`**
+
+    Size of station call letter record.
+    &#34;&#34;&#34;
+    counter = 0
+    def __init__(self,stations=None,**kwargs):
+        &#34;&#34;&#34;
+        `pytdlpack.TdlpackStationRecord` Constructor
+
+        Parameters
+        ----------
+
+        **`stations : str or list or tuple`**
+
+        String of a single station or a list or tuple of stations.
+        &#34;&#34;&#34;
+        type(self).counter += 1
+
+        if stations is not None:
+            if type(stations) is str:
+                self.stations = [stations]
+            elif type(stations) is list:
+                self.stations = stations
+            elif type(stations) is tuple:
+                self.stations = list(stations)
+            else:
+                pass # TODO: raise error... TypeError
+            self.number_of_stations = np.int32(len(stations))
+            self.id = np.int32([400001000,0,0,0])
+            self.ioctet = np.int32(0)
+            self.ipack = np.array((),dtype=np.int32)
+        else:
+            for k,v in kwargs.items():
+                setattr(self,k,v)
+
+        #self.number_of_stations = np.int32(len(stations))
+        #self.id = np.int32([400001000,0,0,0])
+        #self.ioctet = np.int32(0)
+        #self.ipack = np.array((),dtype=np.int32)
+
+    def __repr__(self):
+        strings = []
+        keys = self.__dict__.keys()
+        for k in keys:
+            if not k.startswith(&#39;_&#39;):
+                strings.append(&#39;%s = %s\n&#39;%(k,self.__dict__[k]))
+        return &#39;&#39;.join(strings)
+    
+    def pack(self):
+        &#34;&#34;&#34;
+        Pack a Station Call Letter Record.
+        &#34;&#34;&#34;
+        #pdb.set_trace()
+        self.ioctet = np.int32(self.number_of_stations*NCHAR)
+        self.ipack = np.ndarray(int(self.ioctet/(L3264B/NCHAR)),dtype=np.int32)
+        for n,s in enumerate(self.stations):
+            sta = s.ljust(int(NCHAR),&#39; &#39;)
+            self.ipack[n*2] = np.copy(np.fromstring(sta[0:int(NCHAR/2)],dtype=np.int32).byteswap())
+            self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[int(NCHAR/2):int(NCHAR)],dtype=np.int32).byteswap())
+
+    def unpack(self):
+        &#34;&#34;&#34;
+        Unpack a Station Call Letter Record.
+        &#34;&#34;&#34;
+        _stations = []
+        _unpack_string_fmt = &#39;&gt;&#39;+str(NCHAR)+&#39;s&#39;
+        nrange = range(0,int(self.ioctet/(NCHAR/2)),2)
+        if _IS_PYTHON3:
+            nrange = list(range(0,int(self.ioctet/(NCHAR/2)),2))
+        for n in nrange:
+            tmp = struct.unpack(_unpack_string_fmt,self.ipack[n:n+2].byteswap())[0]
+            if _IS_PYTHON3:
+                tmp = tmp.decode()
+            _stations.append(tmp.strip(&#39; &#39;))
+        self.stations = list(deepcopy(_stations))</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="pytdlpack.TdlpackStationRecord.counter"><code class="name">var <span class="ident">counter</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pytdlpack.TdlpackStationRecord.pack"><code class="name flex">
+<span>def <span class="ident">pack</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Pack a Station Call Letter Record.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pack(self):
+    &#34;&#34;&#34;
+    Pack a Station Call Letter Record.
+    &#34;&#34;&#34;
+    #pdb.set_trace()
+    self.ioctet = np.int32(self.number_of_stations*NCHAR)
+    self.ipack = np.ndarray(int(self.ioctet/(L3264B/NCHAR)),dtype=np.int32)
+    for n,s in enumerate(self.stations):
+        sta = s.ljust(int(NCHAR),&#39; &#39;)
+        self.ipack[n*2] = np.copy(np.fromstring(sta[0:int(NCHAR/2)],dtype=np.int32).byteswap())
+        self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[int(NCHAR/2):int(NCHAR)],dtype=np.int32).byteswap())</code></pre>
+</details>
+</dd>
+<dt id="pytdlpack.TdlpackStationRecord.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Unpack a Station Call Letter Record.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def unpack(self):
+    &#34;&#34;&#34;
+    Unpack a Station Call Letter Record.
+    &#34;&#34;&#34;
+    _stations = []
+    _unpack_string_fmt = &#39;&gt;&#39;+str(NCHAR)+&#39;s&#39;
+    nrange = range(0,int(self.ioctet/(NCHAR/2)),2)
+    if _IS_PYTHON3:
+        nrange = list(range(0,int(self.ioctet/(NCHAR/2)),2))
+    for n in nrange:
+        tmp = struct.unpack(_unpack_string_fmt,self.ipack[n:n+2].byteswap())[0]
+        if _IS_PYTHON3:
+            tmp = tmp.decode()
+        _stations.append(tmp.strip(&#39; &#39;))
+    self.stations = list(deepcopy(_stations))</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pytdlpack.TdlpackTrailerRecord"><code class="flex name class">
+<span>class <span class="ident">TdlpackTrailerRecord</span></span>
+<span>(</span><span>**kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Defines a TDLPACK Trailer Record.</p>
+<p><code><a title="pytdlpack.TdlpackTrailerRecord" href="#pytdlpack.TdlpackTrailerRecord">TdlpackTrailerRecord</a></code> Constructor</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TdlpackTrailerRecord(object):
+    &#34;&#34;&#34;
+    Defines a TDLPACK Trailer Record.
+    &#34;&#34;&#34;
+    counter = 0
+    def __init__(self, **kwargs):
+        &#34;&#34;&#34;
+        `pytdlpack.TdlpackTrailerRecord` Constructor
+        &#34;&#34;&#34;
+        type(self).counter += 0
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
+    def __repr__(self):
+        strings = []
+        keys = self.__dict__.keys()
+        for k in keys:
+            if not k.startswith(&#39;_&#39;):
+                strings.append(&#39;%s = %s\n&#39;%(k,self.__dict__[k]))
+        return &#39;&#39;.join(strings)
+
+    def pack(self):
+        pass
+
+    def unpack(self):
+        pass</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="pytdlpack.TdlpackTrailerRecord.counter"><code class="name">var <span class="ident">counter</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pytdlpack.TdlpackTrailerRecord.pack"><code class="name flex">
+<span>def <span class="ident">pack</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pack(self):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="pytdlpack.TdlpackTrailerRecord.unpack"><code class="name flex">
+<span>def <span class="ident">unpack</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def unpack(self):
+    pass</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#download">Download</a></li>
+<li><a href="#requires">Requires</a></li>
+<li><a href="#install">Install</a></li>
+<li><a href="#tutorial">Tutorial</a><ul>
+<li><a href="#1-creatingopeningclosing-a-tdlpack-file">1) Creating/Opening/Closing a TDLPACK file.</a></li>
+<li><a href="#2-reading-a-tdlpack-file">2) Reading a TDLPACK file.</a></li>
+<li><a href="#3-writing-a-tdlpack-file">3) Writing a TDLPACK file.</a></li>
+<li><a href="#4-creating-a-tdlpack-station-record">4) Creating a TDLPACK Station Record.</a></li>
+<li><a href="#5-creating-a-tdlpack-record">5) Creating a TDLPACK Record.</a></li>
+<li><a href="#6-packingunpacking-a-tdlpack-record">6) Packing/Unpacking a TDLPACK Record.</a></li>
+</ul>
+</li>
+</ul>
 </div>
-
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackStationRecord.pack">
-    <p>def <span class="ident">pack</span>(</p><p>self)</p>
-    </div>
-    
-
-    
-  
-    <div class="desc"><p>Pack a Station Call Letter Record.</p></div>
-  <div class="source_cont">
-</div>
-
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackStationRecord.unpack">
-    <p>def <span class="ident">unpack</span>(</p><p>self)</p>
-    </div>
-    
-
-    
-  
-    <div class="desc"><p>Unpack a Station Call Letter Record.</p></div>
-  <div class="source_cont">
-</div>
-
-  </div>
-  
-      </div>
-      </div>
-      
-      <div class="item">
-      <p id="pytdlpack.TdlpackTrailerRecord" class="name">class <span class="ident">TdlpackTrailerRecord</span></p>
-      
-  
-    <div class="desc"><p>Defines a TDLPACK Trailer Record.</p></div>
-  <div class="source_cont">
-</div>
-
-
-      <div class="class">
-          <h3>Ancestors (in MRO)</h3>
-          <ul class="class_list">
-          <li><a href="#pytdlpack.TdlpackTrailerRecord">TdlpackTrailerRecord</a></li>
-          <li>builtins.object</li>
-          </ul>
-          <h3>Class variables</h3>
-            <div class="item">
-            <p id="pytdlpack.TdlpackTrailerRecord.counter" class="name">var <span class="ident">counter</span></p>
-            
-
-            
-  
-  <div class="source_cont">
-</div>
-
-            </div>
-          <h3>Static methods</h3>
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackTrailerRecord.__init__">
-    <p>def <span class="ident">__init__</span>(</p><p>self, **kwargs)</p>
-    </div>
-    
-
-    
-  
-    <div class="desc"><p><a href="#pytdlpack.TdlpackTrailerRecord"><code>TdlpackTrailerRecord</code></a> Constructor</p></div>
-  <div class="source_cont">
-</div>
-
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackTrailerRecord.pack">
-    <p>def <span class="ident">pack</span>(</p><p>self)</p>
-    </div>
-    
-
-    
-  
-  <div class="source_cont">
-</div>
-
-  </div>
-  
-            
-  <div class="item">
-    <div class="name def" id="pytdlpack.TdlpackTrailerRecord.unpack">
-    <p>def <span class="ident">unpack</span>(</p><p>self)</p>
-    </div>
-    
-
-    
-  
-  <div class="source_cont">
-</div>
-
-  </div>
-  
-      </div>
-      </div>
-
-  </section>
-
-    </article>
-  <div class="clear"> </div>
-  <footer id="footer">
-    <p>
-      Documentation generated by
-      <a href="https://github.com/BurntSushi/pdoc">pdoc 0.3.2</a>
-    </p>
-
-    <p>pdoc is in the public domain with the
-      <a href="http://unlicense.org">UNLICENSE</a></p>
-
-    <p>Design by <a href="http://nadh.in">Kailash Nadh</a></p>
-  </footer>
-</div>
+<ul id="index">
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="pytdlpack.version" href="version.html">pytdlpack.version</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="pytdlpack.create_grid_definition" href="#pytdlpack.create_grid_definition">create_grid_definition</a></code></li>
+<li><code><a title="pytdlpack.open" href="#pytdlpack.open">open</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pytdlpack.TdlpackFile" href="#pytdlpack.TdlpackFile">TdlpackFile</a></code></h4>
+<ul class="two-column">
+<li><code><a title="pytdlpack.TdlpackFile.backspace" href="#pytdlpack.TdlpackFile.backspace">backspace</a></code></li>
+<li><code><a title="pytdlpack.TdlpackFile.close" href="#pytdlpack.TdlpackFile.close">close</a></code></li>
+<li><code><a title="pytdlpack.TdlpackFile.counter" href="#pytdlpack.TdlpackFile.counter">counter</a></code></li>
+<li><code><a title="pytdlpack.TdlpackFile.read" href="#pytdlpack.TdlpackFile.read">read</a></code></li>
+<li><code><a title="pytdlpack.TdlpackFile.rewind" href="#pytdlpack.TdlpackFile.rewind">rewind</a></code></li>
+<li><code><a title="pytdlpack.TdlpackFile.write" href="#pytdlpack.TdlpackFile.write">write</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pytdlpack.TdlpackRecord" href="#pytdlpack.TdlpackRecord">TdlpackRecord</a></code></h4>
+<ul class="">
+<li><code><a title="pytdlpack.TdlpackRecord.counter" href="#pytdlpack.TdlpackRecord.counter">counter</a></code></li>
+<li><code><a title="pytdlpack.TdlpackRecord.latlons" href="#pytdlpack.TdlpackRecord.latlons">latlons</a></code></li>
+<li><code><a title="pytdlpack.TdlpackRecord.pack" href="#pytdlpack.TdlpackRecord.pack">pack</a></code></li>
+<li><code><a title="pytdlpack.TdlpackRecord.unpack" href="#pytdlpack.TdlpackRecord.unpack">unpack</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pytdlpack.TdlpackStationRecord" href="#pytdlpack.TdlpackStationRecord">TdlpackStationRecord</a></code></h4>
+<ul class="">
+<li><code><a title="pytdlpack.TdlpackStationRecord.counter" href="#pytdlpack.TdlpackStationRecord.counter">counter</a></code></li>
+<li><code><a title="pytdlpack.TdlpackStationRecord.pack" href="#pytdlpack.TdlpackStationRecord.pack">pack</a></code></li>
+<li><code><a title="pytdlpack.TdlpackStationRecord.unpack" href="#pytdlpack.TdlpackStationRecord.unpack">unpack</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pytdlpack.TdlpackTrailerRecord" href="#pytdlpack.TdlpackTrailerRecord">TdlpackTrailerRecord</a></code></h4>
+<ul class="">
+<li><code><a title="pytdlpack.TdlpackTrailerRecord.counter" href="#pytdlpack.TdlpackTrailerRecord.counter">counter</a></code></li>
+<li><code><a title="pytdlpack.TdlpackTrailerRecord.pack" href="#pytdlpack.TdlpackTrailerRecord.pack">pack</a></code></li>
+<li><code><a title="pytdlpack.TdlpackTrailerRecord.unpack" href="#pytdlpack.TdlpackTrailerRecord.unpack">unpack</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
 </body>
 </html>
