@@ -11,7 +11,7 @@ NOAA/NWS Meteorological Development Lab ([MDL](https://www.weather.gov/mdl/)) pr
 Provide a Python interface for reading and writing TDLPACK files.
 
 ## Requirements
-* Python 2.7, 3.4+
+* Python 3.6+
 * NumPy 1.8+
 * Fortran compiler ***Only GNU (gfortran) and Intel (ifort) are supported at this time.***
 
