@@ -8,7 +8,7 @@ tdlpack/*.o
 test/*.ra
 test/*.sq
 test/*.tdlp
-
 *.code-workspace
-
 pytdlpack/version.py
+*.egg-info
+dist/*
