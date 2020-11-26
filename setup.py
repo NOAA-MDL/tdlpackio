@@ -10,6 +10,53 @@ import sys
 VERSION = '1.0.3'
 
 # ---------------------------------------------------------------------------------------- 
+# Define Fortran compiler options for supported compilers
+# ---------------------------------------------------------------------------------------- 
+gnu_f77_flags = ["-O3",
+                 "-g",
+                 "-fbacktrace",
+                 "-fd-lines-as-comments",
+                 "-ffixed-form",
+                 "-fautomatic",
+                 "-finit-integer=0",
+                 "-finit-real=zero",
+                 "-finit-logical=false"]
+gnu_f90_flags = ["-O3",
+                 "-g",
+                 "-fbacktrace",
+                 "-fautomatic",
+                 "-finit-integer=0",
+                 "-finit-real=zero",
+                 "-finit-logical=false"]
+intel_f77_flags = ["-O3",
+                   "-g",
+                   "-traceback",
+                   "-nofree",
+                   "-integer-size 32",
+                   "-real-size 32",
+                   "-auto",
+                   "-fpscomp logicals",
+                   "-fp-model strict",
+                   "-assume byterecl",
+                   "-xHost",
+                   "-align array64byte",
+                   "-fast-transcendentals",
+                   "-assume buffered_io"]
+intel_f90_flags = ["-O3",
+                   "-g",
+                   "-traceback",
+                   "-integer-size 32",
+                   "-real-size 32",
+                   "-auto",
+                   "-fpscomp logicals",
+                   "-fp-model strict",
+                   "-assume byterecl",
+                   "-xHost",
+                   "-align array64byte",
+                   "-fast-transcendentals",
+                   "-assume buffered_io"]
+
+# ---------------------------------------------------------------------------------------- 
 # Write version info
 # ---------------------------------------------------------------------------------------- 
 def write_version_file(filename='pytdlpack/version.py'):
@@ -26,55 +73,15 @@ version = '%(version)s'
 # ---------------------------------------------------------------------------------------- 
 # Define Fortran compiler flags for GNU and Intel Fortran
 # ---------------------------------------------------------------------------------------- 
+f77_flags = gnu_f77_flags
+f90_flags = gnu_f90_flags
 if "build" in sys.argv:
     if "--fcompiler=gnu95" in sys.argv:
-        f77_flags = ["-O3",
-                     "-g",
-                     "-fbacktrace",
-                     "-fd-lines-as-comments",
-                     "-ffixed-form",
-                     "-fautomatic",
-                     "-finit-integer=0",
-                     "-finit-real=zero",
-                     "-finit-logical=false"]
-        f90_flags = ["-O3",
-                     "-g",
-                     "-fbacktrace",
-                     "-fautomatic",
-                     "-finit-integer=0",
-                     "-finit-real=zero",
-                     "-finit-logical=false"]
+       f77_flags = gnu_f77_flags
+       f90_flags = gnu_f90_flags
     elif "--fcompiler=intelem" in sys.argv:
-        f77_flags = ["-O3",
-                     "-g",
-                     "-traceback",
-                     "-nofree",
-                     "-integer-size 32",
-                     "-real-size 32",
-                     "-auto",
-                     "-fpscomp logicals",
-                     "-fp-model strict",
-                     "-assume byterecl",
-                     "-xHost",
-                     "-align array64byte",
-                     "-fast-transcendentals",
-                     "-assume buffered_io"]
-        f90_flags = ["-O3",
-                     "-g",
-                     "-traceback",
-                     "-integer-size 32",
-                     "-real-size 32",
-                     "-auto",
-                     "-fpscomp logicals",
-                     "-fp-model strict",
-                     "-assume byterecl",
-                     "-xHost",
-                     "-align array64byte",
-                     "-fast-transcendentals",
-                     "-assume buffered_io"]
-else:
-    f77_flags = []
-    f90_flags = []
+       f77_flags = intel_f77_flags
+       f90_flags = intel_f90_flags
 
 # ---------------------------------------------------------------------------------------- 
 # Define Extension object. For Fortran 77 source files, use "extra_f77_compile_args".
