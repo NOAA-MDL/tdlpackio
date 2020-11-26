@@ -12,3 +12,4 @@ test/*.tdlp
 pytdlpack/version.py
 *.egg-info
 dist/*
+MANIFEST
