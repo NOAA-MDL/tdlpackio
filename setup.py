@@ -75,13 +75,22 @@ version = '%(version)s'
 # ---------------------------------------------------------------------------------------- 
 f77_flags = gnu_f77_flags
 f90_flags = gnu_f90_flags
+try:
+    if 'gfortran' in os.environ['FC']:
+        f77_flags = gnu_f77_flags
+        f90_flags = gnu_f90_flags
+    elif 'ifort' in os.environ['FC']:
+        f77_flags = intel_f77_flags
+        f90_flags = intel_f90_flags
+except(KeyError):
+    pass # Default to GNU Fortran
 if "build" in sys.argv:
     if "--fcompiler=gnu95" in sys.argv:
-       f77_flags = gnu_f77_flags
-       f90_flags = gnu_f90_flags
+        f77_flags = gnu_f77_flags
+        f90_flags = gnu_f90_flags
     elif "--fcompiler=intelem" in sys.argv:
-       f77_flags = intel_f77_flags
-       f90_flags = intel_f90_flags
+        f77_flags = intel_f77_flags
+        f90_flags = intel_f90_flags
 
 # ---------------------------------------------------------------------------------------- 
 # Define Extension object. For Fortran 77 source files, use "extra_f77_compile_args".
