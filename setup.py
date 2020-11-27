@@ -158,7 +158,7 @@ setup(name             = 'pytdlpack',
                           'Intended Audience :: Science/Research',
                           'Operating System :: OS Independent',
                           'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'],
-      install_requires  = ['numpy'],
+      install_requires  = ['numpy>=1.12'],
       python_requires   = '>=3.6',
       long_description  = long_description,
       long_description_content_type = 'text/markdown'
