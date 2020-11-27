@@ -16,25 +16,18 @@ Provide a Python interface for reading and writing TDLPACK files.
 
 ## Requirements
 * Python 3.6+
-* NumPy 1.8+
-* Fortran compiler ***Only GNU (gfortran) and Intel (ifort) are supported at this time.***
+* NumPy 1.12+
+* GNU or Intel Fortran compiler
 
 ## Installation
 
-### Build
+```shell
+pip3 install pytdlpack
+```
 
-``python setup.py build_ext --fcompiler=[gnu95|intelem] build``
+### Build and Install from Source
 
-**NOTE for macOS users:** If GNU C compilers are not installed on your system, build via the follwing:
-
-``CC=clang python setup.py build_ext --fcompiler=gnu95 build``
-
-### Install
-
-System area:
-``sudo python setup.py install``
-
-Local area:
-``python setup.py install --prefix=<INSTALL_DIR>``
-
-You can also build and install using the provided ``install.sh`` script (see its usage print).
+```shell
+python3 setup.py build_ext --fcompiler=[gnu95|intelem] build
+python3 setup.py install [--user |--prefix=PREFIX]
+```
