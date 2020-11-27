@@ -51,33 +51,22 @@ Requires
 ========
 
 - Python 3.6+
-- [numpy array module](http://numpy.scipy.org), version 1.8.0 or later.
+- [numpy array module](http://numpy.scipy.org), version 1.12 or later.
 - [setuptools](https://pypi.python.org/pypi/setuptools), version 18.0 or later.
-- Fortran compiler (if installing from source). ***Only GNU (gfortran) and Intel (ifort) are supported at this time.***
+- GNU or Intel Fortran compiler (if installing from source).
 
 Install
 =======
 
-**Build**
-
-First build the tdlpack module.
-
 ```shell
-$ python setup.py build_ext --fcompiler=[gnu95|intelem] build
+pip3 install pytdlpack
 ```
 
-**Install**
-
-System-wide:
+**Build and Install from Source**
 
 ```shell
-$ sudo python setup.py install
-```
-
-Locally:
-
-```shell
-$ python setup.py install --prefix=<INSTALL_DIR>
+python3 setup.py build_ext --fcompiler=[gnu95|intelem] build
+python3 setup.py install [--user | --prefix=PREFIX]
 ```
 
 Tutorial
