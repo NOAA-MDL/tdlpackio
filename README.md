@@ -31,3 +31,19 @@ pip3 install pytdlpack
 python3 setup.py build_ext --fcompiler=[gnu95|intelem] build
 python3 setup.py install [--user |--prefix=PREFIX]
 ```
+## Modules
+
+The pytdlpack package contains 2 modules.  See the docstrings for usage of each module
+
+### pytdlpack
+
+```python
+import pytdlpack
+```
+
+### TdlpackIO
+
+```python
+import TdlpackIO
+```
+**IMPORTANT:** TdlpackIO is **experimental** and it usages and functionality could change with future releases.
