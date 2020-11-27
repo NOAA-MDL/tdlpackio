@@ -46,4 +46,4 @@ import pytdlpack
 ```python
 import TdlpackIO
 ```
-**IMPORTANT:** TdlpackIO is **experimental** and it usages and functionality could change with future releases.
+**IMPORTANT:** ```TdlpackIO``` is **experimental** and it usage and functionality could change with future releases.  TdlpackIO is a pure python implementation for reading TDLPACK "sequential" files (i.e. Fortran variable-length record binary files).  Currently, it does not read TDLPACK random-access files and it may never have that capability.  It requires ```pytdlpack``` for unpacking records.
