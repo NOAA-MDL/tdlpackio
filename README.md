@@ -17,6 +17,7 @@ Provide a Python interface for reading and writing TDLPACK files.
 
 ## Requirements
 * Python 3.6+
+* setuptools 34.0+
 * NumPy 1.12+
 * GNU or Intel Fortran compiler
 
