@@ -852,6 +852,7 @@ class TdlpackRecord(object):
             if len(data) > 0:
                 self.data = np.array(data,dtype=np.float32)
                 self.number_of_values = len(data)
+                self._data_unpacked = True
             else:
                 raise ValueError
 
@@ -1403,20 +1404,29 @@ def _create_proj_string(griddict):
                             lat_2=griddict['stdlat'],
                             lon_0=(360.-griddict['orientlon']))
             x,y = p(360.0-griddict['lonll'],griddict['latll'])
-            projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
+            try: 
+                projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
+            except(AttributeError):
+                projstring = None
         elif griddict['proj'] == 5:
             p = pyproj.Proj(proj='stere',
                             lat_0=90.0,
                             lat_ts=griddict['stdlat'],
                             lon_0=(360.-griddict['orientlon']))
             x,y = p(360.0-griddict['lonll'],griddict['latll'])
-            projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
+            try: 
+                projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
+            except(AttributeError):
+                projstring = None
         elif griddict['proj'] == 7:
             p = pyproj.Proj(proj='merc',
                             lat_ts=griddict['stdlat'],
                             lon_0=(360.-griddict['orientlon']))
             x,y = p(360.0-griddict['lonll'],griddict['latll'])
-            projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
+            try: 
+                projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
+            except(AttributeError):
+                projstring = None
         else:
             projstring = None
     except(ImportError):
