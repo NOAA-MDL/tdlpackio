@@ -124,6 +124,7 @@ class open(object):
         self._index['id2'] = []
         self._index['id3'] = []
         self._index['id4'] = []
+        self._index['dims'] = []
         self._index['linked_station_id_record'] = []
         _last_station_id_record = 0
 
@@ -135,8 +136,8 @@ class open(object):
                 # data record.
                 pos = self._filehandle.tell()
                 fortran_header = struct.unpack('>i',self._filehandle.read(4))[0]
-                if fortran_header >= 44:
-                    bytes_to_read = 44
+                if fortran_header >= 132:
+                    bytes_to_read = 132
                 else:
                     bytes_to_read = fortran_header
                 temp = np.frombuffer(self._filehandle.read(bytes_to_read),dtype='>i4')
@@ -146,6 +147,17 @@ class open(object):
                 # record type.
                 if _header == 'PLDT':
                     # TDLPACK data record
+                    # Here we create a dimension dictionary per TDLPACK record and store in
+                    # the index.
+                    _dimdict = {}
+                    _pos = 16+temp.tobytes()[16]
+                    if bool(int(bin(temp.tobytes()[17])[-1])):
+                        # Grid
+                        _dimdict['nx'] = struct.unpack('>h',temp.tobytes()[_pos+2:_pos+4])[0]
+                        _dimdict['ny'] = struct.unpack('>h',temp.tobytes()[_pos+4:_pos+6])[0]
+                    else:
+                        # Vector
+                        _dimdict['nsta'] = struct.unpack('>i',temp.tobytes()[_pos+4:_pos+8])[0]
                     self._index['size'].append(temp[1])
                     self._index['type'].append('data')
                     self._index['date'].append(temp[6])
@@ -154,6 +166,7 @@ class open(object):
                     self._index['id2'].append(temp[8])
                     self._index['id3'].append(temp[9])
                     self._index['id4'].append(temp[10])
+                    self._index['dims'].append(_dimdict)
                     self._index['linked_station_id_record'].append(_last_station_id_record)
                 else:
                     if temp[1] == 24 and temp[6] == 9999:
@@ -166,6 +179,7 @@ class open(object):
                         self._index['id2'].append(None)
                         self._index['id3'].append(None)
                         self._index['id4'].append(None)
+                        self._index['dims'].append(None)
                         self._index['linked_station_id_record'].append(_last_station_id_record)
                     else:
                         # Station ID record
@@ -177,6 +191,7 @@ class open(object):
                         self._index['id2'].append(0)  
                         self._index['id3'].append(0)
                         self._index['id4'].append(0)
+                        self._index['dims'].append(None)
                         self._index['linked_station_id_record'].append(_last_station_id_record)
 
                 # At this point we have successfully identified a TDLPACK record from
@@ -204,8 +219,8 @@ class open(object):
                 break
 
         self._hasindex = True
-        self.dates = tuple(sorted(set(self._index['date'])))
-        self.leadtimes = tuple(sorted(set(self._index['lead'])))
+        self.dates = tuple(sorted(set(list(filter(None,self._index['date'])))))
+        self.leadtimes = tuple(sorted(set(list(filter(None,self._index['lead'])))))
 
     def close(self):
         """
