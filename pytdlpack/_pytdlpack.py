@@ -589,6 +589,7 @@ class TdlpackFile(object):
             _ier = tdlpack.rewindfile(self.fortran_lun)
             if _ier == 0:
                 self.position = 0
+                self.eof = False
             else:
                 raise IOError("Could not rewind file. ier = "+str(_ier))
 
