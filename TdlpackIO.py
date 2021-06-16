@@ -28,7 +28,7 @@ if _IS_PYTHON3:
 else:
     import __builtin__ as builtins
 
-ONE_MB = 1024 ** 3
+ONE_MB = 1048576
 
 class open(object):
     def __init__(self,filename,mode='r'):
