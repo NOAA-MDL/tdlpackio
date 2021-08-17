@@ -6,9 +6,9 @@ pytdlpack is a Python interface to reading/writing TDLPACK files via official
 MOS-2000 (MOS2K) Fortran-based source files.  The necessary MOS2K source files are included
 in this package and are available as module, tdlpack.
 
-TDLPACK is a GRIB-like binary data format that is exclusive to MOS2K Fortran-based 
-sofftware system.  This software system was developed at the Meteorological Development 
-Laboratory (MDL) within NOAA/NWS and its primary purpose is to perform statistical 
+TDLPACK is a GRIB-like binary data format that is exclusive to MOS2K Fortran-based
+sofftware system.  This software system was developed at the Meteorological Development
+Laboratory (MDL) within NOAA/NWS and its primary purpose is to perform statistical
 post-processing of meteorological data.
 
 TDLPACK-formatted data are contained in two type of Fortran-based files;
@@ -82,9 +82,9 @@ Tutorial
 ## <div id='section1'>1) Creating/Opening/Closing a TDLPACK file.
 
 To create a TDLPACK file from Python, you call the `pytdlpack.open` function and provide the
-file name and `mode='w' or 'a'`.  For `mode='a'`, this will append to an existing file.  When 
-creating a new file, the default file format is `'sequential'`, but the user can also specify 
-the format with `format='sequential' or 'random-access'`.  If the new file is random-access, 
+file name and `mode='w' or 'a'`.  For `mode='a'`, this will append to an existing file.  When
+creating a new file, the default file format is `'sequential'`, but the user can also specify
+the format with `format='sequential' or 'random-access'`.  If the new file is random-access,
 then the user can also specify `ra_template='small' or 'large'`.  The default is 'small' and
 'large' is recommended for a high-resolution grids (i.e. ~ > 2M total points).
 
@@ -130,8 +130,8 @@ To close a TDLPACK file is straightforward.
 
 ## <div id='section2'>2) Reading a TDLPACK file.
 
-When a TDLPACK file is opened, an instance of class `pytdlpack.TdlpackFile` is created.  
-To read a record the file, use the class method `pytdlpack.TdlpackFile.read`.  By default 
+When a TDLPACK file is opened, an instance of class `pytdlpack.TdlpackFile` is created.
+To read a record the file, use the class method `pytdlpack.TdlpackFile.read`.  By default
 only 1 record is returned and the TDLPACK indentification sections are unpacked.
 
 Example: Reading a gridded TDLPACK record.
@@ -196,10 +196,10 @@ You can also have `pytdlpack.TdlpackFile.read` read the entire file with optiona
 >>> x = f.read(all=True)
 ```
 
-Here, x will become a list of instances of either `pytdlpack.TdlpackStationRecord`, 
+Here, x will become a list of instances of either `pytdlpack.TdlpackStationRecord`,
 `pytdlpack.TdlpackRecord`, or `pytdlpack.TdlpackTrailerRecord`.
 
-If the file being read a TDLPACK random-access (`format='random-access'`), then you can also provide the `id=` 
+If the file being read a TDLPACK random-access (`format='random-access'`), then you can also provide the `id=`
 argument to search for a specific record.
 
 ```python
@@ -212,7 +212,7 @@ argument to search for a specific record.
 
 ## <div id='section3'>3) Writing a TDLPACK file.
 
-Writing to a TDLPACK file is as easy as reading.  The following uses variable x, from 
+Writing to a TDLPACK file is as easy as reading.  The following uses variable x, from
 above, is an instance of `pytdlpack.TdlpackStationRecord` that has been packed.
 
 Example: Write to a new TDLPACK sequential file.
@@ -227,7 +227,7 @@ Example: Write to a new TDLPACK sequential file.
 ## <div id='section4'>4) Creating a TDLPACK Station Record.
 
 The constructor for `pytdlpack.TdlpackStationRecord` provides two methods of
-instantiation via the traditional **kwargs (see `pytdlpack.TdlpackStationRecord.__init__`) 
+instantiation via the traditional **kwargs (see `pytdlpack.TdlpackStationRecord.__init__`)
 or simply providing `ccall = ...` ***(recommended)***.  The value passed to the `ccall=` argument can
 be a single call letter string, list, tuple, or comma-delimited string of station call letter records.
 
@@ -244,7 +244,7 @@ number_of_stations = 3
 
 ## <div id='section5'>5) Creating a TDLPACK Record.
 
-The recommended method for creating a `pytdlpack.TdlpackRecord` is to pass the TDLPACK 
+The recommended method for creating a `pytdlpack.TdlpackRecord` is to pass the TDLPACK
 indentification arrays, plain language string, and data to the approproiate keyword.  Please
 see `pytdlpack.TdlpackRecord.__init__` for more info.
 
@@ -254,7 +254,7 @@ see `pytdlpack.TdlpackRecord.__init__` for more info.
 plain="GFS WIND SPEED",grid=grid_def,data=<np.float32 array>)
 ```
 
-The user is encouraged to read the official MOS-2000 documentation (specifically Chapter 5) 
+The user is encouraged to read the official MOS-2000 documentation (specifically Chapter 5)
 on construction of these arrays and proper encoding.
 
 ## <div id='section6'>6) Packing/Unpacking a TDLPACK Record.
@@ -274,8 +274,8 @@ To unpack a packed TDLPACK record, perform:
 ```
 
 The `pytdlpack.TdlpackRecord.unpack` class method for TDLPACK data records, contains optional
-arguments `data=` (to control the unpacking of data) and `missing_value=` (to set a different 
-missing value other than what is contained in the record).  For TDLPACK data records, 
+arguments `data=` (to control the unpacking of data) and `missing_value=` (to set a different
+missing value other than what is contained in the record).  For TDLPACK data records,
 `pytdlpack.TdlpackRecord.unpack` automatically unpacks the TDLPACK meta-data.
 
 ```python
@@ -310,7 +310,7 @@ except ImportError:
 __pdoc__ = {}
 
 _DEFAULT_L3264B = np.int32(32)
-_DEFAULT_MINPK = np.int32(14)
+_DEFAULT_MINPK = np.int32(21)
 _DEFAULT_ND5 = np.int32(5242880)
 _DEFAULT_ND7 = np.int32(54)
 
@@ -367,7 +367,7 @@ class TdlpackFile(object):
 
     **`fortran_lun : np.int32`**
 
-    Fortran unit number for file access. If the file is not open, then this value is -1. 
+    Fortran unit number for file access. If the file is not open, then this value is -1.
 
     **`mode : str`**
 
@@ -516,19 +516,19 @@ class TdlpackFile(object):
         **`unpack : bool, optional`**
 
         Unpack TDLPACK identification sections.  Note that data are not unpacked.  The default is True.
-            
+
         **`id : array_like or list, optional`**
 
-        Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list 
+        Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list
         with length 4.  The default is [9999,0,0,0] which will signal the random access IO reader
         to sequentially read the file.
-        
+
         Returns
         -------
 
         **`record [records] : instance [list]`**
 
-        An instance of list of instances contaning `pytdlpack.TdlpackStationRecord`, 
+        An instance of list of instances contaning `pytdlpack.TdlpackStationRecord`,
         `pytdlpack.TdlpackRecord`, or `pytdlpack.TdlpackTrailerRecord`
         """
         if self.fortran_lun == -1:
@@ -576,7 +576,7 @@ class TdlpackFile(object):
             return records
         else:
             return record
-    
+
     def rewind(self):
         """
         Position file to the beginning.
@@ -602,7 +602,7 @@ class TdlpackFile(object):
 
         **`record : instance`**
 
-        An instance of either `pytdlpack.TdlpackStationRecord`, `pytdlpack.TdlpackRecord`, 
+        An instance of either `pytdlpack.TdlpackStationRecord`, `pytdlpack.TdlpackRecord`,
         or `pytdlpack.TdlpackTrailerRecord`.  `record` should contain a packed data.
         """
         #pdb.set_trace()
@@ -651,7 +651,7 @@ class TdlpackRecord(object):
     values are accessible using "fancy indexing".
 
     For gridded records, use grid index values and/or ranges (e.g. rec[0,0]).
-    
+
     For station records, use the station ID string: (e.g. rec['KPHL']).
 
     Attributes
@@ -771,7 +771,7 @@ class TdlpackRecord(object):
 
         **`plain : str, optional`**
 
-        Plain language descriptor.  This is limited to 32 characters, though here 
+        Plain language descriptor.  This is limited to 32 characters, though here
         the input can be longer (will be cut off when packing).
 
         **`grid : dict , optional`**
@@ -910,7 +910,7 @@ class TdlpackRecord(object):
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
-    
+
     def pack(self,dec_scale=None,bin_scale=None):
         """
         Pack a TDLPACK record.
@@ -954,9 +954,10 @@ class TdlpackRecord(object):
                              self.data)
 
         if self.type == 'grid':
-            _a = np.zeros((self.nx,self.ny),dtype=np.float32,order='F')
-            _ia = np.zeros((self.nx,self.ny),dtype=np.int32,order='F')
-            _ic = np.zeros((self.nx*self.ny),dtype=np.int32)
+            _a = np.zeros((self.is2[2],self.is2[3]),dtype=np.float32,order='F')
+            _ia = np.zeros((self.is2[2],self.is2[3]),dtype=np.int32,order='F')
+            _ic = np.zeros((self.is2[2]*self.is2[3]),dtype=np.int32)
+
             self.ioctet,_ier = tdlpack.pack2d(FORTRAN_STDOUT_LUN,self.data,_ia,_ic,self.is0,
                                self.is1,self.is2,self.is4,self.primary_missing_value,
                                self.secondary_missing_value,self.ipack,MINPK,_lx,L3264B)
@@ -966,7 +967,7 @@ class TdlpackRecord(object):
                                self.is1,self.is2,self.is4,self.primary_missing_value,
                                self.secondary_missing_value,self.ipack,MINPK,
                                _lx,L3264B)
-    
+
     def unpack(self,data=False,missing_value=None):
         """
         Unpacks the TDLPACK identification sections and data (optional).
@@ -979,7 +980,7 @@ class TdlpackRecord(object):
         If True, unpack data values. The default is False.
 
         **`missing_value : float, optional`**
-        
+
         Set a missing value. If a missing value exists for the TDLPACK data record,
         it will be replaced with this value.
         """
@@ -1038,7 +1039,7 @@ class TdlpackRecord(object):
                             orientlon=self.origin_longitude,stdlat=self.standard_latitude,
                             meshlength=self.grid_length)
             self.proj_string = _create_proj_string(self.grid_def)
-       
+
         # Set attributes from is4[].
         self.number_of_values = self.is4[2]
         self.primary_missing_value = deepcopy(np.float32(self.is4[3]))
@@ -1067,7 +1068,7 @@ class TdlpackRecord(object):
                 self.primary_missing_value = np.float32(missing_value)
             if self.type == 'grid':
                 self.data = np.reshape(self.data[0:self.number_of_values],(self.nx,self.ny),order='F')
-    
+
     def latlons(self):
         """
         Returns a tuple of latitudes and lontiude numpy.float32 arrays for the TDLPACK record.
@@ -1077,7 +1078,7 @@ class TdlpackRecord(object):
         -------
 
         **`lats,lons : array_like`**
-        
+
         Numpy.float32 arrays of grid latitudes and longitudes.  If `self.grid = 'station'`, then None are returned.
         """
         lats = None
@@ -1162,7 +1163,7 @@ class TdlpackStationRecord(object):
             if not k.startswith('_'):
                 strings.append('%s = %s\n'%(k,self.__dict__[k]))
         return ''.join(strings)
-    
+
     def pack(self):
         """
         Pack a Station Call Letter Record.
@@ -1217,7 +1218,7 @@ class TdlpackTrailerRecord(object):
 
     def unpack(self):
         pass
-    
+
 def open(name, mode='r', format=None, ra_template=None):
     """
     Opens a TDLPACK File for reading/writing.
@@ -1243,7 +1244,7 @@ def open(name, mode='r', format=None, ra_template=None):
 
     Template used to create new random-access file. The default is 'small'.  This parameter
     is ignored if the file access mode is `'r'` or `'a'` or if the file format is `'sequential'`.
-    
+
     Returns
     -------
     **`pytdlpack.TdlpackFile`**
@@ -1306,8 +1307,8 @@ def open(name, mode='r', format=None, ra_template=None):
 def create_grid_definition(name=None,proj=None,nx=None,ny=None,latll=None,lonll=None,
                            orientlon=None,stdlat=None,meshlength=None):
     """
-    Create a dictionary of grid specs.  The user has the option to 
-    populate the dictionary via the args or create an empty dict. 
+    Create a dictionary of grid specs.  The user has the option to
+    populate the dictionary via the args or create an empty dict.
 
     Parameters
     ----------
@@ -1318,13 +1319,13 @@ def create_grid_definition(name=None,proj=None,nx=None,ny=None,latll=None,lonll=
 
     **`proj : int, optional`**
 
-    Map projection of the grid (3 = Lambert Conformal; 5 = Polar Stereographic; 
+    Map projection of the grid (3 = Lambert Conformal; 5 = Polar Stereographic;
     7 = Mercator). NOTE: This parameter is optional if data are station-based.
 
     **`nx : int, optional`**
 
     Number of points in X-direction (East-West). NOTE: This parameter is optional if
-    data are station-based. 
+    data are station-based.
 
     **`ny : int, optional`**
 
@@ -1339,7 +1340,7 @@ def create_grid_definition(name=None,proj=None,nx=None,ny=None,latll=None,lonll=
     **`lonll : float, optional`**
 
     Longitude in decimal degrees of lower-left grid point.  NOTE: This parameter is optional if
-    data are station-based. 
+    data are station-based.
 
     **`orientlon : float, optional`**
 
@@ -1393,7 +1394,7 @@ def _create_proj_string(griddict):
     Returns
     -------
 
-    **`str`**    
+    **`str`**
 
     String containing the pyproj.Proj definition generating by pyproj.Proj.definition_string().
     """
@@ -1405,7 +1406,7 @@ def _create_proj_string(griddict):
                             lat_2=griddict['stdlat'],
                             lon_0=(360.-griddict['orientlon']))
             x,y = p(360.0-griddict['lonll'],griddict['latll'])
-            try: 
+            try:
                 projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
             except(AttributeError):
                 projstring = None
@@ -1415,7 +1416,7 @@ def _create_proj_string(griddict):
                             lat_ts=griddict['stdlat'],
                             lon_0=(360.-griddict['orientlon']))
             x,y = p(360.0-griddict['lonll'],griddict['latll'])
-            try: 
+            try:
                 projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
             except(AttributeError):
                 projstring = None
@@ -1424,7 +1425,7 @@ def _create_proj_string(griddict):
                             lat_ts=griddict['stdlat'],
                             lon_0=(360.-griddict['orientlon']))
             x,y = p(360.0-griddict['lonll'],griddict['latll'])
-            try: 
+            try:
                 projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
             except(AttributeError):
                 projstring = None
@@ -1449,7 +1450,7 @@ def _read_ra_master_key(file):
     Returns
     -------
 
-    **`array`**    
+    **`array`**
     """
     f = builtins.open(file,'rb')
     raw = f.read(24)
