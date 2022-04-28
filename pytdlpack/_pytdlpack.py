@@ -986,7 +986,7 @@ class TdlpackRecord(object):
         _ier = np.int32(0)
         if not self._metadata_unpacked:
             if self.ipack.shape[0] < ND5_META_MAX:
-                _nd5_local = ND5_META_MIN
+                _nd5_local = self.ipack.shape[0]
             else:
                 _nd5_local = ND5_META_MAX
             _data_meta = np.zeros((_nd5_local),dtype=np.int32)
