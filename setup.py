@@ -7,7 +7,7 @@ import sys
 # ---------------------------------------------------------------------------------------- 
 # Definitions
 # ---------------------------------------------------------------------------------------- 
-VERSION = '1.0.5'
+VERSION = '1.0.6'
 
 # ---------------------------------------------------------------------------------------- 
 # Define Fortran compiler options for supported compilers
@@ -152,6 +152,7 @@ setup(name             = 'pytdlpack',
                           'Programming Language :: Python :: 3.7',
                           'Programming Language :: Python :: 3.8',
                           'Programming Language :: Python :: 3.9',
+                          'Programming Language :: Python :: 3.10',
                           'Environment :: Console',
                           'Topic :: Scientific/Engineering',
                           'Topic :: Scientific/Engineering :: Atmospheric Science',
