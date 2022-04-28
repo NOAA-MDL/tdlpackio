@@ -772,7 +772,7 @@ class TdlpDataset:
 
         meta = RequiredTdlpMeta()
         keys = list(meta.__dataclass_fields__.keys())
-        multi_meta = list()
+        coord_meta = list()
         const_meta = list()
         tdlpid = TdlpId()
         for key in keys:
@@ -787,12 +787,8 @@ class TdlpDataset:
                 if 'tdlp_name' in coord.attrs:
                     if coord.attrs['tdlp_name'] == key:
                         found=True
-                        if coord.size > 1:
-                            meta[key] = coord
-                            multi_meta.append(key)
-                        else:
-                            # coord with length 1; get the value as numpy type
-                            meta[key] = coord.data.squeeze()[()]
+                        coord_meta.append(key)
+                        meta[key] = coord
                         break
             if not found:
                 raise ValueError(f'to_tdlpack requres metadata for {key} be in encoding or coordinate')
@@ -813,7 +809,7 @@ class TdlpDataset:
             shutil.rmtree(store)
         store.mkdir(parents=True)
 
-        prodicized = product(*[meta[k] for k in multi_meta])
+        prodicized = product(*[meta[k] for k in coord_meta])
         f = pytdlpack.open(store / filepath.name, mode='w', format='sequential')
         if station:
             template_rec = pytdlpack.TdlpackRecord(date=0, id=[0,0,0,0], data=np.array([0]))
@@ -830,7 +826,7 @@ class TdlpDataset:
         for t in prodicized:
             for var in self._obj.data_vars:
                 # select slice of array for tdlpack record
-                loc = {k:v for (k,v) in zip(multi_meta,t)}
+                loc = {k:v for (k,v) in zip(coord_meta,t)}
                 da = self._obj[var].loc[loc].squeeze()
 
                 # put extra metadata that varies by variable in loc for updating tdlpid
