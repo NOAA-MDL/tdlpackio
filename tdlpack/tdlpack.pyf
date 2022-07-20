@@ -196,6 +196,19 @@ python module tdlpack ! in
             real dimension(nx,ny),intent(out),depend(nx,ny) :: lons
             integer intent(out) :: ier
         end subroutine gridij_to_latlon
+        subroutine latlon_to_gridij(kstdout,mproj,xlatll,xlonll,orient,xmeshl,xlat,alat,alon,xi,yj) ! in :tdlpack:latlon_to_gridij.f90
+            integer, intent(in) :: kstdout
+            integer, intent(in) :: mproj
+            real, intent(in) :: xlatll
+            real, intent(in) :: xlonll
+            real, intent(in) :: orient
+            real, intent(in) :: xmeshl
+            real, intent(in) :: xlat
+            real, intent(in) :: alat
+            real, intent(in) :: alon
+            real, intent(out) :: xi
+            real, intent(out) :: yj
+        end subroutine latlon_to_gridij
         subroutine backspacefile(lun,ier) ! in :tdlpack:fileaction.f
             integer intent(in) :: lun
             integer intent(out) :: ier
