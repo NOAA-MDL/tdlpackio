@@ -1,0 +1,52 @@
+[build-system]
+requires = [
+  "oldest-supported-numpy",
+  "setuptools>=61.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tdlpackio"
+description = "Python interface for reading and writing TDLPACK data"
+authors = [
+  {name = "Eric Engle", email = "eric.engle@mac.com"},
+]
+requires-python = ">=3.8"
+keywords = [
+  "weather", "data-science", "numpy", "meteorology", "weather-data", "atmospheric-science",
+  "statistics", "mos",
+]
+readme = "README.md"
+license = {text = "MIT"}
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Science/Research :: Atmospheric Science",
+  "License :: OSI Approved",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Operating System :: POSIX",
+  "Operating System :: MacOS",
+]
+dependencies = [
+  "numpy",
+] 
+dynamic = ["version"]
+
+[project.urls]
+Documentation = "https://eengl.github.io/tdlpackio"
+Respository = "https://github.com/eengl/tdlpackio"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["tdlpackio"]
+zip-safe = false
+
+#[tool.setuptools.dynamic]
+#version = {attr = "grib2io_interp.__config__.grib2io_interp_version"}

@@ -1,13 +1,11 @@
 from distutils.cmd import Command
 from numpy.distutils.core import setup, Extension
 import glob
+import numpy
 import os
 import sys
 
-# ----------------------------------------------------------------------------------------
-# Definitions
-# ---------------------------------------------------------------------------------------- 
-VERSION = '1.0.7'
+VERSION = '2.0.0'
 
 # ----------------------------------------------------------------------------------------
 # Define Fortran compiler options for supported compilers
@@ -57,7 +55,7 @@ intel_f90_flags = ["-O3",
 # ----------------------------------------------------------------------------------------
 # Write version info
 # ----------------------------------------------------------------------------------------
-def write_version_file(filename='pytdlpack/version.py'):
+def write_version_file(filename='src/tdlpackio/version.py'):
     cnt = """
 # THIS FILE IS GENERATED FROM PYTDLPACK SETUP.PY
 version = '%(version)s'
@@ -94,11 +92,12 @@ if "build" in sys.argv:
 # Define Extension object. For Fortran 77 source files, use "extra_f77_compile_args".
 # For Fortran 90+ source files, use "extra_f90_compile_args".
 # ----------------------------------------------------------------------------------------
-f77_sources = glob.glob("tdlpack/*.f")
-f90_sources = glob.glob("tdlpack/*.f90")
-all_sources = ["tdlpack/tdlpack.pyf"]+f77_sources+f90_sources
-ext = Extension(name  = 'tdlpack',
+f77_sources = glob.glob("src/tdlpacklib/*.f")
+f90_sources = glob.glob("src/tdlpacklib/*.f90")
+all_sources = ["src/tdlpacklib/tdlpacklib.pyf"]+f77_sources+f90_sources
+ext = Extension(name  = 'tdlpackio.tdlpacklib',
                 sources = all_sources,
+                include_dirs = [numpy.get_include()],
                 extra_f77_compile_args = f77_flags,
                 extra_f90_compile_args = f90_flags
                 )
@@ -132,34 +131,9 @@ with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 # ----------------------------------------------------------------------------------------
 # Run setup
 # ----------------------------------------------------------------------------------------
-setup(name             = 'pytdlpack',
-      author           = "Eric Engle",
-      author_email     = "eric.engle@mac.com",
-      url              = "https://github.com/eengl/pytdlpack",
-      download_url     = "https://github.com/eengl/pytdlpack/releases",
+setup(name             = 'tdlpackio',
       version          = VERSION,
-      description      = "Python interface for reading and writing TDLPACK data",
-      license          = 'GPL-3.0',
       ext_modules      = [ext],
-      py_modules       = ['TdlpackIO','TdlpackBackend'],
-      entry_points     = {'xarray.backends': 'tdlpack = TdlpackBackend:TdlpackBackendEntrypoint'},
-      packages         = ['pytdlpack'],
-      cmdclass         = {'test':TestCommand},
-      classifiers      = ['Development Status :: 5 - Production/Stable',
-                          'Programming Language :: Python :: 3',
-                          'Programming Language :: Python :: 3.6',
-                          'Programming Language :: Python :: 3.7',
-                          'Programming Language :: Python :: 3.8',
-                          'Programming Language :: Python :: 3.9',
-                          'Programming Language :: Python :: 3.10',
-                          'Environment :: Console',
-                          'Topic :: Scientific/Engineering',
-                          'Topic :: Scientific/Engineering :: Atmospheric Science',
-                          'Intended Audience :: Science/Research',
-                          'Operating System :: OS Independent',
-                          'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'],
-      install_requires  = ['numpy>=1.12'],
-      python_requires   = '>=3.6',
       long_description  = long_description,
       long_description_content_type = 'text/markdown'
 )

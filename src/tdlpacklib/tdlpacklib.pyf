@@ -1,15 +1,15 @@
 !    -*- f90 -*-
 ! Note: the context of this file is case sensitive.
 
-python module tdlpack ! in 
-    interface  ! in :tdlpack
-        subroutine closefile(kstdout,lun,ftype,ier) ! in :tdlpack:closefile.f90
+python module tdlpacklib ! in 
+    interface  ! in :tdlpacklib
+        subroutine closefile(kstdout,lun,ftype,ier) ! in :tdlpacklib:closefile.f90
             integer intent(in) :: kstdout
             integer intent(in) :: lun
             integer intent(in) :: ftype
             integer intent(out) :: ier
         end subroutine closefile
-        subroutine openfile(kstdout,file,mode,l3264b,lun,byteorder,ftype,ier,ra_maxent,ra_nbytes) ! in :tdlpack:openfile.f90
+        subroutine openfile(kstdout,file,mode,l3264b,lun,byteorder,ftype,ier,ra_maxent,ra_nbytes) ! in :tdlpacklib:openfile.f90
             integer intent(in) :: kstdout
             character*(*) intent(in) :: file
             character*(*) intent(in) :: mode
@@ -21,7 +21,7 @@ python module tdlpack ! in
             integer, optional,intent(in) :: ra_maxent
             integer, optional,intent(in) :: ra_nbytes
         end subroutine openfile
-        subroutine pack(kfildo,ic,nxy,is0,is1,is2,is4,nd7,ipack,nd5,second,ifirst,ifod,missp,misss,minpk,lx,ioctet,l3264b,ier) ! in :tdlpack:pack.f
+        subroutine pack(kfildo,ic,nxy,is0,is1,is2,is4,nd7,ipack,nd5,second,ifirst,ifod,missp,misss,minpk,lx,ioctet,l3264b,ier) ! in :tdlpacklib:pack.f
             integer :: kfildo
             integer dimension(nxy) :: ic
             integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
@@ -43,7 +43,7 @@ python module tdlpack ! in
             integer :: l3264b
             integer :: ier
         end subroutine pack
-        subroutine pack1d(kfildo,a,ic,nsta,is0,is1,is2,is4,nd7,xmissp,xmisss,ipack,nd5,minpk,lx,ioctet,l3264b,ier) ! in :tdlpack:pack1d.f
+        subroutine pack1d(kfildo,a,ic,nsta,is0,is1,is2,is4,nd7,xmissp,xmisss,ipack,nd5,minpk,lx,ioctet,l3264b,ier) ! in :tdlpacklib:pack1d.f
             integer :: kfildo
             real dimension(nsta) :: a
             integer dimension(nsta),depend(nsta) :: ic
@@ -63,7 +63,7 @@ python module tdlpack ! in
             integer :: l3264b
             integer intent(out) :: ier
         end subroutine pack1d
-        subroutine pack2d(kfildo,a,ia,ic,nx,ny,is0,is1,is2,is4,nd7,xmissp,xmisss,ipack,nd5,minpk,lx,ioctet,l3264b,ier) ! in :tdlpack:pack2d.f
+        subroutine pack2d(kfildo,a,ia,ic,nx,ny,is0,is1,is2,is4,nd7,xmissp,xmisss,ipack,nd5,minpk,lx,ioctet,l3264b,ier) ! in :tdlpacklib:pack2d.f
             integer :: kfildo
             real dimension(nx,ny) :: a
             integer dimension(nx,ny),depend(nx,ny) :: ia
@@ -85,7 +85,7 @@ python module tdlpack ! in
             integer :: l3264b
             integer intent(out) :: ier
         end subroutine pack2d
-        subroutine readfile(kstdout,file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,id) ! in :tdlpack:readfile.f90
+        subroutine readfile(kstdout,file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,id) ! in :tdlpacklib:readfile.f90
             integer intent(in) :: kstdout
             character*(*) intent(in) :: file
             integer intent(in) :: lun
@@ -97,7 +97,7 @@ python module tdlpack ! in
             integer intent(out) :: ier
             integer, optional,dimension(4),intent(in) :: id
         end subroutine readfile
-        subroutine writefile(kstdout,file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,nreplace,ncheck) ! in :tdlpack:writefile.f90
+        subroutine writefile(kstdout,file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,nreplace,ncheck) ! in :tdlpacklib:writefile.f90
             integer intent(in) :: kstdout
             character*(*) intent(in) :: file
             integer intent(in) :: lun
@@ -110,7 +110,7 @@ python module tdlpack ! in
             integer, optional,intent(in) :: nreplace
             integer, optional,intent(in) :: ncheck
         end subroutine writefile
-        subroutine trail(kfildo,kfilio,l3264b,l3264w,ntotby,ntotrc,ier) ! in :tdlpack:trail.f
+        subroutine trail(kfildo,kfilio,l3264b,l3264w,ntotby,ntotrc,ier) ! in :tdlpacklib:trail.f
             integer intent(in) :: kfildo
             integer intent(in) :: kfilio
             integer intent(in) :: l3264b
@@ -119,7 +119,7 @@ python module tdlpack ! in
             integer :: ntotrc
             integer intent(out) :: ier
         end subroutine trail
-        subroutine unpack(kfildo,ipack,iwork,data,nd5,is0,is1,is2,is4,nd7,misspx,misssx,igive,l3264b,ier) ! in :tdlpack:unpack.f
+        subroutine unpack(kfildo,ipack,iwork,data,nd5,is0,is1,is2,is4,nd7,misspx,misssx,igive,l3264b,ier) ! in :tdlpacklib:unpack.f
             integer :: kfildo
             integer dimension(nd5) :: ipack
             integer dimension(nd5),depend(nd5) :: iwork
@@ -136,7 +136,7 @@ python module tdlpack ! in
             integer :: l3264b
             integer intent(out) :: ier
         end subroutine unpack
-        subroutine writep(kfildo,kfilio,ipack,nwords,ntotby,ntotrc,l3264b,ier) ! in :tdlpack:writep.f
+        subroutine writep(kfildo,kfilio,ipack,nwords,ntotby,ntotrc,l3264b,ier) ! in :tdlpacklib:writep.f
             integer intent(in) :: kfildo
             integer intent(in) :: kfilio
             integer dimension(nwords) :: ipack
@@ -146,7 +146,7 @@ python module tdlpack ! in
             integer intent(in) :: l3264b
             integer intent(out) :: ier
         end subroutine writep
-        subroutine lmijll(kfildo,xi,yj,xmeshl,orient,xlat,xlatll,xlonll,alat,alon,ier) ! in :tdlpack:lmijll.f
+        subroutine lmijll(kfildo,xi,yj,xmeshl,orient,xlat,xlatll,xlonll,alat,alon,ier) ! in :tdlpacklib:lmijll.f
             integer :: kfildo
             real :: xi
             real :: yj
@@ -159,7 +159,7 @@ python module tdlpack ! in
             real :: alon
             integer :: ier
         end subroutine lmijll
-        subroutine mcijll(kfildo,xi,yj,xmeshl,xlat,xlatll,xlonll,alat,alon) ! in :tdlpack:mcijll.f
+        subroutine mcijll(kfildo,xi,yj,xmeshl,xlat,xlatll,xlonll,alat,alon) ! in :tdlpacklib:mcijll.f
             integer :: kfildo
             real :: xi
             real :: yj
@@ -170,7 +170,7 @@ python module tdlpack ! in
             real :: alat
             real :: alon
         end subroutine mcijll
-        subroutine psijll(kfildo,xi,yj,xmeshl,orient,xlat,xlatll,xlonll,alat,alon) ! in :tdlpack:psijll.f
+        subroutine psijll(kfildo,xi,yj,xmeshl,orient,xlat,xlatll,xlonll,alat,alon) ! in :tdlpacklib:psijll.f
             integer :: kfildo
             real :: xi
             real :: yj
@@ -182,7 +182,7 @@ python module tdlpack ! in
             real :: alat
             real :: alon
         end subroutine psijll
-        subroutine gridij_to_latlon(kstdout,nx,ny,mproj,xmeshl,orient,xlat,xlatll,xlonll,lats,lons,ier) ! in :tdlpack:gridij_to_latlon.f90
+        subroutine gridij_to_latlon(kstdout,nx,ny,mproj,xmeshl,orient,xlat,xlatll,xlonll,lats,lons,ier) ! in :tdlpacklib:gridij_to_latlon.f90
             integer intent(in) :: kstdout
             integer intent(in) :: nx
             integer intent(in) :: ny
@@ -196,7 +196,7 @@ python module tdlpack ! in
             real dimension(nx,ny),intent(out),depend(nx,ny) :: lons
             integer intent(out) :: ier
         end subroutine gridij_to_latlon
-        subroutine latlon_to_gridij(kstdout,mproj,xlatll,xlonll,orient,xmeshl,xlat,alat,alon,xi,yj) ! in :tdlpack:latlon_to_gridij.f90
+        subroutine latlon_to_gridij(kstdout,mproj,xlatll,xlonll,orient,xmeshl,xlat,alat,alon,xi,yj) ! in :tdlpacklib:latlon_to_gridij.f90
             integer, intent(in) :: kstdout
             integer, intent(in) :: mproj
             real, intent(in) :: xlatll
@@ -209,15 +209,15 @@ python module tdlpack ! in
             real, intent(out) :: xi
             real, intent(out) :: yj
         end subroutine latlon_to_gridij
-        subroutine backspacefile(lun,ier) ! in :tdlpack:fileaction.f
+        subroutine backspacefile(lun,ier) ! in :tdlpacklib:fileaction.f
             integer intent(in) :: lun
             integer intent(out) :: ier
         end subroutine backspacefile
-        subroutine rewindfile(lun,ier) ! in :tdlpack:fileaction.f
+        subroutine rewindfile(lun,ier) ! in :tdlpacklib:fileaction.f
             integer intent(in) :: lun
             integer intent(out) :: ier
         end subroutine rewindfile
-        subroutine clfilm(kfildo,kfilx,ier) ! in :tdlpack:clfilm.f
+        subroutine clfilm(kfildo,kfilx,ier) ! in :tdlpacklib:clfilm.f
             integer intent(in) :: kfildo
             integer intent(in) :: kfilx
             integer intent(out) :: ier
@@ -235,7 +235,7 @@ python module tdlpack ! in
             integer dimension(2) :: nraend
             common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
         end subroutine clfilm
-        subroutine flopnm(kfildo,kfilx,cfilx,irw,nt,l3264b,iraend,ier) ! in :tdlpack:flopnm.f
+        subroutine flopnm(kfildo,kfilx,cfilx,irw,nt,l3264b,iraend,ier) ! in :tdlpacklib:flopnm.f
             integer :: kfildo
             integer :: kfilx
             character*1024 :: cfilx
@@ -258,7 +258,7 @@ python module tdlpack ! in
             integer dimension(2) :: nraend
             common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
         end subroutine flopnm
-        subroutine rdtdlm(kfildo,kfilx,cfilx,id,record,nsize,nvalue,l3264b,ier) ! in :tdlpack:rdtdlm.f
+        subroutine rdtdlm(kfildo,kfilx,cfilx,id,record,nsize,nvalue,l3264b,ier) ! in :tdlpacklib:rdtdlm.f
             ! This interface has been modified from what f2py generated.
             integer intent(in) :: kfildo
             integer intent(in) :: kfilx
@@ -284,7 +284,7 @@ python module tdlpack ! in
             integer dimension(2) :: nraend
             common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
         end subroutine rdtdlm
-        subroutine wrtdlm(kfildo,kfilx,cfilx,id,record,nsize,nrepla,ncheck,l3264b,ier) ! in :tdlpack:wrtdlm.f
+        subroutine wrtdlm(kfildo,kfilx,cfilx,id,record,nsize,nrepla,ncheck,l3264b,ier) ! in :tdlpacklib:wrtdlm.f
             ! This interface has been modified from what f2py generated.
             integer intent(in) :: kfildo
             integer intent(in) :: kfilx
@@ -310,13 +310,13 @@ python module tdlpack ! in
             integer dimension(2) :: nraend
             common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
         end subroutine wrtdlm
-        subroutine openlog(kstdout,ier,file) ! in :tdlpack:openlog.f90
+        subroutine openlog(kstdout,ier,file) ! in :tdlpacklib:openlog.f90
             integer intent(in) :: kstdout
             integer intent(out) :: ier
             character*(*) optional,intent(in) :: file
         end subroutine openlog
     end interface 
-end python module tdlpack
+end python module tdlpacklib
 
 ! This file was auto-generated with f2py (version:2).
 ! See http://cens.ioc.ee/projects/f2py2e/
