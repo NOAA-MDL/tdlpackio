@@ -1,0 +1,1144 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="pdoc 14.0.0"/>
+    <title>tdlpackio API documentation</title>
+
+    <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
+    <style>/*! syntax-highlighting.css */pre{line-height:125%;}span.linenos{color:inherit; background-color:transparent; padding-left:5px; padding-right:20px;}.pdoc-code .hll{background-color:#ffffcc}.pdoc-code{background:#f8f8f8;}.pdoc-code .c{color:#3D7B7B; font-style:italic}.pdoc-code .err{border:1px solid #FF0000}.pdoc-code .k{color:#008000; font-weight:bold}.pdoc-code .o{color:#666666}.pdoc-code .ch{color:#3D7B7B; font-style:italic}.pdoc-code .cm{color:#3D7B7B; font-style:italic}.pdoc-code .cp{color:#9C6500}.pdoc-code .cpf{color:#3D7B7B; font-style:italic}.pdoc-code .c1{color:#3D7B7B; font-style:italic}.pdoc-code .cs{color:#3D7B7B; font-style:italic}.pdoc-code .gd{color:#A00000}.pdoc-code .ge{font-style:italic}.pdoc-code .gr{color:#E40000}.pdoc-code .gh{color:#000080; font-weight:bold}.pdoc-code .gi{color:#008400}.pdoc-code .go{color:#717171}.pdoc-code .gp{color:#000080; font-weight:bold}.pdoc-code .gs{font-weight:bold}.pdoc-code .gu{color:#800080; font-weight:bold}.pdoc-code .gt{color:#0044DD}.pdoc-code .kc{color:#008000; font-weight:bold}.pdoc-code .kd{color:#008000; font-weight:bold}.pdoc-code .kn{color:#008000; font-weight:bold}.pdoc-code .kp{color:#008000}.pdoc-code .kr{color:#008000; font-weight:bold}.pdoc-code .kt{color:#B00040}.pdoc-code .m{color:#666666}.pdoc-code .s{color:#BA2121}.pdoc-code .na{color:#687822}.pdoc-code .nb{color:#008000}.pdoc-code .nc{color:#0000FF; font-weight:bold}.pdoc-code .no{color:#880000}.pdoc-code .nd{color:#AA22FF}.pdoc-code .ni{color:#717171; font-weight:bold}.pdoc-code .ne{color:#CB3F38; font-weight:bold}.pdoc-code .nf{color:#0000FF}.pdoc-code .nl{color:#767600}.pdoc-code .nn{color:#0000FF; font-weight:bold}.pdoc-code .nt{color:#008000; font-weight:bold}.pdoc-code .nv{color:#19177C}.pdoc-code .ow{color:#AA22FF; font-weight:bold}.pdoc-code .w{color:#bbbbbb}.pdoc-code .mb{color:#666666}.pdoc-code .mf{color:#666666}.pdoc-code .mh{color:#666666}.pdoc-code .mi{color:#666666}.pdoc-code .mo{color:#666666}.pdoc-code .sa{color:#BA2121}.pdoc-code .sb{color:#BA2121}.pdoc-code .sc{color:#BA2121}.pdoc-code .dl{color:#BA2121}.pdoc-code .sd{color:#BA2121; font-style:italic}.pdoc-code .s2{color:#BA2121}.pdoc-code .se{color:#AA5D1F; font-weight:bold}.pdoc-code .sh{color:#BA2121}.pdoc-code .si{color:#A45A77; font-weight:bold}.pdoc-code .sx{color:#008000}.pdoc-code .sr{color:#A45A77}.pdoc-code .s1{color:#BA2121}.pdoc-code .ss{color:#19177C}.pdoc-code .bp{color:#008000}.pdoc-code .fm{color:#0000FF}.pdoc-code .vc{color:#19177C}.pdoc-code .vg{color:#19177C}.pdoc-code .vi{color:#19177C}.pdoc-code .vm{color:#19177C}.pdoc-code .il{color:#666666}</style>
+    <style>/*! theme.css */:root{--pdoc-background:#fff;}.pdoc{--text:#212529;--muted:#6c757d;--link:#3660a5;--link-hover:#1659c5;--code:#f8f8f8;--active:#fff598;--accent:#eee;--accent2:#c1c1c1;--nav-hover:rgba(255, 255, 255, 0.5);--name:#0066BB;--def:#008800;--annotation:#007020;}</style>
+    <style>/*! layout.css */html, body{width:100%;height:100%;}html, main{scroll-behavior:smooth;}body{background-color:var(--pdoc-background);}@media (max-width:769px){#navtoggle{cursor:pointer;position:absolute;width:50px;height:40px;top:1rem;right:1rem;border-color:var(--text);color:var(--text);display:flex;opacity:0.8;z-index:999;}#navtoggle:hover{opacity:1;}#togglestate + div{display:none;}#togglestate:checked + div{display:inherit;}main, header{padding:2rem 3vw;}header + main{margin-top:-3rem;}.git-button{display:none !important;}nav input[type="search"]{max-width:77%;}nav input[type="search"]:first-child{margin-top:-6px;}nav input[type="search"]:valid ~ *{display:none !important;}}@media (min-width:770px){:root{--sidebar-width:clamp(12.5rem, 28vw, 22rem);}nav{position:fixed;overflow:auto;height:100vh;width:var(--sidebar-width);}main, header{padding:3rem 2rem 3rem calc(var(--sidebar-width) + 3rem);width:calc(54rem + var(--sidebar-width));max-width:100%;}header + main{margin-top:-4rem;}#navtoggle{display:none;}}#togglestate{position:absolute;height:0;opacity:0;}nav.pdoc{--pad:clamp(0.5rem, 2vw, 1.75rem);--indent:1.5rem;background-color:var(--accent);border-right:1px solid var(--accent2);box-shadow:0 0 20px rgba(50, 50, 50, .2) inset;padding:0 0 0 var(--pad);overflow-wrap:anywhere;scrollbar-width:thin; scrollbar-color:var(--accent2) transparent }nav.pdoc::-webkit-scrollbar{width:.4rem; }nav.pdoc::-webkit-scrollbar-thumb{background-color:var(--accent2); }nav.pdoc > div{padding:var(--pad) 0;}nav.pdoc .module-list-button{display:inline-flex;align-items:center;color:var(--text);border-color:var(--muted);margin-bottom:1rem;}nav.pdoc .module-list-button:hover{border-color:var(--text);}nav.pdoc input[type=search]{display:block;outline-offset:0;width:calc(100% - var(--pad));}nav.pdoc .logo{max-width:calc(100% - var(--pad));max-height:35vh;display:block;margin:0 auto 1rem;transform:translate(calc(-.5 * var(--pad)), 0);}nav.pdoc ul{list-style:none;padding-left:0;}nav.pdoc > div > ul{margin-left:calc(0px - var(--pad));}nav.pdoc li a{padding:.2rem 0 .2rem calc(var(--pad) + var(--indent));}nav.pdoc > div > ul > li > a{padding-left:var(--pad);}nav.pdoc li{transition:all 100ms;}nav.pdoc li:hover{background-color:var(--nav-hover);}nav.pdoc a, nav.pdoc a:hover{color:var(--text);}nav.pdoc a{display:block;}nav.pdoc > h2:first-of-type{margin-top:1.5rem;}nav.pdoc .class:before{content:"class ";color:var(--muted);}nav.pdoc .function:after{content:"()";color:var(--muted);}nav.pdoc footer:before{content:"";display:block;width:calc(100% - var(--pad));border-top:solid var(--accent2) 1px;margin-top:1.5rem;padding-top:.5rem;}nav.pdoc footer{font-size:small;}</style>
+    <style>/*! content.css */.pdoc{color:var(--text);box-sizing:border-box;line-height:1.5;background:none;}.pdoc .pdoc-button{cursor:pointer;display:inline-block;border:solid black 1px;border-radius:2px;font-size:.75rem;padding:calc(0.5em - 1px) 1em;transition:100ms all;}.pdoc .pdoc-alert{padding:1rem 1rem 1rem calc(1.5rem + 24px);border:1px solid transparent;border-radius:.25rem;background-repeat:no-repeat;background-position:1rem center;margin-bottom:1rem;}.pdoc .pdoc-alert > *:last-child{margin-bottom:0;}.pdoc .pdoc-alert-note {color:#084298;background-color:#cfe2ff;border-color:#b6d4fe;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23084298%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M8%2016A8%208%200%201%200%208%200a8%208%200%200%200%200%2016zm.93-9.412-1%204.705c-.07.34.029.533.304.533.194%200%20.487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703%200-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381%202.29-.287zM8%205.5a1%201%200%201%201%200-2%201%201%200%200%201%200%202z%22/%3E%3C/svg%3E");}.pdoc .pdoc-alert-warning{color:#664d03;background-color:#fff3cd;border-color:#ffecb5;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23664d03%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M8.982%201.566a1.13%201.13%200%200%200-1.96%200L.165%2013.233c-.457.778.091%201.767.98%201.767h13.713c.889%200%201.438-.99.98-1.767L8.982%201.566zM8%205c.535%200%20.954.462.9.995l-.35%203.507a.552.552%200%200%201-1.1%200L7.1%205.995A.905.905%200%200%201%208%205zm.002%206a1%201%200%201%201%200%202%201%201%200%200%201%200-2z%22/%3E%3C/svg%3E");}.pdoc .pdoc-alert-danger{color:#842029;background-color:#f8d7da;border-color:#f5c2c7;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23842029%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M5.52.359A.5.5%200%200%201%206%200h4a.5.5%200%200%201%20.474.658L8.694%206H12.5a.5.5%200%200%201%20.395.807l-7%209a.5.5%200%200%201-.873-.454L6.823%209.5H3.5a.5.5%200%200%201-.48-.641l2.5-8.5z%22/%3E%3C/svg%3E");}.pdoc .visually-hidden{position:absolute !important;width:1px !important;height:1px !important;padding:0 !important;margin:-1px !important;overflow:hidden !important;clip:rect(0, 0, 0, 0) !important;white-space:nowrap !important;border:0 !important;}.pdoc h1, .pdoc h2, .pdoc h3{font-weight:300;margin:.3em 0;padding:.2em 0;}.pdoc > section:not(.module-info) h1{font-size:1.5rem;font-weight:500;}.pdoc > section:not(.module-info) h2{font-size:1.4rem;font-weight:500;}.pdoc > section:not(.module-info) h3{font-size:1.3rem;font-weight:500;}.pdoc > section:not(.module-info) h4{font-size:1.2rem;}.pdoc > section:not(.module-info) h5{font-size:1.1rem;}.pdoc a{text-decoration:none;color:var(--link);}.pdoc a:hover{color:var(--link-hover);}.pdoc blockquote{margin-left:2rem;}.pdoc pre{border-top:1px solid var(--accent2);border-bottom:1px solid var(--accent2);margin-top:0;margin-bottom:1em;padding:.5rem 0 .5rem .5rem;overflow-x:auto;background-color:var(--code);}.pdoc code{color:var(--text);padding:.2em .4em;margin:0;font-size:85%;background-color:var(--code);border-radius:6px;}.pdoc a > code{color:inherit;}.pdoc pre > code{display:inline-block;font-size:inherit;background:none;border:none;padding:0;}.pdoc > section:not(.module-info){margin-bottom:1.5rem;}.pdoc .modulename{margin-top:0;font-weight:bold;}.pdoc .modulename a{color:var(--link);transition:100ms all;}.pdoc .git-button{float:right;border:solid var(--link) 1px;}.pdoc .git-button:hover{background-color:var(--link);color:var(--pdoc-background);}.view-source-toggle-state,.view-source-toggle-state ~ .pdoc-code{display:none;}.view-source-toggle-state:checked ~ .pdoc-code{display:block;}.view-source-button{display:inline-block;float:right;font-size:.75rem;line-height:1.5rem;color:var(--muted);padding:0 .4rem 0 1.3rem;cursor:pointer;text-indent:-2px;}.view-source-button > span{visibility:hidden;}.module-info .view-source-button{float:none;display:flex;justify-content:flex-end;margin:-1.2rem .4rem -.2rem 0;}.view-source-button::before{position:absolute;content:"View Source";display:list-item;list-style-type:disclosure-closed;}.view-source-toggle-state:checked ~ .attr .view-source-button::before,.view-source-toggle-state:checked ~ .view-source-button::before{list-style-type:disclosure-open;}.pdoc .docstring{margin-bottom:1.5rem;}.pdoc section:not(.module-info) .docstring{margin-left:clamp(0rem, 5vw - 2rem, 1rem);}.pdoc .docstring .pdoc-code{margin-left:1em;margin-right:1em;}.pdoc h1:target,.pdoc h2:target,.pdoc h3:target,.pdoc h4:target,.pdoc h5:target,.pdoc h6:target,.pdoc .pdoc-code > pre > span:target{background-color:var(--active);box-shadow:-1rem 0 0 0 var(--active);}.pdoc .pdoc-code > pre > span:target{display:block;}.pdoc div:target > .attr,.pdoc section:target > .attr,.pdoc dd:target > a{background-color:var(--active);}.pdoc *{scroll-margin:2rem;}.pdoc .pdoc-code .linenos{user-select:none;}.pdoc .attr:hover{filter:contrast(0.95);}.pdoc section, .pdoc .classattr{position:relative;}.pdoc .headerlink{--width:clamp(1rem, 3vw, 2rem);position:absolute;top:0;left:calc(0rem - var(--width));transition:all 100ms ease-in-out;opacity:0;}.pdoc .headerlink::before{content:"#";display:block;text-align:center;width:var(--width);height:2.3rem;line-height:2.3rem;font-size:1.5rem;}.pdoc .attr:hover ~ .headerlink,.pdoc *:target > .headerlink,.pdoc .headerlink:hover{opacity:1;}.pdoc .attr{display:block;margin:.5rem 0 .5rem;padding:.4rem .4rem .4rem 1rem;background-color:var(--accent);overflow-x:auto;}.pdoc .classattr{margin-left:2rem;}.pdoc .name{color:var(--name);font-weight:bold;}.pdoc .def{color:var(--def);font-weight:bold;}.pdoc .signature{background-color:transparent;}.pdoc .param, .pdoc .return-annotation{white-space:pre;}.pdoc .signature.multiline .param{display:block;}.pdoc .signature.condensed .param{display:inline-block;}.pdoc .annotation{color:var(--annotation);}.pdoc .view-value-toggle-state,.pdoc .view-value-toggle-state ~ .default_value{display:none;}.pdoc .view-value-toggle-state:checked ~ .default_value{display:inherit;}.pdoc .view-value-button{font-size:.5rem;vertical-align:middle;border-style:dashed;margin-top:-0.1rem;}.pdoc .view-value-button:hover{background:white;}.pdoc .view-value-button::before{content:"show";text-align:center;width:2.2em;display:inline-block;}.pdoc .view-value-toggle-state:checked ~ .view-value-button::before{content:"hide";}.pdoc .inherited{margin-left:2rem;}.pdoc .inherited dt{font-weight:700;}.pdoc .inherited dt, .pdoc .inherited dd{display:inline;margin-left:0;margin-bottom:.5rem;}.pdoc .inherited dd:not(:last-child):after{content:", ";}.pdoc .inherited .class:before{content:"class ";}.pdoc .inherited .function a:after{content:"()";}.pdoc .search-result .docstring{overflow:auto;max-height:25vh;}.pdoc .search-result.focused > .attr{background-color:var(--active);}.pdoc .attribution{margin-top:2rem;display:block;opacity:0.5;transition:all 200ms;filter:grayscale(100%);}.pdoc .attribution:hover{opacity:1;filter:grayscale(0%);}.pdoc .attribution img{margin-left:5px;height:35px;vertical-align:middle;width:70px;transition:all 200ms;}.pdoc table{display:block;width:max-content;max-width:100%;overflow:auto;margin-bottom:1rem;}.pdoc table th{font-weight:600;}.pdoc table th, .pdoc table td{padding:6px 13px;border:1px solid var(--accent2);}</style>
+    <style>/*! custom.css */</style></head>
+<body>
+    <nav class="pdoc">
+        <label id="navtoggle" for="togglestate" class="pdoc-button"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke-linecap='round' stroke="currentColor" stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg></label>
+        <input id="togglestate" type="checkbox" aria-hidden="true" tabindex="-1">
+        <div>
+
+
+            <h2>Contents</h2>
+            <ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#download">Download</a></li>
+  <li><a href="#requires">Requires</a></li>
+  <li><a href="#install">Install</a></li>
+  <li><a href="#tutorial">Tutorial</a>
+  <ul>
+    <li><a href="#div-idsection11-creatingopeningclosing-a-tdlpack-file"><div id='section1'>1) Creating/Opening/Closing a TDLPACK file.</a></li>
+    <li><a href="#div-idsection22-reading-a-tdlpack-file"><div id='section2'>2) Reading a TDLPACK file.</a></li>
+    <li><a href="#div-idsection33-writing-a-tdlpack-file"><div id='section3'>3) Writing a TDLPACK file.</a></li>
+    <li><a href="#div-idsection44-creating-a-tdlpack-station-record"><div id='section4'>4) Creating a TDLPACK Station Record.</a></li>
+    <li><a href="#div-idsection55-creating-a-tdlpack-record"><div id='section5'>5) Creating a TDLPACK Record.</a></li>
+    <li><a href="#div-idsection66-packingunpacking-a-tdlpack-record"><div id='section6'>6) Packing/Unpacking a TDLPACK Record.</a></li>
+  </ul></li>
+</ul>
+
+
+
+            <h2>API Documentation</h2>
+                <ul class="memberlist">
+            <li>
+                    <a class="variable" href="#__version__">__version__</a>
+            </li>
+            <li>
+                    <a class="class" href="#open">open</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#open.__init__">open</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#open.mode">mode</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#open.name">name</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#open.filetype">filetype</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#open.records">records</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#open.size">size</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#open.close">close</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#open.select">select</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#TdlpackRecord">TdlpackRecord</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#TdlpackStationRecord">TdlpackStationRecord</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#TdlpackStationRecord.__init__">TdlpackStationRecord</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#TdlpackStationRecord.stations">stations</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#TdlpackStationRecord.numberOfStations">numberOfStations</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TdlpackStationRecord.pack">pack</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TdlpackStationRecord.unpack">unpack</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#TdlpackTrailerRecord">TdlpackTrailerRecord</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#TdlpackTrailerRecord.pack">pack</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TdlpackTrailerRecord.unpack">unpack</a>
+                        </li>
+                </ul>
+
+            </li>
+    </ul>
+
+
+
+        <a class="attribution" title="pdoc: Python API documentation generator" href="https://pdoc.dev" target="_blank">
+            built with <span class="visually-hidden">pdoc</span><img
+                alt="pdoc logo"
+                src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20role%3D%22img%22%20aria-label%3D%22pdoc%20logo%22%20width%3D%22300%22%20height%3D%22150%22%20viewBox%3D%22-1%200%2060%2030%22%3E%3Ctitle%3Epdoc%3C/title%3E%3Cpath%20d%3D%22M29.621%2021.293c-.011-.273-.214-.475-.511-.481a.5.5%200%200%200-.489.503l-.044%201.393c-.097.551-.695%201.215-1.566%201.704-.577.428-1.306.486-2.193.182-1.426-.617-2.467-1.654-3.304-2.487l-.173-.172a3.43%203.43%200%200%200-.365-.306.49.49%200%200%200-.286-.196c-1.718-1.06-4.931-1.47-7.353.191l-.219.15c-1.707%201.187-3.413%202.131-4.328%201.03-.02-.027-.49-.685-.141-1.763.233-.721.546-2.408.772-4.076.042-.09.067-.187.046-.288.166-1.347.277-2.625.241-3.351%201.378-1.008%202.271-2.586%202.271-4.362%200-.976-.272-1.935-.788-2.774-.057-.094-.122-.18-.184-.268.033-.167.052-.339.052-.516%200-1.477-1.202-2.679-2.679-2.679-.791%200-1.496.352-1.987.9a6.3%206.3%200%200%200-1.001.029c-.492-.564-1.207-.929-2.012-.929-1.477%200-2.679%201.202-2.679%202.679A2.65%202.65%200%200%200%20.97%206.554c-.383.747-.595%201.572-.595%202.41%200%202.311%201.507%204.29%203.635%205.107-.037.699-.147%202.27-.423%203.294l-.137.461c-.622%202.042-2.515%208.257%201.727%2010.643%201.614.908%203.06%201.248%204.317%201.248%202.665%200%204.492-1.524%205.322-2.401%201.476-1.559%202.886-1.854%206.491.82%201.877%201.393%203.514%201.753%204.861%201.068%202.223-1.713%202.811-3.867%203.399-6.374.077-.846.056-1.469.054-1.537zm-4.835%204.313c-.054.305-.156.586-.242.629-.034-.007-.131-.022-.307-.157-.145-.111-.314-.478-.456-.908.221.121.432.25.675.355.115.039.219.051.33.081zm-2.251-1.238c-.05.33-.158.648-.252.694-.022.001-.125-.018-.307-.157-.217-.166-.488-.906-.639-1.573.358.344.754.693%201.198%201.036zm-3.887-2.337c-.006-.116-.018-.231-.041-.342.635.145%201.189.368%201.599.625.097.231.166.481.174.642-.03.049-.055.101-.067.158-.046.013-.128.026-.298.004-.278-.037-.901-.57-1.367-1.087zm-1.127-.497c.116.306.176.625.12.71-.019.014-.117.045-.345.016-.206-.027-.604-.332-.986-.695.41-.051.816-.056%201.211-.031zm-4.535%201.535c.209.22.379.47.358.598-.006.041-.088.138-.351.234-.144.055-.539-.063-.979-.259a11.66%2011.66%200%200%200%20.972-.573zm.983-.664c.359-.237.738-.418%201.126-.554.25.237.479.548.457.694-.006.042-.087.138-.351.235-.174.064-.694-.105-1.232-.375zm-3.381%201.794c-.022.145-.061.29-.149.401-.133.166-.358.248-.69.251h-.002c-.133%200-.306-.26-.45-.621.417.091.854.07%201.291-.031zm-2.066-8.077a4.78%204.78%200%200%201-.775-.584c.172-.115.505-.254.88-.378l-.105.962zm-.331%202.302a10.32%2010.32%200%200%201-.828-.502c.202-.143.576-.328.984-.49l-.156.992zm-.45%202.157l-.701-.403c.214-.115.536-.249.891-.376a11.57%2011.57%200%200%201-.19.779zm-.181%201.716c.064.398.194.702.298.893-.194-.051-.435-.162-.736-.398.061-.119.224-.3.438-.495zM8.87%204.141c0%20.152-.123.276-.276.276s-.275-.124-.275-.276.123-.276.276-.276.275.124.275.276zm-.735-.389a1.15%201.15%200%200%200-.314.783%201.16%201.16%200%200%200%201.162%201.162c.457%200%20.842-.27%201.032-.653.026.117.042.238.042.362a1.68%201.68%200%200%201-1.679%201.679%201.68%201.68%200%200%201-1.679-1.679c0-.843.626-1.535%201.436-1.654zM5.059%205.406A1.68%201.68%200%200%201%203.38%207.085a1.68%201.68%200%200%201-1.679-1.679c0-.037.009-.072.011-.109.21.3.541.508.935.508a1.16%201.16%200%200%200%201.162-1.162%201.14%201.14%200%200%200-.474-.912c.015%200%20.03-.005.045-.005.926.001%201.679.754%201.679%201.68zM3.198%204.141c0%20.152-.123.276-.276.276s-.275-.124-.275-.276.123-.276.276-.276.275.124.275.276zM1.375%208.964c0-.52.103-1.035.288-1.52.466.394%201.06.64%201.717.64%201.144%200%202.116-.725%202.499-1.738.383%201.012%201.355%201.738%202.499%201.738.867%200%201.631-.421%202.121-1.062.307.605.478%201.267.478%201.942%200%202.486-2.153%204.51-4.801%204.51s-4.801-2.023-4.801-4.51zm24.342%2019.349c-.985.498-2.267.168-3.813-.979-3.073-2.281-5.453-3.199-7.813-.705-1.315%201.391-4.163%203.365-8.423.97-3.174-1.786-2.239-6.266-1.261-9.479l.146-.492c.276-1.02.395-2.457.444-3.268a6.11%206.11%200%200%200%201.18.115%206.01%206.01%200%200%200%202.536-.562l-.006.175c-.802.215-1.848.612-2.021%201.25-.079.295.021.601.274.837.219.203.415.364.598.501-.667.304-1.243.698-1.311%201.179-.02.144-.022.507.393.787.213.144.395.26.564.365-1.285.521-1.361.96-1.381%201.126-.018.142-.011.496.427.746l.854.489c-.473.389-.971.914-.999%201.429-.018.278.095.532.316.713.675.556%201.231.721%201.653.721.059%200%20.104-.014.158-.02.207.707.641%201.64%201.513%201.64h.013c.8-.008%201.236-.345%201.462-.626.173-.216.268-.457.325-.692.424.195.93.374%201.372.374.151%200%20.294-.021.423-.068.732-.27.944-.704.993-1.021.009-.061.003-.119.002-.179.266.086.538.147.789.147.15%200%20.294-.021.423-.069.542-.2.797-.489.914-.754.237.147.478.258.704.288.106.014.205.021.296.021.356%200%20.595-.101.767-.229.438.435%201.094.992%201.656%201.067.106.014.205.021.296.021a1.56%201.56%200%200%200%20.323-.035c.17.575.453%201.289.866%201.605.358.273.665.362.914.362a.99.99%200%200%200%20.421-.093%201.03%201.03%200%200%200%20.245-.164c.168.428.39.846.68%201.068.358.273.665.362.913.362a.99.99%200%200%200%20.421-.093c.317-.148.512-.448.639-.762.251.157.495.257.726.257.127%200%20.25-.024.37-.071.427-.17.706-.617.841-1.314.022-.015.047-.022.068-.038.067-.051.133-.104.196-.159-.443%201.486-1.107%202.761-2.086%203.257zM8.66%209.925a.5.5%200%201%200-1%200c0%20.653-.818%201.205-1.787%201.205s-1.787-.552-1.787-1.205a.5.5%200%201%200-1%200c0%201.216%201.25%202.205%202.787%202.205s2.787-.989%202.787-2.205zm4.4%2015.965l-.208.097c-2.661%201.258-4.708%201.436-6.086.527-1.542-1.017-1.88-3.19-1.844-4.198a.4.4%200%200%200-.385-.414c-.242-.029-.406.164-.414.385-.046%201.249.367%203.686%202.202%204.896.708.467%201.547.7%202.51.7%201.248%200%202.706-.392%204.362-1.174l.185-.086a.4.4%200%200%200%20.205-.527c-.089-.204-.326-.291-.527-.206zM9.547%202.292c.093.077.205.114.317.114a.5.5%200%200%200%20.318-.886L8.817.397a.5.5%200%200%200-.703.068.5.5%200%200%200%20.069.703l1.364%201.124zm-7.661-.065c.086%200%20.173-.022.253-.068l1.523-.893a.5.5%200%200%200-.506-.863l-1.523.892a.5.5%200%200%200-.179.685c.094.158.261.247.432.247z%22%20transform%3D%22matrix%28-1%200%200%201%2058%200%29%22%20fill%3D%22%233bb300%22/%3E%3Cpath%20d%3D%22M.3%2021.86V10.18q0-.46.02-.68.04-.22.18-.5.28-.54%201.34-.54%201.06%200%201.42.28.38.26.44.78.76-1.04%202.38-1.04%201.64%200%203.1%201.54%201.46%201.54%201.46%203.58%200%202.04-1.46%203.58-1.44%201.54-3.08%201.54-1.64%200-2.38-.92v4.04q0%20.46-.04.68-.02.22-.18.5-.14.3-.5.42-.36.12-.98.12-.62%200-1-.12-.36-.12-.52-.4-.14-.28-.18-.5-.02-.22-.02-.68zm3.96-9.42q-.46.54-.46%201.18%200%20.64.46%201.18.48.52%201.2.52.74%200%201.24-.52.52-.52.52-1.18%200-.66-.48-1.18-.48-.54-1.26-.54-.76%200-1.22.54zm14.741-8.36q.16-.3.54-.42.38-.12%201-.12.64%200%201.02.12.38.12.52.42.16.3.18.54.04.22.04.68v11.94q0%20.46-.04.7-.02.22-.18.5-.3.54-1.7.54-1.38%200-1.54-.98-.84.96-2.34.96-1.8%200-3.28-1.56-1.48-1.58-1.48-3.66%200-2.1%201.48-3.68%201.5-1.58%203.28-1.58%201.48%200%202.3%201v-4.2q0-.46.02-.68.04-.24.18-.52zm-3.24%2010.86q.52.54%201.26.54.74%200%201.22-.54.5-.54.5-1.18%200-.66-.48-1.22-.46-.56-1.26-.56-.8%200-1.28.56-.48.54-.48%201.2%200%20.66.52%201.2zm7.833-1.2q0-2.4%201.68-3.96%201.68-1.56%203.84-1.56%202.16%200%203.82%201.56%201.66%201.54%201.66%203.94%200%201.66-.86%202.96-.86%201.28-2.1%201.9-1.22.6-2.54.6-1.32%200-2.56-.64-1.24-.66-2.1-1.92-.84-1.28-.84-2.88zm4.18%201.44q.64.48%201.3.48.66%200%201.32-.5.66-.5.66-1.48%200-.98-.62-1.46-.62-.48-1.34-.48-.72%200-1.34.5-.62.5-.62%201.48%200%20.96.64%201.46zm11.412-1.44q0%20.84.56%201.32.56.46%201.18.46.64%200%201.18-.36.56-.38.9-.38.6%200%201.46%201.06.46.58.46%201.04%200%20.76-1.1%201.42-1.14.8-2.8.8-1.86%200-3.58-1.34-.82-.64-1.34-1.7-.52-1.08-.52-2.36%200-1.3.52-2.34.52-1.06%201.34-1.7%201.66-1.32%203.54-1.32.76%200%201.48.22.72.2%201.06.4l.32.2q.36.24.56.38.52.4.52.92%200%20.5-.42%201.14-.72%201.1-1.38%201.1-.38%200-1.08-.44-.36-.34-1.04-.34-.66%200-1.24.48-.58.48-.58%201.34z%22%20fill%3D%22green%22/%3E%3C/svg%3E"/>
+        </a>
+</div>
+    </nav>
+    <main class="pdoc">
+            <section class="module-info">
+                    <h1 class="modulename">
+tdlpackio    </h1>
+
+                        <div class="docstring"><h1 id="introduction">Introduction</h1>
+
+<p>tdlpackio is a Python interface to reading/writing TDLPACK files via official
+MOS-2000 (MOS2K) Fortran-based source files.  The necessary MOS2K source files are included
+in this package and are available as module, tdlpacklib.</p>
+
+<p>TDLPACK is a GRIB-like binary data format that is exclusive to MOS2K Fortran-based
+sofftware system.  This software system was developed at the Meteorological Development
+Laboratory (MDL) within NOAA/NWS and its primary purpose is to perform statistical
+post-processing of meteorological data.</p>
+
+<p>TDLPACK-formatted data are contained in two type of Fortran-based files;
+sequential or random-access.  Sequential files are variable length, record-based, and unformatted.
+Random-access files are fixed-length and direct-access.  pytdlpack accommodates reading
+and writing of both types of TDLPACK files.</p>
+
+<p>TDLPACK format is based on the World Meteorological Organizations (WMO) GRIdded Binary (GRIB)
+code, but has been tailored to MDL needs for data -- mainly the ability to store 1D (vector),
+datasets such as station observations, along with 2D grids.</p>
+
+<p>There also exists two other types of records in a TDLPACK file: station call letter record
+and trailer record.  A station call letter record can exist in both types of TDLPACK files
+and contains a stream of alphanumeric characters (<code>CHARACTER(LEN=8)</code>).  A trailer record exists
+to signal the MOS2K system that another station call letter record is about to be read or we
+have reached the end of the file (EOF).  A trailer record is not written to a random-access
+file.</p>
+
+<p>For more information on the MOS-2000 software system and TDLPACK foremat, user is
+referred to the official <a href="https://www.weather.gov/media/mdl/TDL_OfficeNote00-1.pdf">MOS-2000 documentation</a>.</p>
+
+<p>In order for pytdlpack to read/write TDLPACK files, we need to compile the necessary MOS2K
+Fortran source code into a shared object library.  This is handled by the setup process as the
+Fortran source is compiled with f2py (included with Numpy).  The following are some important
+items to note regarding MOS2K source files included:</p>
+
+<ul>
+<li>Several Fortran 90+ source files have been created to better interface to MOS2K Fortran 77 code.</li>
+<li>The only modification made to MOS2K source files is changing the filename variable, <code>CFILX</code> from
+<code>CHARACTER*60</code> to <code>CHARACTER*1024</code> in the appropropriate subroutines where random-access file IO
+occurs.</li>
+</ul>
+
+<h1 id="download">Download</h1>
+
+<ul>
+<li>Latest code from <a href="https://github.com/eengl/pytdlpack">github repository</a>.</li>
+<li>Latest <a href="https://github.com/eengl/pytdlpack/releases">releases</a> on GitHub.</li>
+<li><a href="https://pypi.org/project/pytdlpack">PyPI</a></li>
+</ul>
+
+<h1 id="requires">Requires</h1>
+
+<ul>
+<li>Python 3.6+</li>
+<li><a href="http://numpy.scipy.org">numpy array module</a>, version 1.12 or later.</li>
+<li><a href="https://pypi.python.org/pypi/setuptools">setuptools</a>, version 18.0 or later.</li>
+<li>GNU or Intel Fortran compiler (if installing from source).</li>
+</ul>
+
+<h1 id="install">Install</h1>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>pip3<span class="w"> </span>install<span class="w"> </span>pytdlpack
+</code></pre>
+</div>
+
+<p><strong>Build and Install from Source</strong></p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>python3<span class="w"> </span>setup.py<span class="w"> </span>build_ext<span class="w"> </span>--fcompiler<span class="o">=[</span>gnu95<span class="p">|</span>intelem<span class="o">]</span><span class="w"> </span>build
+python3<span class="w"> </span>setup.py<span class="w"> </span>install<span class="w"> </span><span class="o">[</span>--user<span class="w"> </span><span class="p">|</span><span class="w"> </span>--prefix<span class="o">=</span>PREFIX<span class="o">]</span>
+</code></pre>
+</div>
+
+<h1 id="tutorial">Tutorial</h1>
+
+<ol>
+<li><a href="#section1">Creating/Opening/Closing a TDLPACK file.</a></li>
+<li><a href="#section2">Reading a TDLPACK file.</a></li>
+<li><a href="#section3">Writing a TDLPACK file.</a></li>
+<li><a href="#section4">Creating a TDLPACK Station Record.</a></li>
+<li><a href="#section5">Creating a TDLPACK Record.</a></li>
+<li><a href="#section6">Packing/Unpacking a TDLPACK Record.</a></li>
+</ol>
+
+<h2 id="div-idsection11-creatingopeningclosing-a-tdlpack-file"><div id='section1'>1) Creating/Opening/Closing a TDLPACK file.</h2>
+
+<p>To create a TDLPACK file from Python, you call the <code>pytdlpack.open</code> function and provide the
+file name and <code>mode='w' or 'a'</code>.  For <code>mode='a'</code>, this will append to an existing file.  When
+creating a new file, the default file format is <code>'sequential'</code>, but the user can also specify
+the format with <code>format='sequential' or 'random-access'</code>.  If the new file is random-access,
+then the user can also specify <code>ra_template='small' or 'large'</code>.  The default is 'small' and
+'large' is recommended for a high-resolution grids (i.e. ~ &gt; 2M total points).</p>
+
+<p>Example: Create a new sequential file:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.sq&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Example: Create a new random-access file:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.sq&#39;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;random-access&#39;</span><span class="p">,</span><span class="n">ra_template</span><span class="o">=</span><span class="s1">&#39;small&#39;</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>To open an existing TDLPACK file, simply provide the filename since the default mode is read.</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">import</span> <span class="nn">pytdlpack</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.sq&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">pytdlpack</span><span class="o">.</span><span class="n">_pytdlpack</span><span class="o">.</span><span class="n">TdlpackFile</span><span class="s1">&#39;&gt;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span>
+<span class="n">byte_order</span> <span class="o">=</span> <span class="o">&gt;</span>
+<span class="n">data_type</span> <span class="o">=</span>
+<span class="n">eof</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="nb">format</span> <span class="o">=</span> <span class="n">sequential</span>
+<span class="n">fortran_lun</span> <span class="o">=</span> <span class="mi">65535</span>
+<span class="n">mode</span> <span class="o">=</span> <span class="n">r</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">sq</span>
+<span class="n">position</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">ra_master_key</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">size</span> <span class="o">=</span> <span class="mi">998672</span>
+</code></pre>
+</div>
+
+<p>To close a TDLPACK file is straightforward.</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h2 id="div-idsection22-reading-a-tdlpack-file"><div id='section2'>2) Reading a TDLPACK file.</h2>
+
+<p>When a TDLPACK file is opened, an instance of class <code>pytdlpack.TdlpackFile</code> is created.
+To read a record the file, use the class method <code>pytdlpack.TdlpackFile.read</code>.  By default
+only 1 record is returned and the TDLPACK indentification sections are unpacked.</p>
+
+<p>Example: Reading a gridded TDLPACK record.</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span>
+<span class="n">grid_length</span> <span class="o">=</span> <span class="mf">2539.703</span>
+<span class="nb">id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">223254166</span>         <span class="mi">0</span>         <span class="mi">6</span>         <span class="mi">0</span><span class="p">]</span>
+<span class="n">ioctet</span> <span class="o">=</span> <span class="mi">998656</span>
+<span class="n">ipack</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1347175508</span>  <span class="mi">255654144</span> <span class="mi">1191249890</span> <span class="o">...</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span><span class="p">]</span>
+<span class="n">is0</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1347175508</span>     <span class="mi">998649</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span><span class="p">]</span>
+<span class="n">is1</span> <span class="o">=</span> <span class="p">[</span>        <span class="mi">71</span>          <span class="mi">1</span>       <span class="mi">2018</span>         <span class="mi">12</span>          <span class="mi">4</span>          <span class="mi">0</span>
+          <span class="mi">0</span> <span class="mi">2018120400</span>  <span class="mi">223254166</span>          <span class="mi">0</span>          <span class="mi">6</span>          <span class="mi">0</span>
+          <span class="mi">6</span>          <span class="mi">0</span>         <span class="mi">66</span>          <span class="mi">0</span>          <span class="mi">1</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>         <span class="mi">32</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>
+          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span>          <span class="mi">0</span><span class="p">]</span>
+<span class="n">is2</span> <span class="o">=</span> <span class="p">[</span>     <span class="mi">28</span>       <span class="mi">3</span>    <span class="mi">2345</span>    <span class="mi">1597</span>  <span class="mi">192290</span> <span class="mi">2337234</span>  <span class="mi">950000</span> <span class="mi">2539703</span>  <span class="mi">250000</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span><span class="p">]</span>
+<span class="n">is4</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">998538</span>      <span class="mi">12</span> <span class="mi">3744965</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>
+       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span>       <span class="mi">0</span><span class="p">]</span>
+<span class="n">lead_time</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="n">lower_left_latitude</span> <span class="o">=</span> <span class="mf">19.229</span>
+<span class="n">lower_left_longitude</span> <span class="o">=</span> <span class="mf">233.7234</span>
+<span class="n">map_proj</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">number_of_values</span> <span class="o">=</span> <span class="mi">3744965</span>
+<span class="n">nx</span> <span class="o">=</span> <span class="mi">2345</span>
+<span class="n">ny</span> <span class="o">=</span> <span class="mi">1597</span>
+<span class="n">origin_longitude</span> <span class="o">=</span> <span class="mf">95.0</span>
+<span class="n">plain</span> <span class="o">=</span>
+<span class="n">primary_missing_value</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">reference_date</span> <span class="o">=</span> <span class="mi">2018120400</span>
+<span class="n">secondary_missing_value</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">standard_latitude</span> <span class="o">=</span> <span class="mf">25.0</span>
+<span class="nb">type</span> <span class="o">=</span> <span class="n">grid</span>
+</code></pre>
+</div>
+
+<p>You can also have <code>pytdlpack.TdlpackFile.read</code> read the entire file with optional keyword
+<code>all = True</code>.  Reading all records at once is not recommened if the file is large in size.</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">all</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>Here, x will become a list of instances of either <code>pytdlpack.TdlpackStationRecord</code>,
+<code>pytdlpack.TdlpackRecord</code>, or <code>pytdlpack.TdlpackTrailerRecord</code>.</p>
+
+<p>If the file being read a TDLPACK random-access (<code>format='random-access'</code>), then you can also provide the <code>id=</code>
+argument to search for a specific record.</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;test.ra&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="p">[</span><span class="mi">400001000</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="err">&#39;</span><span class="nc">pytdlpack</span><span class="o">.</span><span class="n">_pytdlpack</span><span class="o">.</span><span class="n">TdlpackStationRecord</span><span class="s1">&#39;&gt;</span>
+</code></pre>
+</div>
+
+<h2 id="div-idsection33-writing-a-tdlpack-file"><div id='section3'>3) Writing a TDLPACK file.</h2>
+
+<p>Writing to a TDLPACK file is as easy as reading.  The following uses variable x, from
+above, is an instance of <code>pytdlpack.TdlpackStationRecord</code> that has been packed.</p>
+
+<p>Example: Write to a new TDLPACK sequential file.</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;new.sq&quot;</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;sequential&quot;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<h2 id="div-idsection44-creating-a-tdlpack-station-record"><div id='section4'>4) Creating a TDLPACK Station Record.</h2>
+
+<p>The constructor for <code>pytdlpack.TdlpackStationRecord</code> provides two methods of
+instantiation via the traditional <strong>kwargs (see <code>pytdlpack.TdlpackStationRecord.__init__</code>)
+or simply providing <code>ccall = ...</code> <em></strong>(recommended)</em>**.  The value passed to the <code>ccall=</code> argument can
+be a single call letter string, list, tuple, or comma-delimited string of station call letter records.</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pytdlpack</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">stations</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">TdlpackStationRecord</span><span class="p">([</span><span class="s1">&#39;KBWI&#39;</span><span class="p">,</span><span class="s1">&#39;KDCA&#39;</span><span class="p">,</span><span class="s1">&#39;KIAD&#39;</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">stations</span>
+<span class="n">ccall</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;KBWI&#39;</span><span class="p">,</span> <span class="s1">&#39;KDCA&#39;</span><span class="p">,</span> <span class="s1">&#39;KIAD&#39;</span><span class="p">]</span>
+<span class="nb">id</span> <span class="o">=</span> <span class="p">[</span><span class="mi">400001000</span>         <span class="mi">0</span>         <span class="mi">0</span>         <span class="mi">0</span><span class="p">]</span>
+<span class="n">ioctet</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">ipack</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">number_of_stations</span> <span class="o">=</span> <span class="mi">3</span>
+</code></pre>
+</div>
+
+<h2 id="div-idsection55-creating-a-tdlpack-record"><div id='section5'>5) Creating a TDLPACK Record.</h2>
+
+<p>The recommended method for creating a <code>pytdlpack.TdlpackRecord</code> is to pass the TDLPACK
+indentification arrays, plain language string, and data to the approproiate keyword.  Please
+see <code>pytdlpack.TdlpackRecord.__init__</code> for more info.</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">record</span> <span class="o">=</span> <span class="n">pytdlpack</span><span class="o">.</span><span class="n">TdlpackRecord</span><span class="p">(</span><span class="n">date</span><span class="o">=</span><span class="mi">2019070100</span><span class="p">,</span><span class="nb">id</span><span class="o">=</span><span class="p">[</span><span class="mi">4210008</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span><span class="n">lead</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+<span class="n">plain</span><span class="o">=</span><span class="s2">&quot;GFS WIND SPEED&quot;</span><span class="p">,</span><span class="n">grid</span><span class="o">=</span><span class="n">grid_def</span><span class="p">,</span><span class="n">data</span><span class="o">=&lt;</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span> <span class="n">array</span><span class="o">&gt;</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>The user is encouraged to read the official MOS-2000 documentation (specifically Chapter 5)
+on construction of these arrays and proper encoding.</p>
+
+<h2 id="div-idsection66-packingunpacking-a-tdlpack-record"><div id='section6'>6) Packing/Unpacking a TDLPACK Record.</h2>
+
+<p>Once any of the three classes of TDLPACK records have been instantiated, you can pack the
+record using the class method <code>pack</code>.  Using the example from <a href="#section5">Section 5</a>, <code>record</code>
+is now an instance of <code>pytdlpack.TdlpackRecord</code>.  You can pack this record with the following:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">record</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p>To unpack a packed TDLPACK record, perform:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">record</span><span class="o">.</span><span class="n">unpack</span><span class="p">()</span>
+</code></pre>
+</div>
+
+<p>The <code>pytdlpack.TdlpackRecord.unpack</code> class method for TDLPACK data records, contains optional
+arguments <code>data=</code> (to control the unpacking of data) and <code>missing_value=</code> (to set a different
+missing value other than what is contained in the record).  For TDLPACK data records,
+<code>pytdlpack.TdlpackRecord.unpack</code> automatically unpacks the TDLPACK meta-data.</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">record</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">missing_value</span><span class="o">=-</span><span class="mf">9999.0</span><span class="p">)</span>
+</code></pre>
+</div>
+</div>
+
+                        <input id="mod-tdlpackio-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+
+                        <label class="view-source-button" for="mod-tdlpackio-view-source"><span>View Source</span></label>
+
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a><span class="c1"># init for tdlpackio package</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos">2</span></a><span class="kn">from</span> <span class="nn">._tdlpackio</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos">3</span></a><span class="kn">from</span> <span class="nn">._tdlpackio</span> <span class="kn">import</span> <span class="vm">__doc__</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos">4</span></a>
+</span><span id="L-5"><a href="#L-5"><span class="linenos">5</span></a><span class="c1">#from ._grid_definitions import grids</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos">6</span></a>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">7</span></a><span class="kn">from</span> <span class="nn">.version</span> <span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">__version__</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">8</span></a>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">9</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;__version__&#39;</span><span class="p">,</span><span class="s1">&#39;open&#39;</span><span class="p">,</span><span class="s1">&#39;TdlpackRecord&#39;</span><span class="p">,</span><span class="s1">&#39;TdlpackStationRecord&#39;</span><span class="p">,</span><span class="s1">&#39;TdlpackTrailerRecord&#39;</span><span class="p">,]</span>
+</span></pre></div>
+
+
+            </section>
+                <section id="__version__">
+                    <div class="attr variable">
+            <span class="name">__version__</span>        =
+<span class="default_value">&#39;2.0.0&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#__version__"></a>
+    
+    
+
+                </section>
+                <section id="open">
+                            <input id="open-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">open</span>:
+
+                <label class="view-source-button" for="open-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#open"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="open-323"><a href="#open-323"><span class="linenos">323</span></a><span class="k">class</span> <span class="nc">open</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span id="open-324"><a href="#open-324"><span class="linenos">324</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-325"><a href="#open-325"><span class="linenos">325</span></a><span class="sd">    Open class for tdlpackio.</span>
+</span><span id="open-326"><a href="#open-326"><span class="linenos">326</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="open-327"><a href="#open-327"><span class="linenos">327</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">):</span>
+</span><span id="open-328"><a href="#open-328"><span class="linenos">328</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-329"><a href="#open-329"><span class="linenos">329</span></a><span class="sd">        Class Constructor</span>
+</span><span id="open-330"><a href="#open-330"><span class="linenos">330</span></a>
+</span><span id="open-331"><a href="#open-331"><span class="linenos">331</span></a><span class="sd">        Parameters</span>
+</span><span id="open-332"><a href="#open-332"><span class="linenos">332</span></a><span class="sd">        ----------</span>
+</span><span id="open-333"><a href="#open-333"><span class="linenos">333</span></a>
+</span><span id="open-334"><a href="#open-334"><span class="linenos">334</span></a><span class="sd">        **`path : str`**</span>
+</span><span id="open-335"><a href="#open-335"><span class="linenos">335</span></a>
+</span><span id="open-336"><a href="#open-336"><span class="linenos">336</span></a><span class="sd">        File name.</span>
+</span><span id="open-337"><a href="#open-337"><span class="linenos">337</span></a>
+</span><span id="open-338"><a href="#open-338"><span class="linenos">338</span></a><span class="sd">        **`mode : str, optional, default = &#39;r&#39;`**</span>
+</span><span id="open-339"><a href="#open-339"><span class="linenos">339</span></a>
+</span><span id="open-340"><a href="#open-340"><span class="linenos">340</span></a><span class="sd">        File handle mode.  The default is open for reading (&#39;r&#39;).</span>
+</span><span id="open-341"><a href="#open-341"><span class="linenos">341</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open-342"><a href="#open-342"><span class="linenos">342</span></a>        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;r&#39;</span> <span class="ow">or</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span><span class="o">+</span><span class="s1">&#39;b&#39;</span>
+</span><span id="open-343"><a href="#open-343"><span class="linenos">343</span></a>        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;wb&#39;</span>
+</span><span id="open-344"><a href="#open-344"><span class="linenos">344</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span> <span class="o">=</span> <span class="n">builtins</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span><span class="n">buffering</span><span class="o">=</span><span class="n">_ONE_MB</span><span class="p">)</span>
+</span><span id="open-345"><a href="#open-345"><span class="linenos">345</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_hasindex</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="open-346"><a href="#open-346"><span class="linenos">346</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="open-347"><a href="#open-347"><span class="linenos">347</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_counter</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="open-348"><a href="#open-348"><span class="linenos">348</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+</span><span id="open-349"><a href="#open-349"><span class="linenos">349</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span id="open-350"><a href="#open-350"><span class="linenos">350</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">filetype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tdlpack_file_type</span><span class="p">()</span>
+</span><span id="open-351"><a href="#open-351"><span class="linenos">351</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="open-352"><a href="#open-352"><span class="linenos">352</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="open-353"><a href="#open-353"><span class="linenos">353</span></a>        <span class="c1"># Perform indexing on read</span>
+</span><span id="open-354"><a href="#open-354"><span class="linenos">354</span></a>        <span class="k">if</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_index</span><span class="p">()</span>
+</span><span id="open-355"><a href="#open-355"><span class="linenos">355</span></a>
+</span><span id="open-356"><a href="#open-356"><span class="linenos">356</span></a>    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="open-357"><a href="#open-357"><span class="linenos">357</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-358"><a href="#open-358"><span class="linenos">358</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open-359"><a href="#open-359"><span class="linenos">359</span></a>        <span class="k">return</span> <span class="bp">self</span>
+</span><span id="open-360"><a href="#open-360"><span class="linenos">360</span></a>
+</span><span id="open-361"><a href="#open-361"><span class="linenos">361</span></a>    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atype</span> <span class="p">,</span><span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+</span><span id="open-362"><a href="#open-362"><span class="linenos">362</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-363"><a href="#open-363"><span class="linenos">363</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open-364"><a href="#open-364"><span class="linenos">364</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="open-365"><a href="#open-365"><span class="linenos">365</span></a>
+</span><span id="open-366"><a href="#open-366"><span class="linenos">366</span></a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="open-367"><a href="#open-367"><span class="linenos">367</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-368"><a href="#open-368"><span class="linenos">368</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open-369"><a href="#open-369"><span class="linenos">369</span></a>        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]</span>
+</span><span id="open-370"><a href="#open-370"><span class="linenos">370</span></a>
+</span><span id="open-371"><a href="#open-371"><span class="linenos">371</span></a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="open-372"><a href="#open-372"><span class="linenos">372</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-373"><a href="#open-373"><span class="linenos">373</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open-374"><a href="#open-374"><span class="linenos">374</span></a>        <span class="n">strings</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="open-375"><a href="#open-375"><span class="linenos">375</span></a>        <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</span><span id="open-376"><a href="#open-376"><span class="linenos">376</span></a>        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+</span><span id="open-377"><a href="#open-377"><span class="linenos">377</span></a>            <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+</span><span id="open-378"><a href="#open-378"><span class="linenos">378</span></a>                <span class="n">strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+</span><span id="open-379"><a href="#open-379"><span class="linenos">379</span></a>        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">strings</span><span class="p">)</span>
+</span><span id="open-380"><a href="#open-380"><span class="linenos">380</span></a>
+</span><span id="open-381"><a href="#open-381"><span class="linenos">381</span></a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+</span><span id="open-382"><a href="#open-382"><span class="linenos">382</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-383"><a href="#open-383"><span class="linenos">383</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open-384"><a href="#open-384"><span class="linenos">384</span></a>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="nb">slice</span><span class="p">):</span>
+</span><span id="open-385"><a href="#open-385"><span class="linenos">385</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+</span><span id="open-386"><a href="#open-386"><span class="linenos">386</span></a>        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="nb">int</span><span class="p">):</span>
+</span><span id="open-387"><a href="#open-387"><span class="linenos">387</span></a>            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+</span><span id="open-388"><a href="#open-388"><span class="linenos">388</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="open-389"><a href="#open-389"><span class="linenos">389</span></a>            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Key must be an integer record number or a slice&#39;</span><span class="p">)</span>
+</span><span id="open-390"><a href="#open-390"><span class="linenos">390</span></a>
+</span><span id="open-391"><a href="#open-391"><span class="linenos">391</span></a>    <span class="k">def</span> <span class="nf">_get_tdlpack_file_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="open-392"><a href="#open-392"><span class="linenos">392</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-393"><a href="#open-393"><span class="linenos">393</span></a><span class="sd">        Determine the type of TDLPACK file.</span>
+</span><span id="open-394"><a href="#open-394"><span class="linenos">394</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open-395"><a href="#open-395"><span class="linenos">395</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="open-396"><a href="#open-396"><span class="linenos">396</span></a>        <span class="n">i</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="open-397"><a href="#open-397"><span class="linenos">397</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="open-398"><a href="#open-398"><span class="linenos">398</span></a>        <span class="k">return</span> <span class="s1">&#39;random-access&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;sequential&#39;</span>
+</span><span id="open-399"><a href="#open-399"><span class="linenos">399</span></a>        
+</span><span id="open-400"><a href="#open-400"><span class="linenos">400</span></a>    <span class="k">def</span> <span class="nf">_build_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="open-401"><a href="#open-401"><span class="linenos">401</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-402"><a href="#open-402"><span class="linenos">402</span></a><span class="sd">        Record Indexer</span>
+</span><span id="open-403"><a href="#open-403"><span class="linenos">403</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open-404"><a href="#open-404"><span class="linenos">404</span></a>        <span class="c1"># Initialize index dictionary</span>
+</span><span id="open-405"><a href="#open-405"><span class="linenos">405</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="open-406"><a href="#open-406"><span class="linenos">406</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="open-407"><a href="#open-407"><span class="linenos">407</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="open-408"><a href="#open-408"><span class="linenos">408</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="open-409"><a href="#open-409"><span class="linenos">409</span></a>
+</span><span id="open-410"><a href="#open-410"><span class="linenos">410</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filetype</span> <span class="o">==</span> <span class="s1">&#39;sequential&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequential_file_indexer</span><span class="p">()</span>
+</span><span id="open-411"><a href="#open-411"><span class="linenos">411</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filetype</span> <span class="o">==</span> <span class="s1">&#39;random-access&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randomaccess_file_indexer</span><span class="p">()</span>
+</span><span id="open-412"><a href="#open-412"><span class="linenos">412</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_hasindex</span> <span class="o">=</span> <span class="kc">True</span>
+</span><span id="open-413"><a href="#open-413"><span class="linenos">413</span></a>
+</span><span id="open-414"><a href="#open-414"><span class="linenos">414</span></a>        <span class="c1"># Index at end of _build_index()</span>
+</span><span id="open-415"><a href="#open-415"><span class="linenos">415</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hasindex</span><span class="p">:</span>
+</span><span id="open-416"><a href="#open-416"><span class="linenos">416</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">dates</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">rec</span><span class="o">.</span><span class="n">refDate</span> <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span><span class="s1">&#39;refDate&#39;</span><span class="p">)])))</span>
+</span><span id="open-417"><a href="#open-417"><span class="linenos">417</span></a>
+</span><span id="open-418"><a href="#open-418"><span class="linenos">418</span></a>    <span class="k">def</span> <span class="nf">_randomaccess_file_indexer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="open-419"><a href="#open-419"><span class="linenos">419</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-420"><a href="#open-420"><span class="linenos">420</span></a><span class="sd">        Indexer for random-access TDLPACK files.</span>
+</span><span id="open-421"><a href="#open-421"><span class="linenos">421</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open-422"><a href="#open-422"><span class="linenos">422</span></a>        <span class="c1"># Read master key</span>
+</span><span id="open-423"><a href="#open-423"><span class="linenos">423</span></a>        <span class="n">version</span><span class="p">,</span> <span class="n">nids</span><span class="p">,</span> <span class="n">nwords</span><span class="p">,</span> <span class="n">nkyrec</span><span class="p">,</span> <span class="n">maxent</span><span class="p">,</span> <span class="n">lastky</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&gt;iiiiii&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">24</span><span class="p">))</span>
+</span><span id="open-424"><a href="#open-424"><span class="linenos">424</span></a>        <span class="n">nbytes</span> <span class="o">=</span> <span class="n">nwords</span><span class="o">*</span><span class="n">_L3264W</span>
+</span><span id="open-425"><a href="#open-425"><span class="linenos">425</span></a>        <span class="c1"># Set file position to first key record</span>
+</span><span id="open-426"><a href="#open-426"><span class="linenos">426</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">nbytes</span><span class="p">)</span>
+</span><span id="open-427"><a href="#open-427"><span class="linenos">427</span></a>
+</span><span id="open-428"><a href="#open-428"><span class="linenos">428</span></a>        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+</span><span id="open-429"><a href="#open-429"><span class="linenos">429</span></a>
+</span><span id="open-430"><a href="#open-430"><span class="linenos">430</span></a>            <span class="c1"># Read key record &quot;header&quot; data</span>
+</span><span id="open-431"><a href="#open-431"><span class="linenos">431</span></a>            <span class="n">nkeys</span><span class="p">,</span> <span class="n">nprec</span><span class="p">,</span> <span class="n">prec_next_key</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&gt;iii&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">12</span><span class="p">))</span>
+</span><span id="open-432"><a href="#open-432"><span class="linenos">432</span></a>
+</span><span id="open-433"><a href="#open-433"><span class="linenos">433</span></a>            <span class="n">mid</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+</span><span id="open-434"><a href="#open-434"><span class="linenos">434</span></a>            <span class="n">nd</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+</span><span id="open-435"><a href="#open-435"><span class="linenos">435</span></a>            <span class="n">bprec</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+</span><span id="open-436"><a href="#open-436"><span class="linenos">436</span></a>
+</span><span id="open-437"><a href="#open-437"><span class="linenos">437</span></a>            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nkeys</span><span class="p">):</span>
+</span><span id="open-438"><a href="#open-438"><span class="linenos">438</span></a>                <span class="n">id1</span><span class="p">,</span><span class="n">id2</span><span class="p">,</span><span class="n">id3</span><span class="p">,</span><span class="n">id4</span><span class="p">,</span><span class="n">_nd</span><span class="p">,</span><span class="n">_bprec</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&gt;iiiiii&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">24</span><span class="p">))</span>
+</span><span id="open-439"><a href="#open-439"><span class="linenos">439</span></a>                <span class="n">mid</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">id1</span><span class="p">,</span><span class="n">id2</span><span class="p">,</span><span class="n">id3</span><span class="p">,</span><span class="n">id4</span><span class="p">])</span>
+</span><span id="open-440"><a href="#open-440"><span class="linenos">440</span></a>                <span class="n">nd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_nd</span><span class="p">)</span>
+</span><span id="open-441"><a href="#open-441"><span class="linenos">441</span></a>                <span class="n">bprec</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_bprec</span><span class="p">)</span>
+</span><span id="open-442"><a href="#open-442"><span class="linenos">442</span></a>
+</span><span id="open-443"><a href="#open-443"><span class="linenos">443</span></a>            <span class="k">for</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mid</span><span class="p">,</span><span class="n">nd</span><span class="p">,</span><span class="n">bprec</span><span class="p">):</span>
+</span><span id="open-444"><a href="#open-444"><span class="linenos">444</span></a>                <span class="n">prec1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="o">/</span><span class="mf">1000.0</span><span class="p">)</span>
+</span><span id="open-445"><a href="#open-445"><span class="linenos">445</span></a>                <span class="n">nprec</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="p">(</span><span class="n">prec1</span><span class="o">*</span><span class="mf">1000.0</span><span class="p">))</span>
+</span><span id="open-446"><a href="#open-446"><span class="linenos">446</span></a>
+</span><span id="open-447"><a href="#open-447"><span class="linenos">447</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">seek</span><span class="p">((</span><span class="n">prec1</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nbytes</span><span class="p">)</span>
+</span><span id="open-448"><a href="#open-448"><span class="linenos">448</span></a>                <span class="n">mbytes</span> <span class="o">=</span> <span class="n">nprec</span><span class="o">*</span><span class="n">nbytes</span>
+</span><span id="open-449"><a href="#open-449"><span class="linenos">449</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">tell</span><span class="p">())</span>
+</span><span id="open-450"><a href="#open-450"><span class="linenos">450</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mbytes</span><span class="p">)</span>
+</span><span id="open-451"><a href="#open-451"><span class="linenos">451</span></a>                <span class="k">if</span> <span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">400001000</span><span class="p">:</span>
+</span><span id="open-452"><a href="#open-452"><span class="linenos">452</span></a>                    <span class="c1"># Station ID record...not in TDLPACK format</span>
+</span><span id="open-453"><a href="#open-453"><span class="linenos">453</span></a>                    <span class="n">rec</span> <span class="o">=</span> <span class="n">TdlpackStationRecord</span><span class="p">()</span>
+</span><span id="open-454"><a href="#open-454"><span class="linenos">454</span></a>                    <span class="n">rec</span><span class="o">.</span><span class="n">_recnum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="o">+</span><span class="mi">1</span>
+</span><span id="open-455"><a href="#open-455"><span class="linenos">455</span></a>                    <span class="n">rec</span><span class="o">.</span><span class="n">numberOfStations</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+</span><span id="open-456"><a href="#open-456"><span class="linenos">456</span></a>                    <span class="c1">#stations = struct.unpack(&#39;&gt;&#39;+&#39;8s&#39;*nsta,self._filehandle.read(nsta*8))</span>
+</span><span id="open-457"><a href="#open-457"><span class="linenos">457</span></a>                    <span class="c1">#rec.stations = [s.decode().strip() for s in stations]</span>
+</span><span id="open-458"><a href="#open-458"><span class="linenos">458</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+</span><span id="open-459"><a href="#open-459"><span class="linenos">459</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;station&#39;</span><span class="p">)</span>
+</span><span id="open-460"><a href="#open-460"><span class="linenos">460</span></a>                <span class="k">else</span><span class="p">:</span>
+</span><span id="open-461"><a href="#open-461"><span class="linenos">461</span></a>                    <span class="c1"># TDLPACK data record</span>
+</span><span id="open-462"><a href="#open-462"><span class="linenos">462</span></a>                    <span class="n">ipack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">132</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;i4&#39;</span><span class="p">)</span>
+</span><span id="open-463"><a href="#open-463"><span class="linenos">463</span></a>                    <span class="n">iwork</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ipack</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="open-464"><a href="#open-464"><span class="linenos">464</span></a>                    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ipack</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="open-465"><a href="#open-465"><span class="linenos">465</span></a>                    <span class="n">is0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_ND7</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="open-466"><a href="#open-466"><span class="linenos">466</span></a>                    <span class="n">is1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_ND7</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="open-467"><a href="#open-467"><span class="linenos">467</span></a>                    <span class="n">is2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_ND7</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="open-468"><a href="#open-468"><span class="linenos">468</span></a>                    <span class="n">is4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_ND7</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="open-469"><a href="#open-469"><span class="linenos">469</span></a>                    <span class="n">ier</span><span class="p">,</span> <span class="n">igive</span><span class="p">,</span> <span class="n">pmiss</span><span class="p">,</span> <span class="n">smiss</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_PMISS</span><span class="p">,</span> <span class="n">_SMISS</span>
+</span><span id="open-470"><a href="#open-470"><span class="linenos">470</span></a>                    <span class="n">data</span><span class="p">,</span><span class="n">ier</span> <span class="o">=</span> <span class="n">tdlpacklib</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="n">ipack</span><span class="p">,</span><span class="n">iwork</span><span class="p">,</span><span class="n">is0</span><span class="p">,</span><span class="n">is1</span><span class="p">,</span><span class="n">is2</span><span class="p">,</span><span class="n">is4</span><span class="p">,</span><span class="n">pmiss</span><span class="p">,</span><span class="n">smiss</span><span class="p">,</span>
+</span><span id="open-471"><a href="#open-471"><span class="linenos">471</span></a>                                               <span class="n">igive</span><span class="p">,</span><span class="n">_L3264B</span><span class="p">)</span>
+</span><span id="open-472"><a href="#open-472"><span class="linenos">472</span></a>                    <span class="n">rec</span> <span class="o">=</span> <span class="n">TdlpackRecord</span><span class="p">(</span><span class="n">is0</span><span class="p">,</span><span class="n">is1</span><span class="p">,</span><span class="n">is2</span><span class="p">,</span><span class="n">is4</span><span class="p">)</span>
+</span><span id="open-473"><a href="#open-473"><span class="linenos">473</span></a>                    <span class="n">rec</span><span class="o">.</span><span class="n">_recnum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="o">+</span><span class="mi">1</span>
+</span><span id="open-474"><a href="#open-474"><span class="linenos">474</span></a>                    <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span><span class="n">rec</span><span class="o">.</span><span class="n">nx</span><span class="p">)</span> <span class="k">if</span> <span class="n">rec</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;grid&#39;</span> <span class="k">else</span> <span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">numberOfPackedValues</span><span class="p">,)</span>
+</span><span id="open-475"><a href="#open-475"><span class="linenos">475</span></a>                    <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="open-476"><a href="#open-476"><span class="linenos">476</span></a>                    <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span>
+</span><span id="open-477"><a href="#open-477"><span class="linenos">477</span></a>                    <span class="n">rec</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">TdlpackRecordOnDiskArray</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span><span class="n">ndim</span><span class="p">,</span><span class="n">dtype</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">filetype</span><span class="p">,</span>
+</span><span id="open-478"><a href="#open-478"><span class="linenos">478</span></a>                                                         <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="p">,</span><span class="n">rec</span><span class="p">,</span>
+</span><span id="open-479"><a href="#open-479"><span class="linenos">479</span></a>                                                         <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+</span><span id="open-480"><a href="#open-480"><span class="linenos">480</span></a>                                                         <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span><span id="open-481"><a href="#open-481"><span class="linenos">481</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+</span><span id="open-482"><a href="#open-482"><span class="linenos">482</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+</span><span id="open-483"><a href="#open-483"><span class="linenos">483</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span id="open-484"><a href="#open-484"><span class="linenos">484</span></a>
+</span><span id="open-485"><a href="#open-485"><span class="linenos">485</span></a>            <span class="c1"># Hold the record number of the last station ID record</span>
+</span><span id="open-486"><a href="#open-486"><span class="linenos">486</span></a>            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;station&#39;</span><span class="p">:</span>
+</span><span id="open-487"><a href="#open-487"><span class="linenos">487</span></a>                <span class="n">_last_station_id_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="c1"># This should be OK.</span>
+</span><span id="open-488"><a href="#open-488"><span class="linenos">488</span></a>
+</span><span id="open-489"><a href="#open-489"><span class="linenos">489</span></a>            <span class="k">if</span> <span class="n">prec_next_key</span> <span class="o">==</span> <span class="mi">99999999</span><span class="p">:</span> <span class="k">break</span>
+</span><span id="open-490"><a href="#open-490"><span class="linenos">490</span></a>            <span class="n">kbytes</span> <span class="o">=</span> <span class="p">(</span><span class="n">prec_next_key</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">nbytes</span>
+</span><span id="open-491"><a href="#open-491"><span class="linenos">491</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">kbytes</span><span class="p">)</span>
+</span><span id="open-492"><a href="#open-492"><span class="linenos">492</span></a>
+</span><span id="open-493"><a href="#open-493"><span class="linenos">493</span></a>    <span class="k">def</span> <span class="nf">_sequential_file_indexer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="open-494"><a href="#open-494"><span class="linenos">494</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-495"><a href="#open-495"><span class="linenos">495</span></a><span class="sd">        Indexer for sequential TDLPACK files.</span>
+</span><span id="open-496"><a href="#open-496"><span class="linenos">496</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open-497"><a href="#open-497"><span class="linenos">497</span></a>        <span class="c1"># Iterate</span>
+</span><span id="open-498"><a href="#open-498"><span class="linenos">498</span></a>        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+</span><span id="open-499"><a href="#open-499"><span class="linenos">499</span></a>            <span class="k">try</span><span class="p">:</span>
+</span><span id="open-500"><a href="#open-500"><span class="linenos">500</span></a>                <span class="c1"># First read 4-byte Fortran record header</span>
+</span><span id="open-501"><a href="#open-501"><span class="linenos">501</span></a>                <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+</span><span id="open-502"><a href="#open-502"><span class="linenos">502</span></a>                <span class="n">fortran_header</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="open-503"><a href="#open-503"><span class="linenos">503</span></a>                <span class="k">if</span> <span class="n">fortran_header</span> <span class="o">&gt;=</span> <span class="mi">132</span><span class="p">:</span>
+</span><span id="open-504"><a href="#open-504"><span class="linenos">504</span></a>                    <span class="n">bytes_to_read</span> <span class="o">=</span> <span class="mi">132</span>
+</span><span id="open-505"><a href="#open-505"><span class="linenos">505</span></a>                <span class="k">else</span><span class="p">:</span>
+</span><span id="open-506"><a href="#open-506"><span class="linenos">506</span></a>                    <span class="n">bytes_to_read</span> <span class="o">=</span> <span class="n">fortran_header</span>
+</span><span id="open-507"><a href="#open-507"><span class="linenos">507</span></a>
+</span><span id="open-508"><a href="#open-508"><span class="linenos">508</span></a>                <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+</span><span id="open-509"><a href="#open-509"><span class="linenos">509</span></a>                <span class="n">ioctet</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;i8&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="open-510"><a href="#open-510"><span class="linenos">510</span></a>                <span class="n">ipack</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bytes_to_read</span><span class="o">-</span><span class="mi">8</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;&gt;i4&#39;</span><span class="p">)</span>
+</span><span id="open-511"><a href="#open-511"><span class="linenos">511</span></a>                <span class="n">_header</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&gt;4s&#39;</span><span class="p">,</span><span class="n">ipack</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+</span><span id="open-512"><a href="#open-512"><span class="linenos">512</span></a>
+</span><span id="open-513"><a href="#open-513"><span class="linenos">513</span></a>                <span class="c1"># Check to first 4 bytes of the data record to determine the data</span>
+</span><span id="open-514"><a href="#open-514"><span class="linenos">514</span></a>                <span class="c1"># record type.</span>
+</span><span id="open-515"><a href="#open-515"><span class="linenos">515</span></a>                <span class="k">if</span> <span class="n">_header</span> <span class="o">==</span> <span class="s1">&#39;PLDT&#39;</span><span class="p">:</span>
+</span><span id="open-516"><a href="#open-516"><span class="linenos">516</span></a>                    <span class="c1"># TDLPACK data record</span>
+</span><span id="open-517"><a href="#open-517"><span class="linenos">517</span></a>                    <span class="n">iwork</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ipack</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="open-518"><a href="#open-518"><span class="linenos">518</span></a>                    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">ipack</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="open-519"><a href="#open-519"><span class="linenos">519</span></a>                    <span class="n">is0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_ND7</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="open-520"><a href="#open-520"><span class="linenos">520</span></a>                    <span class="n">is1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_ND7</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="open-521"><a href="#open-521"><span class="linenos">521</span></a>                    <span class="n">is2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_ND7</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="open-522"><a href="#open-522"><span class="linenos">522</span></a>                    <span class="n">is4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_ND7</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="open-523"><a href="#open-523"><span class="linenos">523</span></a>                    <span class="n">ier</span><span class="p">,</span> <span class="n">igive</span><span class="p">,</span> <span class="n">pmiss</span><span class="p">,</span> <span class="n">smiss</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">_PMISS</span><span class="p">,</span> <span class="n">_SMISS</span>
+</span><span id="open-524"><a href="#open-524"><span class="linenos">524</span></a>                    <span class="n">data</span><span class="p">,</span><span class="n">ier</span> <span class="o">=</span> <span class="n">tdlpacklib</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="n">ipack</span><span class="p">,</span><span class="n">iwork</span><span class="p">,</span><span class="n">is0</span><span class="p">,</span><span class="n">is1</span><span class="p">,</span><span class="n">is2</span><span class="p">,</span><span class="n">is4</span><span class="p">,</span><span class="n">pmiss</span><span class="p">,</span><span class="n">smiss</span><span class="p">,</span>
+</span><span id="open-525"><a href="#open-525"><span class="linenos">525</span></a>                                                 <span class="n">igive</span><span class="p">,</span><span class="n">_L3264B</span><span class="p">)</span>
+</span><span id="open-526"><a href="#open-526"><span class="linenos">526</span></a>
+</span><span id="open-527"><a href="#open-527"><span class="linenos">527</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+</span><span id="open-528"><a href="#open-528"><span class="linenos">528</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fortran_header</span><span class="p">)</span> <span class="c1"># Size given by Fortran header</span>
+</span><span id="open-529"><a href="#open-529"><span class="linenos">529</span></a>                    <span class="n">rec</span> <span class="o">=</span> <span class="n">TdlpackRecord</span><span class="p">(</span><span class="n">is0</span><span class="p">,</span><span class="n">is1</span><span class="p">,</span><span class="n">is2</span><span class="p">,</span><span class="n">is4</span><span class="p">)</span>
+</span><span id="open-530"><a href="#open-530"><span class="linenos">530</span></a>                    <span class="n">rec</span><span class="o">.</span><span class="n">_recnum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="o">+</span><span class="mi">1</span>
+</span><span id="open-531"><a href="#open-531"><span class="linenos">531</span></a>                    <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span><span class="n">rec</span><span class="o">.</span><span class="n">nx</span><span class="p">)</span> <span class="k">if</span> <span class="n">rec</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;grid&#39;</span> <span class="k">else</span> <span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">numberOfPackedValues</span><span class="p">,)</span>
+</span><span id="open-532"><a href="#open-532"><span class="linenos">532</span></a>                    <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+</span><span id="open-533"><a href="#open-533"><span class="linenos">533</span></a>                    <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float32&#39;</span>
+</span><span id="open-534"><a href="#open-534"><span class="linenos">534</span></a>                    <span class="n">rec</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">TdlpackRecordOnDiskArray</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span><span class="n">ndim</span><span class="p">,</span><span class="n">dtype</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">filetype</span><span class="p">,</span>
+</span><span id="open-535"><a href="#open-535"><span class="linenos">535</span></a>                                                         <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="p">,</span><span class="n">rec</span><span class="p">,</span>
+</span><span id="open-536"><a href="#open-536"><span class="linenos">536</span></a>                                                         <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+</span><span id="open-537"><a href="#open-537"><span class="linenos">537</span></a>                                                         <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</span><span id="open-538"><a href="#open-538"><span class="linenos">538</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+</span><span id="open-539"><a href="#open-539"><span class="linenos">539</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+</span><span id="open-540"><a href="#open-540"><span class="linenos">540</span></a>                <span class="k">else</span><span class="p">:</span>
+</span><span id="open-541"><a href="#open-541"><span class="linenos">541</span></a>                    <span class="k">if</span> <span class="n">ioctet</span> <span class="o">==</span> <span class="mi">24</span> <span class="ow">and</span> <span class="n">ipack</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="mi">9999</span><span class="p">:</span>
+</span><span id="open-542"><a href="#open-542"><span class="linenos">542</span></a>                        <span class="c1"># Trailer record</span>
+</span><span id="open-543"><a href="#open-543"><span class="linenos">543</span></a>                        <span class="n">rec</span> <span class="o">=</span> <span class="n">TdlpackTrailerRecord</span><span class="p">()</span>
+</span><span id="open-544"><a href="#open-544"><span class="linenos">544</span></a>                        <span class="n">rec</span><span class="o">.</span><span class="n">_recnum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="o">+</span><span class="mi">1</span>
+</span><span id="open-545"><a href="#open-545"><span class="linenos">545</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+</span><span id="open-546"><a href="#open-546"><span class="linenos">546</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fortran_header</span><span class="p">)</span>
+</span><span id="open-547"><a href="#open-547"><span class="linenos">547</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;trailer&#39;</span><span class="p">)</span>
+</span><span id="open-548"><a href="#open-548"><span class="linenos">548</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+</span><span id="open-549"><a href="#open-549"><span class="linenos">549</span></a>                    <span class="k">else</span><span class="p">:</span>
+</span><span id="open-550"><a href="#open-550"><span class="linenos">550</span></a>                        <span class="c1"># Station ID record</span>
+</span><span id="open-551"><a href="#open-551"><span class="linenos">551</span></a>                        <span class="n">rec</span> <span class="o">=</span> <span class="n">TdlpackStationRecord</span><span class="p">()</span>
+</span><span id="open-552"><a href="#open-552"><span class="linenos">552</span></a>                        <span class="n">rec</span><span class="o">.</span><span class="n">_recnum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="o">+</span><span class="mi">1</span>
+</span><span id="open-553"><a href="#open-553"><span class="linenos">553</span></a>                        <span class="n">rec</span><span class="o">.</span><span class="n">numberOfStations</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ioctet</span><span class="o">/</span><span class="mi">8</span><span class="p">)</span>
+</span><span id="open-554"><a href="#open-554"><span class="linenos">554</span></a>                        <span class="c1">#self._filehandle.seek(pos+8)</span>
+</span><span id="open-555"><a href="#open-555"><span class="linenos">555</span></a>                        <span class="c1">#stations = struct.unpack(&#39;&gt;&#39;+&#39;8s&#39;*nsta,self._filehandle.read(ioctet))</span>
+</span><span id="open-556"><a href="#open-556"><span class="linenos">556</span></a>                        <span class="c1">#self._filehandle.seek(pos+bytes_to_read)</span>
+</span><span id="open-557"><a href="#open-557"><span class="linenos">557</span></a>                        <span class="c1">#rec.stations = [s.decode().strip() for s in stations]</span>
+</span><span id="open-558"><a href="#open-558"><span class="linenos">558</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;offset&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+</span><span id="open-559"><a href="#open-559"><span class="linenos">559</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fortran_header</span><span class="p">)</span>
+</span><span id="open-560"><a href="#open-560"><span class="linenos">560</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;station&#39;</span><span class="p">)</span>
+</span><span id="open-561"><a href="#open-561"><span class="linenos">561</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+</span><span id="open-562"><a href="#open-562"><span class="linenos">562</span></a>
+</span><span id="open-563"><a href="#open-563"><span class="linenos">563</span></a>                <span class="c1"># At this point we have successfully identified a TDLPACK record from</span>
+</span><span id="open-564"><a href="#open-564"><span class="linenos">564</span></a>                <span class="c1"># the file. Increment self.records and position the file pointer to</span>
+</span><span id="open-565"><a href="#open-565"><span class="linenos">565</span></a>                <span class="c1"># now read the Fortran trailer.</span>
+</span><span id="open-566"><a href="#open-566"><span class="linenos">566</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="o">+=</span> <span class="mi">1</span> <span class="c1"># Includes trailer records</span>
+</span><span id="open-567"><a href="#open-567"><span class="linenos">567</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fortran_header</span><span class="o">-</span><span class="n">bytes_to_read</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+</span><span id="open-568"><a href="#open-568"><span class="linenos">568</span></a>                <span class="n">fortran_trailer</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&gt;i&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+</span><span id="open-569"><a href="#open-569"><span class="linenos">569</span></a>
+</span><span id="open-570"><a href="#open-570"><span class="linenos">570</span></a>                <span class="c1"># Check Fortran header and trailer for the record.</span>
+</span><span id="open-571"><a href="#open-571"><span class="linenos">571</span></a>                <span class="k">if</span> <span class="n">fortran_header</span> <span class="o">!=</span> <span class="n">fortran_trailer</span><span class="p">:</span>
+</span><span id="open-572"><a href="#open-572"><span class="linenos">572</span></a>                    <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Bad Fortran record.&#39;</span><span class="p">)</span>
+</span><span id="open-573"><a href="#open-573"><span class="linenos">573</span></a>
+</span><span id="open-574"><a href="#open-574"><span class="linenos">574</span></a>                <span class="c1"># Hold the record number of the last station ID record</span>
+</span><span id="open-575"><a href="#open-575"><span class="linenos">575</span></a>                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;station&#39;</span><span class="p">:</span>
+</span><span id="open-576"><a href="#open-576"><span class="linenos">576</span></a>                    <span class="n">_last_station_id_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="c1"># This should be OK.</span>
+</span><span id="open-577"><a href="#open-577"><span class="linenos">577</span></a>
+</span><span id="open-578"><a href="#open-578"><span class="linenos">578</span></a>            <span class="k">except</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">error</span><span class="p">):</span>
+</span><span id="open-579"><a href="#open-579"><span class="linenos">579</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</span><span id="open-580"><a href="#open-580"><span class="linenos">580</span></a>                <span class="k">break</span>
+</span><span id="open-581"><a href="#open-581"><span class="linenos">581</span></a>
+</span><span id="open-582"><a href="#open-582"><span class="linenos">582</span></a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="open-583"><a href="#open-583"><span class="linenos">583</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-584"><a href="#open-584"><span class="linenos">584</span></a><span class="sd">        Close the file handle</span>
+</span><span id="open-585"><a href="#open-585"><span class="linenos">585</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open-586"><a href="#open-586"><span class="linenos">586</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span id="open-587"><a href="#open-587"><span class="linenos">587</span></a>
+</span><span id="open-588"><a href="#open-588"><span class="linenos">588</span></a>    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="open-589"><a href="#open-589"><span class="linenos">589</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open-590"><a href="#open-590"><span class="linenos">590</span></a><span class="sd">        Select TDLPACK records by `TdlpackRecord` attributes.</span>
+</span><span id="open-591"><a href="#open-591"><span class="linenos">591</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open-592"><a href="#open-592"><span class="linenos">592</span></a>        <span class="c1"># TODO: Added ability to process multiple values for each keyword (attribute)</span>
+</span><span id="open-593"><a href="#open-593"><span class="linenos">593</span></a>        <span class="n">idxs</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="open-594"><a href="#open-594"><span class="linenos">594</span></a>        <span class="n">nkeys</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</span><span id="open-595"><a href="#open-595"><span class="linenos">595</span></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="open-596"><a href="#open-596"><span class="linenos">596</span></a>            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]:</span>
+</span><span id="open-597"><a href="#open-597"><span class="linenos">597</span></a>                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">v</span><span class="p">:</span> <span class="n">idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">_recnum</span><span class="p">)</span>
+</span><span id="open-598"><a href="#open-598"><span class="linenos">598</span></a>        <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">idxs</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="open-599"><a href="#open-599"><span class="linenos">599</span></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ii</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">()</span> <span class="k">if</span> <span class="n">ii</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">nkeys</span><span class="p">]]</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Open class for tdlpackio.</p>
+</div>
+
+
+                            <div id="open.__init__" class="classattr">
+                                        <input id="open.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">open</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">path</span>, </span><span class="param"><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span></span>)</span>
+
+                <label class="view-source-button" for="open.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#open.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="open.__init__-327"><a href="#open.__init__-327"><span class="linenos">327</span></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">):</span>
+</span><span id="open.__init__-328"><a href="#open.__init__-328"><span class="linenos">328</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open.__init__-329"><a href="#open.__init__-329"><span class="linenos">329</span></a><span class="sd">        Class Constructor</span>
+</span><span id="open.__init__-330"><a href="#open.__init__-330"><span class="linenos">330</span></a>
+</span><span id="open.__init__-331"><a href="#open.__init__-331"><span class="linenos">331</span></a><span class="sd">        Parameters</span>
+</span><span id="open.__init__-332"><a href="#open.__init__-332"><span class="linenos">332</span></a><span class="sd">        ----------</span>
+</span><span id="open.__init__-333"><a href="#open.__init__-333"><span class="linenos">333</span></a>
+</span><span id="open.__init__-334"><a href="#open.__init__-334"><span class="linenos">334</span></a><span class="sd">        **`path : str`**</span>
+</span><span id="open.__init__-335"><a href="#open.__init__-335"><span class="linenos">335</span></a>
+</span><span id="open.__init__-336"><a href="#open.__init__-336"><span class="linenos">336</span></a><span class="sd">        File name.</span>
+</span><span id="open.__init__-337"><a href="#open.__init__-337"><span class="linenos">337</span></a>
+</span><span id="open.__init__-338"><a href="#open.__init__-338"><span class="linenos">338</span></a><span class="sd">        **`mode : str, optional, default = &#39;r&#39;`**</span>
+</span><span id="open.__init__-339"><a href="#open.__init__-339"><span class="linenos">339</span></a>
+</span><span id="open.__init__-340"><a href="#open.__init__-340"><span class="linenos">340</span></a><span class="sd">        File handle mode.  The default is open for reading (&#39;r&#39;).</span>
+</span><span id="open.__init__-341"><a href="#open.__init__-341"><span class="linenos">341</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open.__init__-342"><a href="#open.__init__-342"><span class="linenos">342</span></a>        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;r&#39;</span> <span class="ow">or</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span> <span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span><span class="o">+</span><span class="s1">&#39;b&#39;</span>
+</span><span id="open.__init__-343"><a href="#open.__init__-343"><span class="linenos">343</span></a>        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;wb&#39;</span>
+</span><span id="open.__init__-344"><a href="#open.__init__-344"><span class="linenos">344</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span> <span class="o">=</span> <span class="n">builtins</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span><span class="n">buffering</span><span class="o">=</span><span class="n">_ONE_MB</span><span class="p">)</span>
+</span><span id="open.__init__-345"><a href="#open.__init__-345"><span class="linenos">345</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_hasindex</span> <span class="o">=</span> <span class="kc">False</span>
+</span><span id="open.__init__-346"><a href="#open.__init__-346"><span class="linenos">346</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="open.__init__-347"><a href="#open.__init__-347"><span class="linenos">347</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_counter</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="open.__init__-348"><a href="#open.__init__-348"><span class="linenos">348</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
+</span><span id="open.__init__-349"><a href="#open.__init__-349"><span class="linenos">349</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</span><span id="open.__init__-350"><a href="#open.__init__-350"><span class="linenos">350</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">filetype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tdlpack_file_type</span><span class="p">()</span>
+</span><span id="open.__init__-351"><a href="#open.__init__-351"><span class="linenos">351</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="open.__init__-352"><a href="#open.__init__-352"><span class="linenos">352</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+</span><span id="open.__init__-353"><a href="#open.__init__-353"><span class="linenos">353</span></a>        <span class="c1"># Perform indexing on read</span>
+</span><span id="open.__init__-354"><a href="#open.__init__-354"><span class="linenos">354</span></a>        <span class="k">if</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_index</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Class Constructor</p>
+
+<h2 id="parameters">Parameters</h2>
+
+<p><strong><code>path : str</code></strong></p>
+
+<p>File name.</p>
+
+<p><strong><code>mode : str, optional, default = 'r'</code></strong></p>
+
+<p>File handle mode.  The default is open for reading ('r').</p>
+</div>
+
+
+                            </div>
+                            <div id="open.mode" class="classattr">
+                                <div class="attr variable">
+            <span class="name">mode</span>
+
+        
+    </div>
+    <a class="headerlink" href="#open.mode"></a>
+    
+    
+
+                            </div>
+                            <div id="open.name" class="classattr">
+                                <div class="attr variable">
+            <span class="name">name</span>
+
+        
+    </div>
+    <a class="headerlink" href="#open.name"></a>
+    
+    
+
+                            </div>
+                            <div id="open.filetype" class="classattr">
+                                <div class="attr variable">
+            <span class="name">filetype</span>
+
+        
+    </div>
+    <a class="headerlink" href="#open.filetype"></a>
+    
+    
+
+                            </div>
+                            <div id="open.records" class="classattr">
+                                <div class="attr variable">
+            <span class="name">records</span>
+
+        
+    </div>
+    <a class="headerlink" href="#open.records"></a>
+    
+    
+
+                            </div>
+                            <div id="open.size" class="classattr">
+                                <div class="attr variable">
+            <span class="name">size</span>
+
+        
+    </div>
+    <a class="headerlink" href="#open.size"></a>
+    
+    
+
+                            </div>
+                            <div id="open.close" class="classattr">
+                                        <input id="open.close-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">close</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="open.close-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#open.close"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="open.close-582"><a href="#open.close-582"><span class="linenos">582</span></a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="open.close-583"><a href="#open.close-583"><span class="linenos">583</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open.close-584"><a href="#open.close-584"><span class="linenos">584</span></a><span class="sd">        Close the file handle</span>
+</span><span id="open.close-585"><a href="#open.close-585"><span class="linenos">585</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open.close-586"><a href="#open.close-586"><span class="linenos">586</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_filehandle</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Close the file handle</p>
+</div>
+
+
+                            </div>
+                            <div id="open.select" class="classattr">
+                                        <input id="open.select-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">select</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">**</span><span class="n">kwargs</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="open.select-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#open.select"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="open.select-588"><a href="#open.select-588"><span class="linenos">588</span></a>    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="open.select-589"><a href="#open.select-589"><span class="linenos">589</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="open.select-590"><a href="#open.select-590"><span class="linenos">590</span></a><span class="sd">        Select TDLPACK records by `TdlpackRecord` attributes.</span>
+</span><span id="open.select-591"><a href="#open.select-591"><span class="linenos">591</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="open.select-592"><a href="#open.select-592"><span class="linenos">592</span></a>        <span class="c1"># TODO: Added ability to process multiple values for each keyword (attribute)</span>
+</span><span id="open.select-593"><a href="#open.select-593"><span class="linenos">593</span></a>        <span class="n">idxs</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="open.select-594"><a href="#open.select-594"><span class="linenos">594</span></a>        <span class="n">nkeys</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</span><span id="open.select-595"><a href="#open.select-595"><span class="linenos">595</span></a>        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="open.select-596"><a href="#open.select-596"><span class="linenos">596</span></a>            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">]:</span>
+</span><span id="open.select-597"><a href="#open.select-597"><span class="linenos">597</span></a>                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="n">v</span><span class="p">:</span> <span class="n">idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">_recnum</span><span class="p">)</span>
+</span><span id="open.select-598"><a href="#open.select-598"><span class="linenos">598</span></a>        <span class="n">idxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">idxs</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="open.select-599"><a href="#open.select-599"><span class="linenos">599</span></a>        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">[</span><span class="s1">&#39;record&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ii</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="n">collections</span><span class="o">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">idxs</span><span class="p">)</span><span class="o">.</span><span class="n">most_common</span><span class="p">()</span> <span class="k">if</span> <span class="n">ii</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">nkeys</span><span class="p">]]</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Select TDLPACK records by <code><a href="#TdlpackRecord">TdlpackRecord</a></code> attributes.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="TdlpackRecord">
+                            <input id="TdlpackRecord-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">TdlpackRecord</span>:
+
+                <label class="view-source-button" for="TdlpackRecord-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#TdlpackRecord"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackRecord-602"><a href="#TdlpackRecord-602"><span class="linenos">602</span></a><span class="k">class</span> <span class="nc">TdlpackRecord</span><span class="p">:</span>
+</span><span id="TdlpackRecord-603"><a href="#TdlpackRecord-603"><span class="linenos">603</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="TdlpackRecord-604"><a href="#TdlpackRecord-604"><span class="linenos">604</span></a><span class="sd">    Creation class for TDLPACK Record.</span>
+</span><span id="TdlpackRecord-605"><a href="#TdlpackRecord-605"><span class="linenos">605</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="TdlpackRecord-606"><a href="#TdlpackRecord-606"><span class="linenos">606</span></a>    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is0</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">_HEADER</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+</span><span id="TdlpackRecord-607"><a href="#TdlpackRecord-607"><span class="linenos">607</span></a>                      <span class="n">is1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_ND7</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+</span><span id="TdlpackRecord-608"><a href="#TdlpackRecord-608"><span class="linenos">608</span></a>                      <span class="n">is2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="TdlpackRecord-609"><a href="#TdlpackRecord-609"><span class="linenos">609</span></a>                      <span class="n">is4</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+</span><span id="TdlpackRecord-610"><a href="#TdlpackRecord-610"><span class="linenos">610</span></a>
+</span><span id="TdlpackRecord-611"><a href="#TdlpackRecord-611"><span class="linenos">611</span></a>        <span class="n">bases</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+</span><span id="TdlpackRecord-612"><a href="#TdlpackRecord-612"><span class="linenos">612</span></a>        <span class="k">if</span> <span class="n">is2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">is2</span><span class="o">==</span><span class="mi">0</span><span class="p">):</span>
+</span><span id="TdlpackRecord-613"><a href="#TdlpackRecord-613"><span class="linenos">613</span></a>            <span class="n">bases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">templates</span><span class="o">.</span><span class="n">GridDefinitionSection</span><span class="p">)</span>
+</span><span id="TdlpackRecord-614"><a href="#TdlpackRecord-614"><span class="linenos">614</span></a>            <span class="n">rectype</span> <span class="o">=</span> <span class="s1">&#39;grid&#39;</span>
+</span><span id="TdlpackRecord-615"><a href="#TdlpackRecord-615"><span class="linenos">615</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="TdlpackRecord-616"><a href="#TdlpackRecord-616"><span class="linenos">616</span></a>            <span class="n">rectype</span> <span class="o">=</span> <span class="s1">&#39;vector&#39;</span>
+</span><span id="TdlpackRecord-617"><a href="#TdlpackRecord-617"><span class="linenos">617</span></a>
+</span><span id="TdlpackRecord-618"><a href="#TdlpackRecord-618"><span class="linenos">618</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="TdlpackRecord-619"><a href="#TdlpackRecord-619"><span class="linenos">619</span></a>            <span class="n">Record</span> <span class="o">=</span> <span class="n">_record_class_store</span><span class="p">[</span><span class="s1">&#39;rectype&#39;</span><span class="p">]</span>
+</span><span id="TdlpackRecord-620"><a href="#TdlpackRecord-620"><span class="linenos">620</span></a>        <span class="k">except</span><span class="p">(</span><span class="ne">KeyError</span><span class="p">):</span>
+</span><span id="TdlpackRecord-621"><a href="#TdlpackRecord-621"><span class="linenos">621</span></a>            <span class="nd">@dataclass</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span><span id="TdlpackRecord-622"><a href="#TdlpackRecord-622"><span class="linenos">622</span></a>            <span class="k">class</span> <span class="nc">Record</span><span class="p">(</span><span class="n">_TdlpackRecord</span><span class="p">,</span> <span class="o">*</span><span class="n">bases</span><span class="p">):</span>
+</span><span id="TdlpackRecord-623"><a href="#TdlpackRecord-623"><span class="linenos">623</span></a>                <span class="k">pass</span>
+</span><span id="TdlpackRecord-624"><a href="#TdlpackRecord-624"><span class="linenos">624</span></a>            <span class="n">_record_class_store</span><span class="p">[</span><span class="s1">&#39;rectype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Record</span>
+</span><span id="TdlpackRecord-625"><a href="#TdlpackRecord-625"><span class="linenos">625</span></a>
+</span><span id="TdlpackRecord-626"><a href="#TdlpackRecord-626"><span class="linenos">626</span></a>        <span class="k">return</span> <span class="n">Record</span><span class="p">(</span><span class="n">is0</span><span class="p">,</span> <span class="n">is1</span><span class="p">,</span> <span class="n">is2</span><span class="p">,</span> <span class="n">is4</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Creation class for TDLPACK Record.</p>
+</div>
+
+
+                </section>
+                <section id="TdlpackStationRecord">
+                            <input id="TdlpackStationRecord-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+                    <div class="decorator">@dataclass</div>
+
+    <span class="def">class</span>
+    <span class="name">TdlpackStationRecord</span>:
+
+                <label class="view-source-button" for="TdlpackStationRecord-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#TdlpackStationRecord"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackStationRecord-775"><a href="#TdlpackStationRecord-775"><span class="linenos">775</span></a><span class="nd">@dataclass</span>
+</span><span id="TdlpackStationRecord-776"><a href="#TdlpackStationRecord-776"><span class="linenos">776</span></a><span class="k">class</span> <span class="nc">TdlpackStationRecord</span><span class="p">:</span>
+</span><span id="TdlpackStationRecord-777"><a href="#TdlpackStationRecord-777"><span class="linenos">777</span></a>    <span class="n">stations</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="n">templates</span><span class="o">.</span><span class="n">Stations</span><span class="p">())</span>
+</span><span id="TdlpackStationRecord-778"><a href="#TdlpackStationRecord-778"><span class="linenos">778</span></a>    <span class="n">numberOfStations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="n">templates</span><span class="o">.</span><span class="n">NumberOfStations</span><span class="p">())</span>
+</span><span id="TdlpackStationRecord-779"><a href="#TdlpackStationRecord-779"><span class="linenos">779</span></a>
+</span><span id="TdlpackStationRecord-780"><a href="#TdlpackStationRecord-780"><span class="linenos">780</span></a>    <span class="n">_stations</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</span><span id="TdlpackStationRecord-781"><a href="#TdlpackStationRecord-781"><span class="linenos">781</span></a>    <span class="n">_numberOfStations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="TdlpackStationRecord-782"><a href="#TdlpackStationRecord-782"><span class="linenos">782</span></a>
+</span><span id="TdlpackStationRecord-783"><a href="#TdlpackStationRecord-783"><span class="linenos">783</span></a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="TdlpackStationRecord-784"><a href="#TdlpackStationRecord-784"><span class="linenos">784</span></a>        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_recnum</span><span class="si">}</span><span class="s1">:d=0000000000:&#39;</span>
+</span><span id="TdlpackStationRecord-785"><a href="#TdlpackStationRecord-785"><span class="linenos">785</span></a>                <span class="sa">f</span><span class="s1">&#39;STATION CALL LETTER RECORD:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">numberOfStations</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</span><span id="TdlpackStationRecord-786"><a href="#TdlpackStationRecord-786"><span class="linenos">786</span></a>
+</span><span id="TdlpackStationRecord-787"><a href="#TdlpackStationRecord-787"><span class="linenos">787</span></a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="TdlpackStationRecord-788"><a href="#TdlpackStationRecord-788"><span class="linenos">788</span></a>        <span class="k">pass</span>
+</span><span id="TdlpackStationRecord-789"><a href="#TdlpackStationRecord-789"><span class="linenos">789</span></a>
+</span><span id="TdlpackStationRecord-790"><a href="#TdlpackStationRecord-790"><span class="linenos">790</span></a>    <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="TdlpackStationRecord-791"><a href="#TdlpackStationRecord-791"><span class="linenos">791</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+    
+
+                            <div id="TdlpackStationRecord.__init__" class="classattr">
+                                <div class="attr function">
+            
+        <span class="name">TdlpackStationRecord</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">_numberOfStations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span></span>)</span>
+
+        
+    </div>
+    <a class="headerlink" href="#TdlpackStationRecord.__init__"></a>
+    
+    
+
+                            </div>
+                            <div id="TdlpackStationRecord.stations" class="classattr">
+                                <div class="attr variable">
+            <span class="name">stations</span><span class="annotation">: list</span>
+
+        
+    </div>
+    <a class="headerlink" href="#TdlpackStationRecord.stations"></a>
+    
+    
+
+                            </div>
+                            <div id="TdlpackStationRecord.numberOfStations" class="classattr">
+                                <div class="attr variable">
+            <span class="name">numberOfStations</span><span class="annotation">: int</span>
+
+        
+    </div>
+    <a class="headerlink" href="#TdlpackStationRecord.numberOfStations"></a>
+    
+    
+
+                            </div>
+                            <div id="TdlpackStationRecord.pack" class="classattr">
+                                        <input id="TdlpackStationRecord.pack-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">pack</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="TdlpackStationRecord.pack-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#TdlpackStationRecord.pack"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackStationRecord.pack-787"><a href="#TdlpackStationRecord.pack-787"><span class="linenos">787</span></a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="TdlpackStationRecord.pack-788"><a href="#TdlpackStationRecord.pack-788"><span class="linenos">788</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
+                            <div id="TdlpackStationRecord.unpack" class="classattr">
+                                        <input id="TdlpackStationRecord.unpack-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">unpack</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="TdlpackStationRecord.unpack-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#TdlpackStationRecord.unpack"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackStationRecord.unpack-790"><a href="#TdlpackStationRecord.unpack-790"><span class="linenos">790</span></a>    <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="TdlpackStationRecord.unpack-791"><a href="#TdlpackStationRecord.unpack-791"><span class="linenos">791</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
+                </section>
+                <section id="TdlpackTrailerRecord">
+                            <input id="TdlpackTrailerRecord-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+                    <div class="decorator">@dataclass</div>
+
+    <span class="def">class</span>
+    <span class="name">TdlpackTrailerRecord</span>:
+
+                <label class="view-source-button" for="TdlpackTrailerRecord-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#TdlpackTrailerRecord"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackTrailerRecord-794"><a href="#TdlpackTrailerRecord-794"><span class="linenos">794</span></a><span class="nd">@dataclass</span>
+</span><span id="TdlpackTrailerRecord-795"><a href="#TdlpackTrailerRecord-795"><span class="linenos">795</span></a><span class="k">class</span> <span class="nc">TdlpackTrailerRecord</span><span class="p">:</span>
+</span><span id="TdlpackTrailerRecord-796"><a href="#TdlpackTrailerRecord-796"><span class="linenos">796</span></a>
+</span><span id="TdlpackTrailerRecord-797"><a href="#TdlpackTrailerRecord-797"><span class="linenos">797</span></a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="TdlpackTrailerRecord-798"><a href="#TdlpackTrailerRecord-798"><span class="linenos">798</span></a>        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_recnum</span><span class="si">}</span><span class="s1">:d=0000000000:TRAILER RECORD&#39;</span><span class="p">)</span>
+</span><span id="TdlpackTrailerRecord-799"><a href="#TdlpackTrailerRecord-799"><span class="linenos">799</span></a>
+</span><span id="TdlpackTrailerRecord-800"><a href="#TdlpackTrailerRecord-800"><span class="linenos">800</span></a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="TdlpackTrailerRecord-801"><a href="#TdlpackTrailerRecord-801"><span class="linenos">801</span></a>        <span class="k">pass</span>
+</span><span id="TdlpackTrailerRecord-802"><a href="#TdlpackTrailerRecord-802"><span class="linenos">802</span></a>
+</span><span id="TdlpackTrailerRecord-803"><a href="#TdlpackTrailerRecord-803"><span class="linenos">803</span></a>    <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="TdlpackTrailerRecord-804"><a href="#TdlpackTrailerRecord-804"><span class="linenos">804</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+    
+
+                            <div id="TdlpackTrailerRecord.pack" class="classattr">
+                                        <input id="TdlpackTrailerRecord.pack-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">pack</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="TdlpackTrailerRecord.pack-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#TdlpackTrailerRecord.pack"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackTrailerRecord.pack-800"><a href="#TdlpackTrailerRecord.pack-800"><span class="linenos">800</span></a>    <span class="k">def</span> <span class="nf">pack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="TdlpackTrailerRecord.pack-801"><a href="#TdlpackTrailerRecord.pack-801"><span class="linenos">801</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
+                            <div id="TdlpackTrailerRecord.unpack" class="classattr">
+                                        <input id="TdlpackTrailerRecord.unpack-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">unpack</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+
+                <label class="view-source-button" for="TdlpackTrailerRecord.unpack-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#TdlpackTrailerRecord.unpack"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackTrailerRecord.unpack-803"><a href="#TdlpackTrailerRecord.unpack-803"><span class="linenos">803</span></a>    <span class="k">def</span> <span class="nf">unpack</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="TdlpackTrailerRecord.unpack-804"><a href="#TdlpackTrailerRecord.unpack-804"><span class="linenos">804</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
+                </section>
+    </main>
+</body>
+</html>
