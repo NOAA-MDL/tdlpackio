@@ -1,52 +1,31 @@
-# pytdlpack
+# tdlpackio
 
-[![Build Status](https://app.travis-ci.com/eengl/pytdlpack.svg?branch=master)](https://app.travis-ci.com/eengl/pytdlpack)
-[![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
-[![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
+[![Build Status](https://app.travis-ci.com/eengl/tdlpackio.svg?branch=master)](https://app.travis-ci.com/eengl/tdlpackio)
 [![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
-[![PyPI version](https://badge.fury.io/py/pytdlpack.svg)](https://badge.fury.io/py/pytdlpack)
+[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
+[![PyPI version](https://badge.fury.io/py/tdlpackio.svg)](https://badge.fury.io/py/tdlpackio)
 
 ## Introduction
 
-NOAA/NWS Meteorological Development Lab ([MDL](https://www.weather.gov/mdl/)) produces model output statistics (MOS) for a variety of NOAA/NCEP Numerical Weather Prediction (NWP) models.  MOS is produced via MDL's in-house MOS-2000 (MOS2K) Fortran-based software system.  MOS2K uses a GRIB-like binary data format called TDLPACK.  `pytdlpack` is a Python interface to reading and writing TDLPACK files.  A brief introduction to TDLPACK files and data format can be found [here](TDLPACK.md).
-
-## Motivation
-
-Provide a Python interface for reading and writing TDLPACK files.
+tdlpackio provides a Python interface for reading and writing TDLPACK files. NOAA/NWS Meteorological Development Lab ([MDL](https://www.weather.gov/mdl/)) produces [Model Output Statistics (MOS)](https://vlab.noaa.gov/web/mdl/mos) and the [National Blend of Models (NBM)](https://vlab.noaa.gov/web/mdl/nbm). These products are generated from the MDL's in-house MOS-2000 Software System (MOS2K). The MOS2K system defines a GRIB-like data format called TDLPACK.  A brief introduction to TDLPACK files and data format can be found [here](TDLPACK.md). tdlpackio contains a NumPy/F2PY extension module, tdlpacklib, which is contains Fortran subroutines for TDLPACK I/O and unpacking/packing subroutines.  These are a subset of of the MOS2K system.
 
 ## Requirements
-* Python 3.6+
-* setuptools 34.0+
-* NumPy 1.12+
-* GNU or Intel Fortran compiler
+* Python 3.8+
+* setuptools
+* NumPy
+* Fortran compiler: GNU (gfortran) and Intel (ifort) have been tested.
 
 ## Installation
 
 ```shell
-pip3 install pytdlpack
+pip install tdlpackio
 ```
 
 ### Build and Install from Source
 
 ```shell
-python3 setup.py build_ext --fcompiler=[gnu95|intelem] build
-python3 setup.py install [--user |--prefix=PREFIX]
+python setup.py build --fcompiler=[gnu95|intelem]
+python setup.py install [--user |--prefix=PREFIX]
 ```
-## Modules
-
-The pytdlpack package contains 2 modules.  See the docstrings for usage of each module
-
-### pytdlpack
-
-```python
-import pytdlpack
-```
-
-### TdlpackIO
-
-```python
-import TdlpackIO
-```
-**IMPORTANT:** ```TdlpackIO``` is **experimental** and it usage and functionality could change with future releases.  TdlpackIO is a pure python implementation for reading TDLPACK "sequential" files (i.e. Fortran variable-length record binary files).  Currently, it does not read TDLPACK random-access files and it may never have that capability.  It requires ```pytdlpack``` for unpacking records.
