@@ -2,7 +2,7 @@
 Introduction
 ============
 
-pytdlpack is a Python interface to reading/writing TDLPACK files via official
+tdlpackio is a Python interface to reading/writing TDLPACK files via official
 MOS-2000 (MOS2K) Fortran-based source files.  The necessary MOS2K source files are included
 in this package and are available as module, tdlpacklib.
 
@@ -283,138 +283,81 @@ missing value other than what is contained in the record).  For TDLPACK data rec
 ```
 
 """
+"""
+TdlpackIO is a pure Python implementation for performing IO with TDLPACK sequential files
+(i.e. Fortran unformatted files).  Instead of using Fortran for perform IO, we are using
+Python builtins.open() in binary mode.  This allows us to perform stream-based IO for TDLPACK
+files.  When a file is opened for reading, its contents (TDLPACK records) are automatically
+indexed and stored in a dictionary.  The dictionary stores the byte offset the data record;
+the size of the data record; date and lead time; and MOS-2000 ID.
 
-from copy import deepcopy
-from itertools import count
-import pdb
+This indexing allow the user to access a TDLPACK sequential file in a random-access nature.
+For example if a users wants to read the 500th record in the file, the first 499 records in
+their entirety do not need to be read.
+"""
+
+from dataclasses import dataclass, field
+import builtins
+import collections
+import numpy as np
 import os
 import struct
-import sys
+import sys  
 
-_IS_PYTHON3 = sys.version_info.major >= 3
+from . import tdlpacklib
+from . import templates
 
-if _IS_PYTHON3:
-    import builtins
-else:
-    import __builtin__ as builtins
+_HEADER = 1413762128 # "TDLP" converted to int
 
-try:
-    import numpy as np
-except ImportError:
-    raise ImportError("NumPy required")
-try:
-    from . import tdlpacklib
-except ImportError:
-    raise ImportError("tdlpacklib not found.")
+_L3264B = 32
+_L3264W = int(_L3264B/8)
+_ND5 = 5242880 # Accommodates a 20MB record
+_ND7 = 54
+_ONE_MB = 1048576
+_PMISS = 9999.
+_SMISS = 9997.
 
-__pdoc__ = {}
+_record_class_store = dict()
 
-_DEFAULT_L3264B = np.int32(32)
-_DEFAULT_MINPK = np.int32(21)
-_DEFAULT_ND5 = np.int32(5242880)
-_DEFAULT_ND7 = np.int32(54)
-
-DEFAULT_MISSING_VALUE = np.float32(9999.0)
-FORTRAN_STDOUT_LUN = np.int32(12)
-L3264B = _DEFAULT_L3264B
-L3264W = np.int32(64/L3264B)
-MINPK = _DEFAULT_MINPK
-NCHAR = np.int32(8)
-NCHAR_PLAIN = np.int32(32)
-ND5 = _DEFAULT_ND5
-ND5_META_MIN = np.int32(24)
-ND5_META_MAX = np.int32(32)
-ND7 = _DEFAULT_ND7
-NBYPWD = np.int32(L3264B/8)
-
-_starecdict = {} # Dictionary to store station lists.  Key is the Fortran LUN where list came from.
-_ccall = []
-_ier = np.int32(0)
-_lx = np.int32(0)
-_misspx = np.int32(0)
-_misssx = np.int32(0)
-_is0 = np.zeros((ND7),dtype=np.int32)
-_is1 = np.zeros((ND7),dtype=np.int32)
-_is2 = np.zeros((ND7),dtype=np.int32)
-_is4 = np.zeros((ND7),dtype=np.int32)
-
-_ier = tdlpacklib.openlog(FORTRAN_STDOUT_LUN,file=os.devnull)
-if _ier != 0:
-    raise IOError("Cannot write to log file")
-
-class TdlpackFile(object):
+class open(object):
     """
-    TDLPACK File with associated information.
-
-    Attributes
-    ----------
-
-    **`byte_order : str`**
-
-    Byte order of TDLPACK file using definitions as defined by Python built-in struct module.
-
-    **`data_type : {'grid', 'station'}`**
-
-    Type of data contained in the file.
-
-    **`eof : bool`**
-
-    True if we have reached end of file.
-
-    **`format : {'random-access', 'sequential'}`**
-
-    File format of TDLPACK file.
-
-    **`fortran_lun : np.int32`**
-
-    Fortran unit number for file access. If the file is not open, then this value is -1.
-
-    **`mode : str`**
-
-    Access mode (see pytdlpack.open() docstring).
-
-    **`name : str`**
-
-    File name.
-
-    **`position : int`**
-
-    The current record being read from file. If the file type is 'random-access', then this
-    value is -1.
-
-    **`size : int`**
-
-    File size in units of bytes.
+    Open class for tdlpackio.
     """
-    counter = 0
-    def __init__(self,**kwargs):
-        """Contructor"""
-        type(self).counter += 1
-        self.byte_order = ''
-        self.data_type = ''
-        self.eof = False
-        self.format = ''
-        self.fortran_lun = np.int32(-1)
-        self.mode = ''
-        self.name = ''
-        self.position = np.int32(0)
-        self.ra_master_key = None
-        for k, v in kwargs.items():
-            setattr(self,k,v)
+    def __init__(self, path, mode='r'):
+        """
+        Class Constructor
 
-    def __repr__(self):
-        strings = []
-        keys = self.__dict__.keys()
-        for k in keys:
-            if not k.startswith('_'):
-                strings.append('%s = %s\n'%(k,self.__dict__[k]))
-        return ''.join(strings)
+        Parameters
+        ----------
+
+        **`path : str`**
+
+        File name.
+
+        **`mode : str, optional, default = 'r'`**
+
+        File handle mode.  The default is open for reading ('r').
+        """
+        if mode == 'r' or mode == 'w': mode = mode+'b'
+        if mode == 'a': mode = 'wb'
+        self._filehandle = builtins.open(path,mode=mode,buffering=_ONE_MB)
+        self._hasindex = False
+        self._index = {}
+        self._counter = 0
+        self.mode = mode
+        self.name = os.path.abspath(path)
+        self.filetype = self._get_tdlpack_file_type()
+        self.records = 0
+        self.size = os.path.getsize(self.name)
+        # Perform indexing on read
+        if 'r' in self.mode: self._build_index()
 
     def __enter__(self):
-        """no additional setup as opening with context manager is not required"""
+        """
+        """
         return self
 
-    def __exit__(self,type,value,traceback):
+    def __exit__(self, atype ,value, traceback):
         """
         """
         self.close()
@@ -422,796 +365,423 @@ class TdlpackFile(object):
     def __iter__(self):
         """
         """
-        return self
+        yield from self._index['record']
 
-    def __next__(self):
+    def __repr__(self):
         """
         """
-        if not self.eof:
-            rec = self.read()
-            if self.eof and isinstance(rec,type(None)):
-                raise StopIteration
-            else:
-                return rec
+        strings = []
+        keys = self.__dict__.keys()
+        for k in keys:
+            if not k.startswith('_'):
+                strings.append('%s = %s\n'%(k,self.__dict__[k]))
+        return ''.join(strings)
+
+    def __getitem__(self,key):
+        """
+        """
+        if isinstance(key,slice):
+            return self._index['record'][key]
+        elif isinstance(key,int):
+            return self._index['record'][key]
         else:
-            raise StopIteration
+            raise KeyError('Key must be an integer record number or a slice')
 
-    def _determine_record_type(self,ipack,ioctet):
-        kwargs = {}
-        if ipack[0] == 0 and ipack[4] == 9999 and ioctet == 24:
-            kwargs['ipack'] = deepcopy(ipack)
-            kwargs['ioctet'] = deepcopy(ioctet)
-            kwargs['id'] = np.int32([0,0,0,0])
-            return TdlpackTrailerRecord(**kwargs)
-        if ipack[0] > 0:
-            kwargs['ipack'] = deepcopy(ipack)
-            kwargs['ioctet'] = deepcopy(ioctet)
-            header = struct.unpack('>4s',ipack[0].byteswap())[0]
-            if _IS_PYTHON3:
-                header = header.decode()
-            if header in ["PLDT","TDLP"] :
-                if not self.data_type: self.data_type = 'grid'
-                kwargs['id'] = deepcopy(ipack[5:9])
-                kwargs['reference_date'] = deepcopy(ipack[4])
-                kwargs['lead_time'] = np.int32(str(ipack[7])[-3:])
-                kwargs['_filelun'] = self.fortran_lun
-                kwargs['_starecindex'] = len(_starecdict[self.fortran_lun])-1 if len(_starecdict[self.fortran_lun]) > 0 else 0
-                return TdlpackRecord(**kwargs)
-            else:
-                if not self.data_type: self.data_type = 'station'
-                kwargs['id'] = np.int32([400001000,0,0,0])
-                kwargs['number_of_stations'] = np.int32(deepcopy(ioctet/NCHAR))
-                return TdlpackStationRecord(**kwargs)
-        else:
-            #raise
-            pass #for now
-
-    def backspace(self):
+    def _get_tdlpack_file_type(self):
         """
-        Position file backwards by one record.
+        Determine the type of TDLPACK file.
         """
-        if self.fortran_lun == -1:
-            raise IOError("File is not opened.")
+        self._filehandle.seek(0)
+        i = struct.unpack('>i',self._filehandle.read(4))[0]
+        self._filehandle.seek(0)
+        return 'random-access' if i == 0 else 'sequential'
+        
+    def _build_index(self):
+        """
+        Record Indexer
+        """
+        # Initialize index dictionary
+        self._index['offset'] = []
+        self._index['size'] = []
+        self._index['type'] = []
+        self._index['record'] = []
 
-        if self.format == 'sequential':
-            _ier = np.int32(0)
-            _ier = tdlpacklib.backspacefile(self.fortran_lun)
-            if _ier == 0:
-                self.position -= 1
-            else:
-                raise IOError("Could not backspace file. ier = "+str(_ier))
+        if self.filetype == 'sequential': self._sequential_file_indexer()
+        if self.filetype == 'random-access': self._randomaccess_file_indexer()
+        self._hasindex = True
+
+        # Index at end of _build_index()
+        if self._hasindex:
+            self.dates = tuple(sorted(set([rec.refDate for rec in self._index['record'] if hasattr(rec,'refDate')])))
+
+    def _randomaccess_file_indexer(self):
+        """
+        Indexer for random-access TDLPACK files.
+        """
+        # Read master key
+        version, nids, nwords, nkyrec, maxent, lastky = struct.unpack('>iiiiii',self._filehandle.read(24))
+        nbytes = nwords*_L3264W
+        # Set file position to first key record
+        self._filehandle.seek(nbytes)
+
+        while True:
+
+            # Read key record "header" data
+            nkeys, nprec, prec_next_key = struct.unpack('>iii',self._filehandle.read(12))
+
+            mid = list()
+            nd = list()
+            bprec = list()
+
+            for i in range(nkeys):
+                id1,id2,id3,id4,_nd,_bprec = struct.unpack('>iiiiii',self._filehandle.read(24))
+                mid.append([id1,id2,id3,id4])
+                nd.append(_nd)
+                bprec.append(_bprec)
+
+            for (m,n,b) in zip(mid,nd,bprec):
+                prec1 = int(b/1000.0)
+                nprec = int(b-(prec1*1000.0))
+
+                self._filehandle.seek((prec1-1)*nbytes)
+                mbytes = nprec*nbytes
+                self._index['offset'].append(self._filehandle.tell())
+                self._index['size'].append(mbytes)
+                if m[0] == 400001000:
+                    # Station ID record...not in TDLPACK format
+                    rec = TdlpackStationRecord()
+                    rec._recnum = self.records+1
+                    rec.numberOfStations = int(n/2)
+                    #stations = struct.unpack('>'+'8s'*nsta,self._filehandle.read(nsta*8))
+                    #rec.stations = [s.decode().strip() for s in stations]
+                    self._index['record'].append(rec)
+                    self._index['type'].append('station')
+                else:
+                    # TDLPACK data record
+                    ipack = np.frombuffer(self._filehandle.read(132),dtype='>i4')
+                    iwork = np.zeros(ipack.shape,dtype=np.int32)
+                    data = np.zeros(ipack.shape,dtype=np.float32)
+                    is0 = np.zeros((_ND7),dtype=np.int32)
+                    is1 = np.zeros((_ND7),dtype=np.int32)
+                    is2 = np.zeros((_ND7),dtype=np.int32)
+                    is4 = np.zeros((_ND7),dtype=np.int32)
+                    ier, igive, pmiss, smiss = 0, 1, _PMISS, _SMISS
+                    data,ier = tdlpacklib.unpack(6,ipack,iwork,is0,is1,is2,is4,pmiss,smiss,
+                                               igive,_L3264B)
+                    rec = TdlpackRecord(is0,is1,is2,is4)
+                    rec._recnum = self.records+1
+                    shape = (rec.ny,rec.nx) if rec.type == 'grid' else (rec.numberOfPackedValues,)
+                    ndim = len(shape)
+                    dtype = 'float32'
+                    rec._data = TdlpackRecordOnDiskArray(shape,ndim,dtype,self.filetype,
+                                                         self._filehandle,rec,
+                                                         self._index['offset'][-1],
+                                                         self._index['size'][-1])
+                    self._index['record'].append(rec)
+                    self._index['type'].append('data')
+                self.records += 1
+
+            # Hold the record number of the last station ID record
+            if self._index['type'][-1] == 'station':
+                _last_station_id_record = self.records # This should be OK.
+
+            if prec_next_key == 99999999: break
+            kbytes = (prec_next_key-1)*nbytes
+            self._filehandle.seek(kbytes)
+
+    def _sequential_file_indexer(self):
+        """
+        Indexer for sequential TDLPACK files.
+        """
+        # Iterate
+        while True:
+            try:
+                # First read 4-byte Fortran record header
+                pos = self._filehandle.tell()
+                fortran_header = struct.unpack('>i',self._filehandle.read(4))[0]
+                if fortran_header >= 132:
+                    bytes_to_read = 132
+                else:
+                    bytes_to_read = fortran_header
+
+                pos = self._filehandle.tell()
+                ioctet = np.frombuffer(self._filehandle.read(8),dtype='>i8')[0]
+                ipack = np.frombuffer(self._filehandle.read(bytes_to_read-8),dtype='>i4')
+                _header = struct.unpack('>4s',ipack[0])[0].decode()
+
+                # Check to first 4 bytes of the data record to determine the data
+                # record type.
+                if _header == 'PLDT':
+                    # TDLPACK data record
+                    iwork = np.zeros(ipack.shape,dtype=np.int32)
+                    data = np.zeros(ipack.shape,dtype=np.float32)
+                    is0 = np.zeros((_ND7),dtype=np.int32)
+                    is1 = np.zeros((_ND7),dtype=np.int32)
+                    is2 = np.zeros((_ND7),dtype=np.int32)
+                    is4 = np.zeros((_ND7),dtype=np.int32)
+                    ier, igive, pmiss, smiss = 0, 1, _PMISS, _SMISS
+                    data,ier = tdlpacklib.unpack(6,ipack,iwork,is0,is1,is2,is4,pmiss,smiss,
+                                                 igive,_L3264B)
+
+                    self._index['offset'].append(pos)
+                    self._index['size'].append(fortran_header) # Size given by Fortran header
+                    rec = TdlpackRecord(is0,is1,is2,is4)
+                    rec._recnum = self.records+1
+                    shape = (rec.ny,rec.nx) if rec.type == 'grid' else (rec.numberOfPackedValues,)
+                    ndim = len(shape)
+                    dtype = 'float32'
+                    rec._data = TdlpackRecordOnDiskArray(shape,ndim,dtype,self.filetype,
+                                                         self._filehandle,rec,
+                                                         self._index['offset'][-1],
+                                                         self._index['size'][-1])
+                    self._index['record'].append(rec)
+                    self._index['type'].append('data')
+                else:
+                    if ioctet == 24 and ipack[4] == 9999:
+                        # Trailer record
+                        rec = TdlpackTrailerRecord()
+                        rec._recnum = self.records+1
+                        self._index['offset'].append(pos)
+                        self._index['size'].append(fortran_header)
+                        self._index['type'].append('trailer')
+                        self._index['record'].append(rec)
+                    else:
+                        # Station ID record
+                        rec = TdlpackStationRecord()
+                        rec._recnum = self.records+1
+                        rec.numberOfStations = int(ioctet/8)
+                        #self._filehandle.seek(pos+8)
+                        #stations = struct.unpack('>'+'8s'*nsta,self._filehandle.read(ioctet))
+                        #self._filehandle.seek(pos+bytes_to_read)
+                        #rec.stations = [s.decode().strip() for s in stations]
+                        self._index['offset'].append(pos)
+                        self._index['size'].append(fortran_header)
+                        self._index['type'].append('station')
+                        self._index['record'].append(rec)
+
+                # At this point we have successfully identified a TDLPACK record from
+                # the file. Increment self.records and position the file pointer to
+                # now read the Fortran trailer.
+                self.records += 1 # Includes trailer records
+                self._filehandle.seek(fortran_header-bytes_to_read,1)
+                fortran_trailer = struct.unpack('>i',self._filehandle.read(4))[0]
+
+                # Check Fortran header and trailer for the record.
+                if fortran_header != fortran_trailer:
+                    raise IOError('Bad Fortran record.')
+
+                # Hold the record number of the last station ID record
+                if self._index['type'][-1] == 'station':
+                    _last_station_id_record = self.records # This should be OK.
+
+            except(struct.error):
+                self._filehandle.seek(0)
+                break
 
     def close(self):
         """
-        Close a TDLPACK file.
+        Close the file handle
         """
-        _ier = np.int32(0)
-        if self.format == 'random-access':
-            _ier = tdlpacklib.clfilm(FORTRAN_STDOUT_LUN,self.fortran_lun)
-        elif self.format == 'sequential':
-            _ier = tdlpacklib.closefile(FORTRAN_STDOUT_LUN,self.fortran_lun,np.int32(2))
-        if _ier == 0:
-            try:
-                del _starecdict[self.fortran_lun]
-            except(KeyError):
-                pass
-            self.eof = False
-            self.fortran_lun = -1
-            self.position = 0
-            type(self).counter -= 1
-        else:
-            raise IOError("Trouble closing file. ier = "+str(_ier))
+        self._filehandle.close()
 
-    def read(self,all=False,unpack=True,id=[9999,0,0,0]):
+    def select(self,**kwargs):
         """
-        Read a record from a TDLPACK file.
+        Select TDLPACK records by `TdlpackRecord` attributes.
+        """
+        # TODO: Added ability to process multiple values for each keyword (attribute)
+        idxs = []
+        nkeys = len(kwargs.keys())
+        for k,v in kwargs.items():
+            for m in self._index['record']:
+                if hasattr(m,k) and getattr(m,k) == v: idxs.append(m._recnum)
+        idxs = np.array(idxs,dtype=np.int32)
+        return [self._index['record'][i] for i in [ii[0] for ii in collections.Counter(idxs).most_common() if ii[1] == nkeys]]
+
+
+class TdlpackRecord:
+    """
+    Creation class for TDLPACK Record.
+    """
+    def __new__(self, is0: np.array = np.array([_HEADER, 0, 0],dtype=np.int32),
+                      is1: np.array = np.zeros((_ND7),dtype=np.int32),
+                      is2: np.array = None,
+                      is4: np.array = None, *args, **kwargs):
+
+        bases = list()
+        if is2 is not None or not np.all(is2==0):
+            bases.append(templates.GridDefinitionSection)
+            rectype = 'grid'
+        else:
+            rectype = 'vector'
+
+        try:
+            Record = _record_class_store['rectype']
+        except(KeyError):
+            @dataclass(init=False, repr=False)
+            class Record(_TdlpackRecord, *bases):
+                pass
+            _record_class_store['rectype'] = Record
+
+        return Record(is0, is1, is2, is4, *args)
+
+
+@dataclass
+class _TdlpackRecord:
+    """
+    TDLPACK Record base class
+    """
+    # TDLPACK Sections
+    is0: np.array = field(init=True,repr=False)
+    is1: np.array = field(init=True,repr=False)
+    is2: np.array = field(init=True,repr=False)
+    is4: np.array = field(init=True,repr=False)
+
+    # Section 0 looked up attributes
+    edition: int = field(init=False,repr=False,default=templates.Edition())
+    
+    # Section 1 looked up attributes
+    sectionFlags: int = field(init=False,repr=False,default=templates.SectionFlags())
+    year: int = field(init=False,repr=False,default=templates.Year())
+    month: int = field(init=False,repr=False,default=templates.Month())
+    day: int = field(init=False,repr=False,default=templates.Day())
+    hour: int = field(init=False,repr=False,default=templates.Hour())
+    minute: int = field(init=False,repr=False,default=templates.Minute())
+    refDate: int = field(init=False,repr=False,default=templates.RefDate())
+    id1: int = field(init=False,repr=False,default=templates.VariableID1())
+    id2: int = field(init=False,repr=False,default=templates.VariableID2())
+    id3: int = field(init=False,repr=False,default=templates.VariableID3())
+    id4: int = field(init=False,repr=False,default=templates.VariableID4())
+    id: int = field(init=False,repr=False,default=templates.VariableID())
+    leadTime: int = field(init=False,repr=False,default=templates.LeadTime())
+    leadTimeMinutes: int = field(init=False,repr=False,default=templates.LeadTimeMinutes())
+    modelID: int = field(init=False,repr=False,default=templates.ModelID())
+    modelSequenceID: int = field(init=False,repr=False,default=templates.ModelSequenceID())
+    decScaleFactor: int = field(init=False,repr=False,default=templates.DecScaleFactor())
+    binScaleFactor: int = field(init=False,repr=False,default=templates.BinScaleFactor())
+    lengthOfPlainLanguage: int = field(init=False,repr=False,default=templates.LengthOfPlainLanguage())
+    plainLanguage: str = field(init=False,repr=False,default=templates.PlainLanguage())
+
+    # Section 4 looked up attributes
+    packingFlags: int = field(init=False,repr=False,default=templates.PackingFlags())
+    numberOfPackedValues: int = field(init=False,repr=False,default=templates.NumberOfPackedValues())
+    primaryMissingValue: int = field(init=False,repr=False,default=templates.PrimaryMissingValue())
+    secondaryMissingValue: int = field(init=False,repr=False,default=templates.SecondaryMissingValue())
+    overallMinValue: int = field(init=False,repr=False,default=templates.OverallMinValue())
+    numberOfGroups: int = field(init=False,repr=False,default=templates.NumberOfGroups())
+
+    def __post_init__(self):
+        """
+        """
+        self._recnum = -1
+        self.type = 'vector' if np.all(self.is2==0) else 'grid'
+
+    def __repr__(self):
+        """
+        """
+        info = ''
+        for sect in [0,1,2,4]:
+            for k,v in self.attrs_by_section(sect,values=True).items():
+                info += f'Section {sect}: {k} = {v}\n'
+        return info
+
+    def __str__(self):
+        """
+        """
+        ids = ' '.join([str(i).zfill(z) for (i,z) in zip(self.id,[9,9,9,10])])
+        return (f'{self._recnum}:d={self.refDate:010d}:{ids}:'
+                f'{self.leadTime:3d}-HR FCST:{self.plainLanguage}')
+
+    def attrs_by_section(self, sect, values=False):
+        """
+        Provide a tuple of attribute names for the given TDLPACK section.
 
         Parameters
         ----------
 
-        **`all : bool, optional`**
+        **`sect : int`**
 
-        Read all records from file. The default is False.
+        The TDLPACK section number.
 
-        **`unpack : bool, optional`**
+        **`values : bool, optional`**
 
-        Unpack TDLPACK identification sections.  Note that data are not unpacked.  The default is True.
-
-        **`id : array_like or list, optional`**
-
-        Provide an ID to search for. This can be either a Numpy.int32 array with shape (4,) or list
-        with length 4.  The default is [9999,0,0,0] which will signal the random access IO reader
-        to sequentially read the file.
+        Optional (default is `False`) arugment to return attributes values.
 
         Returns
         -------
 
-        **`record [records] : instance [list]`**
-
-        An instance of list of instances contaning `pytdlpack.TdlpackStationRecord`,
-        `pytdlpack.TdlpackRecord`, or `pytdlpack.TdlpackTrailerRecord`
+        A List attribute names or Dict if `values = True`.
         """
-        if self.fortran_lun == -1:
-            raise IOError("File is not opened.")
-
-        record = None
-        records = []
-        while True:
-            _ipack = np.array((),dtype=np.int32)
-            _ioctet = np.int32(0)
-            _ier = np.int32(0)
-            if self.format == 'random-access':
-                id = np.int32(id)
-                _nvalue = np.int32(0)
-                _ipack,_nvalue,_ier = tdlpacklib.rdtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,id,ND5,L3264B)
-                if _ier == 0:
-                    _ioctet = _nvalue*NBYPWD
-                    record = self._determine_record_type(_ipack,_ioctet)
-                elif _ier == 153:
-                    self.eof = True
-                    break
+        if sect in {0,1,4}:
+            attrs = templates._section_attrs[sect]
+        elif sect == 2 and self.type == 'grid':
+            def _find_class_index(n):
+                _key = {2:'Grid'}
+                for i,c in enumerate(self.__class__.__mro__):
+                    if _key[n] in c.__name__:
+                        return i
                 else:
-                    #raise
-                    pass # for now
-            elif self.format == 'sequential':
-                _ioctet,_ipack,_ier = tdlpacklib.readfile(FORTRAN_STDOUT_LUN,self.name,self.fortran_lun,ND5,L3264B,np.int32(2))
-                if _ier == 0:
-                    record = self._determine_record_type(_ipack,_ioctet)
-                    self.position += 1
-                elif _ier == -1:
-                    self.eof = True
-                    break
-
-            if unpack: record.unpack()
-
-            if type(record) is TdlpackStationRecord:
-                _starecdict[self.fortran_lun].append(record.stations)
-
-            if all:
-                records.append(record)
+                    return []
+            if sys.version_info.minor <= 8:
+                attrs = templates._section_attrs[sect]+\
+                        [a for a in dir(self.__class__.__mro__[_find_class_index(sect)]) if not a.startswith('_')]
             else:
-                break
-
-        if len(records) > 0:
-            return records
+                attrs = templates._section_attrs[sect]+\
+                        self.__class__.__mro__[_find_class_index(sect)]._attrs
         else:
-            return record
-
-    def rewind(self):
-        """
-        Position file to the beginning.
-        """
-        if self.fortran_lun == -1:
-            raise IOError("File is not opened.")
-
-        if self.format == 'sequential':
-            _ier = np.int32(0)
-            _ier = tdlpacklib.rewindfile(self.fortran_lun)
-            if _ier == 0:
-                self.position = 0
-                self.eof = False
-            else:
-                raise IOError("Could not rewind file. ier = "+str(_ier))
-
-    def write(self,record):
-        """
-        Write a packed TDLPACK record to file.
-
-        Parameters
-        ----------
-
-        **`record : instance`**
-
-        An instance of either `pytdlpack.TdlpackStationRecord`, `pytdlpack.TdlpackRecord`,
-        or `pytdlpack.TdlpackTrailerRecord`.  `record` should contain a packed data.
-        """
-        #pdb.set_trace()
-        if self.fortran_lun == -1:
-            raise IOError("File is not opened.")
-        if self.mode == "r":
-            raise IOError("File is read-only.")
-
-        _ier = np.int32(0)
-        _ntotby = np.int32(0)
-        _ntotrc = np.int32(0)
-        _nreplace = np.int32(0)
-        _ncheck = np.int32(0)
-
-        if type(record) is TdlpackStationRecord:
-            if self.position == 0: self.data_type = 'station'
-            _nwords = record.number_of_stations*2
-            if self.format == 'random-access':
-                _ier = tdlpacklib.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
-                                       record.id,record.ipack[0:_nwords],_nreplace,
-                                       _ncheck,L3264B)
-            elif self.format == 'sequential':
-                _ntotby,_ntotrc,_ier = tdlpacklib.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,
-                                       record.ipack[0:_nwords],_ntotby,_ntotrc,L3264B)
-        elif type(record) is TdlpackRecord:
-            if self.position == 0: self.data_type = 'grid'
-            _nwords = np.int32(record.ioctet/NBYPWD)
-            if self.format == 'random-access':
-                record.ipack[0] = record.ipack[0].byteswap()
-                _ier = tdlpacklib.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
-                                       record.id,record.ipack[0:_nwords],_nreplace,
-                                       _ncheck,L3264B)
-            elif self.format == 'sequential':
-                _ntotby,_ntotrc,_ier = tdlpacklib.writep(FORTRAN_STDOUT_LUN,self.fortran_lun,
-                                       record.ipack[0:_nwords],_ntotby,_ntotrc,L3264B)
-        elif type(record) is TdlpackTrailerRecord:
-            _ier = tdlpacklib.trail(FORTRAN_STDOUT_LUN,self.fortran_lun,L3264B,L3264W,_ntotby,
-                           _ntotrc)
-        if _ier == 0:
-            self.position += 1
-            self.size = os.path.getsize(self.name)
-
-class TdlpackRecord(object):
-    """
-    Defines a TDLPACK data record object.  Once data are unpacked (TdlpackRecord.unpack(data=True)),
-    values are accessible using "fancy indexing".
-
-    For gridded records, use grid index values and/or ranges (e.g. rec[0,0]).
-
-    For station records, use the station ID string: (e.g. rec['KPHL']).
-
-    Attributes
-    ----------
-
-    **`data : array_like`**
-
-    Data values.
-
-    **`grid_length : float`**
-
-    Distance between grid points in units of meters.
-
-    **`id : array_like`**
-
-    ID of the TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.
-
-    **`ioctet : int`**
-
-    Size of the packed TDLPACK data record in bytes.
-
-    **`ipack : array_like`**
-
-    Packed TDLPACK data record. This is a NumPy 1D array of dtype=np.int32.
-
-    **`is0 : array_like`**
-
-    TDLPACK Section 0 (Indicator Section).
-
-    **`is1 : array_like`**
-
-    TDLPACK Section 1 (Product Definition Section).
-
-    **`is2 : array_like`**
-
-    TDLPACK Section 2 (Grid Definition Section)
-
-    **`is4 : array_like`**
-
-    TDLPACK Section 4 (Data Section).
-
-    **`lead_time : int`**
-
-    Forecast lead time in units of hours.
-
-    **`lower_left_latitude : float`**
-
-    Latitude of lower left grid point
-
-    **`lower_left_longitude : float`**
-
-    Longitude of lower left grid point
-
-    **`number_of_values : int`**
-
-    Number of data values.
-
-    **`nx : int`**
-
-    Number of points in the x-direction (West-East).
-
-    **`ny : int`**
-
-    Number of points in the y-direction (West-East).
-
-    **`origin_longitude : float`**
-
-    Originating longitude of projected grid.
-
-    **`plain : str`**
-
-    Plain language description of TDLPACK record.
-
-    **`primary_missing_value : float`**
-
-    Primary missing value.
-
-    **`reference_date : int`**
-
-    Reference date from the TDLPACK data record in YYYYMMDDHH format.
-
-    **`secondary_missing_value : float`**
-
-    Secondary missing value.
-
-    **`standard_latitude : float`**
-
-    Latitude at which the grid length applies.
-
-    **`type : {'grid', 'station'}`**
-
-    Identifies the type of data.  This implies that data are 1D for type = 'station'
-    and data are 2D for type = 'grid'.
-
-    """
-    counter = 0
-    def __init__(self,date=None,id=None,lead=None,plain=None,grid=None,data=None,
-                 missing_value=None,**kwargs):
-        """
-        Constructor
-
-        Parameters
-        ----------
-
-        **`date : int, optional`**
-
-        Forecast initialization or observation date in YYYYMMDDHH format.
-
-        **`id : list or 1-D array, optional`**
-
-        List or 1-D array of length 4 containing the 4-word (integer) MOS-2000 ID of the data
-        to be put into TdlpackRecord
-
-        **`lead : int, optional`**
-
-        Lead time (i.e. forecast projection) in hours of the data.  NOTE: This can be omitted
-
-        **`plain : str, optional`**
-
-        Plain language descriptor.  This is limited to 32 characters, though here
-        the input can be longer (will be cut off when packing).
-
-        **`grid : dict , optional`**
-
-        A dictionary containing grid definition attributes.  See
-        Dictionary of grid specs (created from create_grid_def_dict)
-
-        **`data : array_like, optional`**
-
-        Data values.
-
-        **`missing_value : float or list of floats, optional`**
-
-        Provide either a primary missing value or primary and secondary as list.
-
-        **`**kwargs : dict, optional`**
-
-        Dictionary of class attributes (keys) and class attributes (values).
-        """
-        type(self).counter += 1
-        self._metadata_unpacked = False
-        self._data_unpacked = False
-        self.plain = ''
-        if len(kwargs) == 0:
-            # Means we are creating TdlpackRecord instance from the other function
-            # input, NOT the kwargs Dict.
-            self.id = id
-            self.reference_date = date
-            self.type = 'station'
-            self.is0 = np.zeros(ND7,dtype=np.int32)
-            self.is1 = np.zeros(ND7,dtype=np.int32)
-            self.is2 = np.zeros(ND7,dtype=np.int32)
-            self.is4 = np.zeros(ND7,dtype=np.int32)
-
-            self.is1[2] = np.int32(date/1000000)
-            self.is1[3] = np.int32((date/10000)-(self.is1[2]*100))
-            self.is1[4] = np.int32((date/100)-(self.is1[2]*10000)-(self.is1[3]*100))
-            self.is1[5] = np.int32(date-((date/100)*100))
-            self.is1[6] = np.int32(0)
-            self.is1[7] = np.int32(date)
-            self.is1[8] = np.int32(id[0])
-            self.is1[9] = np.int32(id[1])
-            self.is1[10] = np.int32(id[2])
-            self.is1[11] = np.int32(id[3])
-            if lead is None:
-                self.is1[12] = np.int32(self.is1[10]-((self.is1[10]/1000)*1000))
-            else:
-                self.is1[12] = np.int32(lead)
-            self.is1[13] = np.int32(0)
-            self.is1[14] = np.int32(self.is1[8]-((self.is1[8]/100)*100))
-            self.is1[15] = np.int32(0)
-            self.is1[16] = np.int32(0)
-            self.is1[17] = np.int32(0)
-            self.is1[18] = np.int32(0)
-            self.is1[19] = np.int32(0)
-            self.is1[20] = np.int32(0)
-            self.is1[21] = NCHAR_PLAIN
-            if plain is None:
-                self.plain = ' '*NCHAR_PLAIN
-            else:
-                self.plain = plain
-                for n,p in enumerate(plain):
-                    self.is1[22+n] = np.int32(ord(p))
-
-            if grid is not None and type(grid) is dict or data.shape == 2:
-                # Gridded Data
-                self.type = 'grid'
-                self.is1[1] = np.int32(1) # Set IS1[1] = 1
-                self.is2[1] = np.int32(grid['proj'])
-                self.is2[2] = np.int32(grid['nx'])
-                self.is2[3] = np.int32(grid['ny'])
-                self.is2[4] = np.int32(grid['latll']*10000)
-                self.is2[5] = np.int32(grid['lonll']*10000)
-                self.is2[6] = np.int32(grid['orientlon']*10000)
-                self.is2[7] = np.int32(grid['meshlength']*1000) # Value in dict is in units of meters.
-                self.is2[8] = np.int32(grid['stdlat']*10000)
-                self.nx = np.int32(grid['nx'])
-                self.ny = np.int32(grid['ny'])
-            if len(data) > 0:
-                self.data = np.array(data,dtype=np.float32)
-                self.number_of_values = len(data)
-                self._data_unpacked = True
-            else:
-                raise ValueError
-
-            if missing_value is None:
-                self.primary_missing_value = np.int32(0)
-                self.secondary_missing_value = np.int32(0)
-            else:
-                if type(missing_value) is list:
-                    if len(missing_value) == 1:
-                        self.primary_missing_value = np.int32(missing_value[0])
-                    elif len(missing_value) == 2:
-                        self.primary_missing_value = np.int32(missing_value[0])
-                        self.secondary_missing_value = np.int32(missing_value[1])
-                else:
-                    self.primary_missing_value = np.int32(missing_value)
-                    self.secondary_missing_value = np.int32(0)
-
+            attrs = []
+        if values:
+            return {k:getattr(self,k) for k in attrs}
         else:
-            # Instantiate via **kwargs
-            for k,v in kwargs.items():
-                setattr(self,k,v)
+            return attrs
 
-    def __getitem__(self,indices):
+    @property
+    def data(self) -> np.array:
+        """
+        Accessing the data attribute loads data into memmory
+        """
+        if hasattr(self,'_data'):
+            self._data = np.asarray(self._data)
+            return self._data
+        raise ValueError
+
+    @data.setter
+    def data(self, data):
+        if not isinstance(data, np.ndarray):
+            raise ValueError('TdlpackRecord data only supports numpy arrays')
+        self._data = data
+
+    def __getitem__(self, item):
         """
         """
         if self.type == 'grid':
-            if not isinstance(indices,tuple):
-                indices = tuple(indices)
-        elif self.type == 'station':
-            if isinstance(indices,str):
-                indices = tuple([_starecdict[self._filelun][self._starecindex].index(indices)])
+            if not isinstance(item,tuple):
+                item = tuple(item)
+        elif self.type == 'vector':
+            if isinstance(item,str):
+                item = tuple([_open_file_store[self._source][self._linked_station_id_record].stations.index(item)])
 
         try:
-            return self.data[indices]
+            return self.data[item]
         except(AttributeError):
             return None
 
-    def __setitem__(self,indices,values):
+    def __setitem__(self, item):
         """
         """
-        if self.type == 'grid':
-            if not isinstance(indices,tuple):
-                indices = tuple(indices)
-        elif self.type == 'station':
-            if isinstance(indices,str):
-                indices = tuple([_starecdict[self._filelun][self._starecindex].index(indices)])
+        raise NotImplementedError('assignment of data not supported via setitem')
 
-        self.data[indices] = values
 
-    def __repr__(self):
-        strings = []
-        keys = self.__dict__.keys()
-        for k in keys:
-            if not k.startswith('_'):
-                strings.append('%s = %s\n'%(k,self.__dict__[k]))
-        return ''.join(strings)
+@dataclass
+class TdlpackStationRecord:
+    stations: list = field(init=False,repr=False,default=templates.Stations())
+    numberOfStations: int = field(init=False,repr=False,default=templates.NumberOfStations())
 
-    def pack(self,dec_scale=None,bin_scale=None):
-        """
-        Pack a TDLPACK record.
+    _stations: list = field(init=False,repr=False,default=None)
+    _numberOfStations: int = 0
 
-        Parameters
-        ----------
-
-        **`dec_scale : int, optional, default = 1`**
-
-        Decimal Scale Factor used to when packing TdlpackRecord data [DEFAULT is 1].
-
-        **`bin_scale : int, optional, default = 0`**
-
-        Binary Scale Factor used to when packing TdlpackRecord data [DEFAULT is 0]. NOTE:
-        binary scale factor is currently NOT SUPPORTED in MOS-2000 software. It is added
-        here for completeness.
-        """
-
-        # Make sure data are unpacked
-        if not self._data_unpacked:
-            self.unpack(data=True)
-
-        _ier = np.int32(0)
-        self.ipack = np.zeros((ND5),dtype=np.int32)
-
-        if dec_scale is not None:
-            self.is1[16] = np.int32(dec_scale)
-
-        if bin_scale is not None:
-            self.is1[17] = np.int32(bin_scale)
-
-        # Pack plain langauge into IS1 array.
-        self.plain = self.plain.ljust(NCHAR_PLAIN)
-        for n,p in enumerate(self.plain):
-            self.is1[22+n] = np.int32(ord(p))
-
-        # Handle potential NaN values
-        if self.primary_missing_value == 0:
-            self.primary_missing_value == DEFAULT_MISSING_VALUE
-        self.data = np.where(np.isnan(self.data),np.float32(self.primary_missing_value),
-                             self.data)
-
-        if self.type == 'grid':
-            _a = np.zeros((self.is2[2],self.is2[3]),dtype=np.float32,order='F')
-            _ia = np.zeros((self.is2[2],self.is2[3]),dtype=np.int32,order='F')
-            _ic = np.zeros((self.is2[2]*self.is2[3]),dtype=np.int32)
-
-            self.ioctet,_ier = tdlpacklib.pack2d(FORTRAN_STDOUT_LUN,self.data,_ia,_ic,self.is0,
-                               self.is1,self.is2,self.is4,self.primary_missing_value,
-                               self.secondary_missing_value,self.ipack,MINPK,_lx,L3264B)
-        elif self.type == 'station':
-            _ic = np.zeros((self.number_of_values),dtype=np.int32)
-            self.ioctet,_ier = tdlpacklib.pack1d(FORTRAN_STDOUT_LUN,self.data,_ic,self.is0,
-                               self.is1,self.is2,self.is4,self.primary_missing_value,
-                               self.secondary_missing_value,self.ipack,MINPK,
-                               _lx,L3264B)
-
-    def unpack(self,data=False,missing_value=None):
-        """
-        Unpacks the TDLPACK identification sections and data (optional).
-
-        Parameters
-        ----------
-
-        **`data : bool, optional`**
-
-        If True, unpack data values. The default is False.
-
-        **`missing_value : float, optional`**
-
-        Set a missing value. If a missing value exists for the TDLPACK data record,
-        it will be replaced with this value.
-        """
-        _ier = np.int32(0)
-        if not self._metadata_unpacked:
-            if self.ipack.shape[0] < ND5_META_MAX:
-                _nd5_local = self.ipack.shape[0]
-            else:
-                _nd5_local = ND5_META_MAX
-            _data_meta = np.zeros((_nd5_local),dtype=np.int32)
-            _iwork_meta = np.zeros((_nd5_local),dtype=np.int32)
-            _data_meta,_ier = tdlpacklib.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:_nd5_local],
-                              _iwork_meta,_is0,_is1,_is2,_is4,_misspx,
-                              _misssx,np.int32(1),L3264B)
-            if _ier == 0:
-                self._metadata_unpacked = True
-                self.is0 = deepcopy(_is0)
-                self.is1 = deepcopy(_is1)
-                self.is2 = deepcopy(_is2)
-                self.is4 = deepcopy(_is4)
-                self.id = self.is1[8:12]
-
-        # Set attributes from is1[].
-        self.lead_time = np.int32(str(self.is1[10])[-3:])
-        if not self.plain:
-            if self.is1[21] > 0:
-                for n in np.nditer(self.is1[22:(22+self.is1[21])]):
-                    self.plain += chr(n)
-            else:
-                self.plain = ' '*NCHAR_PLAIN
-
-        # Set attributes from is2[].
-        if self.is1[1] == 0:
-            self.type = 'station'
-            self.map_proj = None
-            self.nx = None
-            self.ny = None
-            self.lower_left_latitude = None
-            self.lower_left_longitude = None
-            self.origin_longitude = None
-            self.grid_length = None
-            self.standard_latitude = None
-            if np.sum(self.is2) > 0: self.is2 = np.zeros((ND7),dtype=np.int32)
-        elif self.is1[1] == 1:
-            self.type = 'grid'
-            self.map_proj = self.is2[1]
-            self.nx = self.is2[2]
-            self.ny = self.is2[3]
-            self.lower_left_latitude = self.is2[4]/10000.
-            self.lower_left_longitude = self.is2[5]/10000.
-            self.origin_longitude = self.is2[6]/10000.
-            self.grid_length = self.is2[7]/1000.
-            self.standard_latitude = self.is2[8]/10000.
-            self.grid_def = create_grid_definition(proj=self.map_proj,nx=self.nx,ny=self.ny,
-                            latll=self.lower_left_latitude,lonll=self.lower_left_longitude,
-                            orientlon=self.origin_longitude,stdlat=self.standard_latitude,
-                            meshlength=self.grid_length)
-            self.proj_string = _create_proj_string(self.grid_def)
-
-        # Set attributes from is4[].
-        self.number_of_values = self.is4[2]
-        self.primary_missing_value = deepcopy(np.float32(self.is4[3]))
-        self.secondary_missing_value = deepcopy(np.float32(self.is4[4]))
-
-        if data:
-            self._data_unpacked = True
-            _nd5_local = max(self.is4[2],int(self.ioctet/NBYPWD))
-            _iwork = np.zeros((_nd5_local),dtype=np.int32)
-            _data = np.zeros((_nd5_local),dtype=np.float32)
-            # Check to make sure the size of self.ipack is long enough. If not, then
-            # we will "append" to self.ipack.
-            if self.ipack.shape[0] < _nd5_local:
-                pad = np.zeros((_nd5_local-self.ipack.shape[0]),dtype=np.int32)
-                self.ipack = np.append(self.ipack,pad)
-            _data,_ier = tdlpacklib.unpack(FORTRAN_STDOUT_LUN,self.ipack[0:_nd5_local],
-                                         _iwork,self.is0,self.is1,self.is2,self.is4,
-                                         _misspx,_misssx,np.int32(2),L3264B)
-            if _ier == 0:
-                _data = deepcopy(_data[0:self.number_of_values+1])
-            else:
-                _data = np.zeros((self.number_of_values),dtype=np.float32)+DEFAULT_MISSING_VALUE
-            self.data = deepcopy(_data[0:self.number_of_values])
-            if missing_value is not None:
-                self.data = np.where(self.data==self.primary_missing_value,np.float32(missing_value),self.data)
-                self.primary_missing_value = np.float32(missing_value)
-            if self.type == 'grid':
-                self.data = np.reshape(self.data[0:self.number_of_values],(self.nx,self.ny),order='F')
-
-    def latlons(self):
-        """
-        Returns a tuple of latitudes and lontiude numpy.float32 arrays for the TDLPACK record.
-        If the record is station, then return is None.
-
-        Returns
-        -------
-
-        **`lats,lons : array_like`**
-
-        Numpy.float32 arrays of grid latitudes and longitudes.  If `self.grid = 'station'`, then None are returned.
-        """
-        lats = None
-        lons = None
-        if self.type == 'grid':
-            _ier = np.int32(0)
-            lats = np.zeros((self.nx,self.ny),dtype=np.float32,order='F')
-            lons = np.zeros((self.nx,self.ny),dtype=np.float32,order='F')
-            lats,lons,_ier = tdlpacklib.gridij_to_latlon(FORTRAN_STDOUT_LUN,self.nx,self.ny,
-                             self.map_proj,self.grid_length,self.origin_longitude,
-                             self.standard_latitude,self.lower_left_latitude,
-                             self.lower_left_longitude)
-        return (lats,lons)
-
-class TdlpackStationRecord(object):
-    """
-    Defines a TDLPACK Station Call Letter Record.
-
-    Attributes
-    ----------
-
-    **`station : list`**
-
-    A list of station call letters.
-
-    **`id : array_like`**
-
-    ID of station call letters. Note: This id is only used for random-access IO.
-
-    **`ioctet : int`**
-
-    Size of packed station call letter record in bytes.
-
-    **`ipack : array_like`**
-
-    Array containing the packed station call letter record.
-
-    **`number_of_stations: int`**
-
-    Size of station call letter record.
-    """
-    counter = 0
-    def __init__(self,stations=None,**kwargs):
-        """
-        `pytdlpack.TdlpackStationRecord` Constructor
-
-        Parameters
-        ----------
-
-        **`stations : str or list or tuple`**
-
-        String of a single station or a list or tuple of stations.
-        """
-        type(self).counter += 1
-
-        if stations is not None:
-            if type(stations) is str:
-                self.stations = [stations]
-            elif type(stations) is list:
-                self.stations = stations
-            elif type(stations) is tuple:
-                self.stations = list(stations)
-            else:
-                pass # TODO: raise error... TypeError
-            self.number_of_stations = np.int32(len(stations))
-            self.id = np.int32([400001000,0,0,0])
-            self.ioctet = np.int32(0)
-            self.ipack = np.array((),dtype=np.int32)
-        else:
-            for k,v in kwargs.items():
-                setattr(self,k,v)
-
-        #self.number_of_stations = np.int32(len(stations))
-        #self.id = np.int32([400001000,0,0,0])
-        #self.ioctet = np.int32(0)
-        #self.ipack = np.array((),dtype=np.int32)
-
-    def __repr__(self):
-        strings = []
-        keys = self.__dict__.keys()
-        for k in keys:
-            if not k.startswith('_'):
-                strings.append('%s = %s\n'%(k,self.__dict__[k]))
-        return ''.join(strings)
-
-    def pack(self):
-        """
-        Pack a Station Call Letter Record.
-        """
-        #pdb.set_trace()
-        self.ioctet = np.int32(self.number_of_stations*NCHAR)
-        self.ipack = np.ndarray(int(self.ioctet/(L3264B/NCHAR)),dtype=np.int32)
-        for n,s in enumerate(self.stations):
-            sta = s.ljust(int(NCHAR),' ')
-            self.ipack[n*2] = np.copy(np.fromstring(sta[0:int(NCHAR/2)],dtype=np.int32).byteswap())
-            self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[int(NCHAR/2):int(NCHAR)],dtype=np.int32).byteswap())
-
-    def unpack(self):
-        """
-        Unpack a Station Call Letter Record.
-        """
-        _stations = []
-        _unpack_string_fmt = '>'+str(NCHAR)+'s'
-        nrange = range(0,int(self.ioctet/(NCHAR/2)),2)
-        if _IS_PYTHON3:
-            nrange = list(range(0,int(self.ioctet/(NCHAR/2)),2))
-        for n in nrange:
-            tmp = struct.unpack(_unpack_string_fmt,self.ipack[n:n+2].byteswap())[0]
-            if _IS_PYTHON3:
-                tmp = tmp.decode()
-            _stations.append(tmp.strip(' '))
-        self.stations = list(deepcopy(_stations))
-
-class TdlpackTrailerRecord(object):
-    """
-    Defines a TDLPACK Trailer Record.
-    """
-    counter = 0
-    def __init__(self, **kwargs):
-        """
-        `pytdlpack.TdlpackTrailerRecord` Constructor
-        """
-        type(self).counter += 0
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-
-    def __repr__(self):
-        strings = []
-        keys = self.__dict__.keys()
-        for k in keys:
-            if not k.startswith('_'):
-                strings.append('%s = %s\n'%(k,self.__dict__[k]))
-        return ''.join(strings)
+    def __str__(self):
+        return (f'{self._recnum}:d=0000000000:'
+                f'STATION CALL LETTER RECORD:{self.numberOfStations}')
 
     def pack(self):
         pass
@@ -1219,240 +789,68 @@ class TdlpackTrailerRecord(object):
     def unpack(self):
         pass
 
-def open(name, mode='r', format=None, ra_template=None):
+
+@dataclass
+class TdlpackTrailerRecord:
+
+    def __str__(self):
+        return (f'{self._recnum}:d=0000000000:TRAILER RECORD')
+
+    def pack(self):
+        pass
+
+    def unpack(self):
+        pass
+
+
+@dataclass
+class TdlpackRecordOnDiskArray:
+    shape: str
+    ndim: str
+    dtype: str
+    filetype: str
+    filehandle: open
+    rec: TdlpackRecord
+    offset: int
+    size: int
+
+    def __array__(self, dtype=None):
+        return np.asarray(_data(self.filehandle, self.filetype, self.rec, self.offset, self.size),dtype=dtype)
+
+
+def _data(filehandle: open, filetype: str, rec: TdlpackRecord, offset: int, size: int)-> np.array:
     """
-    Opens a TDLPACK File for reading/writing.
-
-    Parameters
-    ----------
-    **`name : str`**
-
-    TDLPACK file name.  This string is expanded into an absolute path via os.path.abspath().
-
-    **`mode : {'r', 'w', 'a', 'x'}, optional`**
-
-    Access mode. `'r'` means read only; `'w'` means write (existing file is overwritten);
-    `'a'` means to append to the existing file; `'x'` means to write to a new file (if
-    the file exists, an error is raised).
-
-    **`format : {'sequential', 'random-access'}, optional`**
-
-    Type of TDLPACK File when creating a new file.  This parameter is ignored if the
-    file access mode is `'r'` or `'a'`.
-
-    **`ra_template : {'small', 'large'}, optional`**
-
-    Template used to create new random-access file. The default is 'small'.  This parameter
-    is ignored if the file access mode is `'r'` or `'a'` or if the file format is `'sequential'`.
-
-    Returns
-    -------
-    **`pytdlpack.TdlpackFile`**
-
-    Instance of class TdlpackFile.
-    """
-    _byteorder = np.int32(0)
-    _filetype = np.int32(0)
-    _lun = np.int32(0)
-    _ier = np.int32(0)
-    name = os.path.abspath(name)
-
-    if format is None: format = 'sequential'
-    if mode == 'w' or mode == 'x':
-
-        if format == 'random-access':
-            if not ra_template: ra_template = 'small'
-            if ra_template == 'small':
-                _maxent = np.int32(300)
-                _nbytes = np.int32(2000)
-            elif ra_template == 'large':
-                _maxent = np.int32(840)
-                _nbytes = np.int32(20000)
-            _filetype = np.int32(1)
-            _lun,_byteorder,_filetype,_ier = tdlpacklib.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype,
-                                             ra_maxent=_maxent,ra_nbytes=_nbytes)
-        elif format == 'sequential':
-            _filetype = np.int32(2)
-            _lun,_byteorder,_filetype,_ier = tdlpacklib.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
-
-    elif mode == 'r' or mode == 'a':
-        if os.path.isfile(name):
-            _lun,_byteorder,_filetype,_ier = tdlpacklib.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype)
-        else:
-            raise IOError("File not found.")
-
-    if _ier == 0:
-        kwargs = {}
-        if _byteorder == -1:
-            kwargs['byte_order'] = '<'
-        elif _byteorder == 1:
-            kwargs['byte_order'] = '>'
-        if _filetype == 1:
-            kwargs['format'] = 'random-access'
-            kwargs['ra_master_key'] = _read_ra_master_key(name)
-        elif _filetype == 2:
-            kwargs['format'] = 'sequential'
-        kwargs['fortran_lun'] = deepcopy(_lun)
-        kwargs['mode'] = mode
-        kwargs['name'] = name
-        kwargs['position'] = np.int32(0)
-        if mode == 'r' or mode == 'a': kwargs['size'] = os.path.getsize(name)
-    else:
-        raise IOError("Could not open TDLPACK file"+name+". Error return from tdlpacklib.openfile = "+str(_ier))
-
-    _starecdict[_lun] = []
-
-    return TdlpackFile(**kwargs)
-
-def create_grid_definition(name=None,proj=None,nx=None,ny=None,latll=None,lonll=None,
-                           orientlon=None,stdlat=None,meshlength=None):
-    """
-    Create a dictionary of grid specs.  The user has the option to
-    populate the dictionary via the args or create an empty dict.
-
-    Parameters
-    ----------
-
-    **`name : str, optional`**
-
-    String that identifies a predefined grid.
-
-    **`proj : int, optional`**
-
-    Map projection of the grid (3 = Lambert Conformal; 5 = Polar Stereographic;
-    7 = Mercator). NOTE: This parameter is optional if data are station-based.
-
-    **`nx : int, optional`**
-
-    Number of points in X-direction (East-West). NOTE: This parameter is optional if
-    data are station-based.
-
-    **`ny : int, optional`**
-
-    Number of points in Y-direction (North-South). NOTE: This parameter is optional if
-    data are station-based.
-
-    **`latll : float, optional`**
-
-    Latitude in decimal degrees of lower-left grid point.  NOTE: This parameter is optional if
-    data are station-based.
-
-    **`lonll : float, optional`**
-
-    Longitude in decimal degrees of lower-left grid point.  NOTE: This parameter is optional if
-    data are station-based.
-
-    **`orientlon : float, optional`**
-
-    Longitude in decimal degrees of the central meridian.  NOTE: This parameter is optional if
-    data are station-based.
-
-    **`stdlat : float, optional`**
-
-    Latitude in decimal degrees of the standard latitude.  NOTE: This parameter is optional if
-    data are station-based.
-
-    **`meshlength : float, optional`**
-
-    Distance in meters between grid points.  NOTE: This parameter is optional if
-    data are station-based.
+    Returns an unpacked data grid.
 
     Returns
     -------
 
-    **`griddict : dict`**
+    **`numpy.ndarray`**
 
-    Dictionary whose keys are the named parameters of this function.
+    A numpy.ndarray with shape (ny,nx). By default the array dtype is np.float32.
     """
-    griddict = {}
-    if name is not None:
-        from ._grid_definitions import grids
-        griddict = grids[name]
-    else:
-        griddict['proj'] = proj
-        griddict['nx'] = nx
-        griddict['ny'] = ny
-        griddict['latll'] = latll
-        griddict['lonll'] = lonll
-        griddict['orientlon'] = orientlon
-        griddict['stdlat'] = stdlat
-        griddict['meshlength'] = meshlength
-    return griddict
 
-def _create_proj_string(griddict):
-    """
-    Returns a string that defines a pyproj.Proj map projection.  If pyproj is not availale,
-    then None is returned.
+    # Position file pointer to the beginning of the TDLPACK record.
+    filehandle.seek(offset)
+    if filetype == 'sequential':
+        ioctet = np.frombuffer(filehandle.read(8),dtype='>i8')[0]
+    elif filetype == 'random-access':
+        ioctet = size
+    _ipack = np.frombuffer(filehandle.read(ioctet),dtype='>i4')
+    # Unpack data
+    ipack = np.zeros((_ND5),dtype=np.int32)
+    ipack[0:_ipack.shape[0]] = _ipack[:]
+    del _ipack
+    iwork = np.zeros((_ND5),dtype=np.int32)
+    xdata = np.zeros((_ND5),dtype=np.float32)
+    is0 = np.zeros((_ND7),dtype=np.int32)
+    is1 = np.zeros((_ND7),dtype=np.int32)
+    is2 = np.zeros((_ND7),dtype=np.int32)
+    is4 = np.zeros((_ND7),dtype=np.int32)
+    ier, igive, pmiss, smiss = 0, 2, rec.primaryMissingValue, rec.secondaryMissingValue
+    xdata,ier = tdlpacklib.unpack(6,ipack,iwork,is0,is1,is2,is4,pmiss,smiss,
+                                 igive,_L3264B)
+    xdata = xdata[:rec.numberOfPackedValues]
 
-    Parameters
-    ----------
-
-    **`griddict : dict`**
-
-    Dictionary of TDLPACK grid definition parameters
-
-    Returns
-    -------
-
-    **`str`**
-
-    String containing the pyproj.Proj definition generating by pyproj.Proj.definition_string().
-    """
-    try:
-        import pyproj
-        if griddict['proj'] == 3:
-            p = pyproj.Proj(proj='lcc',
-                            lat_1=griddict['stdlat'],
-                            lat_2=griddict['stdlat'],
-                            lon_0=(360.-griddict['orientlon']))
-            x,y = p(360.0-griddict['lonll'],griddict['latll'])
-            try:
-                projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
-            except(AttributeError):
-                projstring = None
-        elif griddict['proj'] == 5:
-            p = pyproj.Proj(proj='stere',
-                            lat_0=90.0,
-                            lat_ts=griddict['stdlat'],
-                            lon_0=(360.-griddict['orientlon']))
-            x,y = p(360.0-griddict['lonll'],griddict['latll'])
-            try:
-                projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
-            except(AttributeError):
-                projstring = None
-        elif griddict['proj'] == 7:
-            p = pyproj.Proj(proj='merc',
-                            lat_ts=griddict['stdlat'],
-                            lon_0=(360.-griddict['orientlon']))
-            x,y = p(360.0-griddict['lonll'],griddict['latll'])
-            try:
-                projstring = p.definition_string().replace('x_0=0','x_0='+str(x)).replace('y_0=0','y_0='+str(y))
-            except(AttributeError):
-                projstring = None
-        else:
-            projstring = None
-    except(ImportError):
-        projstring = None
-    return projstring
-
-def _read_ra_master_key(file):
-    """
-    Reads the master key record of TDLPACK Random-Access files.
-
-    Parameters
-    ----------
-
-    **`file : str`**
-
-    Distance in meters between grid points.  NOTE: This parameter is optional if
-    data are station-based.
-
-    Returns
-    -------
-
-    **`array`**
-    """
-    f = builtins.open(file,'rb')
-    raw = f.read(24)
-    f.close()
-    return np.fromstring(raw,dtype='>i4')
+    if rec.type == 'grid': xdata = np.reshape(xdata,(rec.ny,rec.nx))
+    return xdata 

@@ -1,6 +1,6 @@
 # init for pytdlpack package
 from ._tdlpackio import *
-from ._tdlpackio import __doc__,__pdoc__
+from ._tdlpackio import __doc__
 
 from ._grid_definitions import grids
 
