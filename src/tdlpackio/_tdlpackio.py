@@ -319,6 +319,7 @@ _PMISS = 9999.
 _SMISS = 9997.
 
 _record_class_store = dict()
+_open_file_store = dict()
 
 class open(object):
     """
@@ -347,6 +348,7 @@ class open(object):
         self._counter = 0
         self.mode = mode
         self.name = os.path.abspath(path)
+        _open_file_store[self.name] = self
         self.filetype = self._get_tdlpack_file_type()
         self.records = 0
         self.size = os.path.getsize(self.name)
@@ -425,6 +427,8 @@ class open(object):
         # Set file position to first key record
         self._filehandle.seek(nbytes)
 
+        last_station = -1
+
         while True:
 
             # Read key record "header" data
@@ -451,6 +455,7 @@ class open(object):
                 if m[0] == 400001000:
                     # Station ID record...not in TDLPACK format
                     rec = TdlpackStationRecord()
+                    last_station = self.records
                     rec._recnum = self.records+1
                     rec.numberOfStations = int(n/2)
                     #stations = struct.unpack('>'+'8s'*nsta,self._filehandle.read(nsta*8))
@@ -471,6 +476,8 @@ class open(object):
                                                igive,_L3264B)
                     rec = TdlpackRecord(is0,is1,is2,is4)
                     rec._recnum = self.records+1
+                    rec._linked_station_record = last_station
+                    rec._source = self.name
                     shape = (rec.ny,rec.nx) if rec.type == 'grid' else (rec.numberOfPackedValues,)
                     ndim = len(shape)
                     dtype = 'float32'
@@ -494,6 +501,7 @@ class open(object):
         """
         Indexer for sequential TDLPACK files.
         """
+        last_station = -1
         # Iterate
         while True:
             try:
@@ -528,6 +536,8 @@ class open(object):
                     self._index['size'].append(fortran_header) # Size given by Fortran header
                     rec = TdlpackRecord(is0,is1,is2,is4)
                     rec._recnum = self.records+1
+                    rec._linked_station_record = last_station
+                    rec._source = self.name
                     shape = (rec.ny,rec.nx) if rec.type == 'grid' else (rec.numberOfPackedValues,)
                     ndim = len(shape)
                     dtype = 'float32'
@@ -549,6 +559,7 @@ class open(object):
                     else:
                         # Station ID record
                         rec = TdlpackStationRecord()
+                        last_station = self.records
                         rec._recnum = self.records+1
                         rec.numberOfStations = int(ioctet/8)
                         #self._filehandle.seek(pos+8)
@@ -584,6 +595,7 @@ class open(object):
         Close the file handle
         """
         self._filehandle.close()
+        del _open_file_store[self.name]
 
     def select(self,**kwargs):
         """
@@ -675,6 +687,7 @@ class _TdlpackRecord:
         """
         """
         self._recnum = -1
+        self._linked_station_record = -1
         self.type = 'vector' if np.all(self.is2==0) else 'grid'
 
     def __repr__(self):
