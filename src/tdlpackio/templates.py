@@ -1,12 +1,13 @@
 from dataclasses import dataclass, field
 import datetime
 
+_DATE_FORMAT = '%Y%m%d%H'
 
 _section_attrs = {0:['edition'],
                   1:['sectionFlags','year','month','day','hour','minute','refDate',
                      'id1','id2','id3','id4','id','leadTime','leadTimeMinutes',
                      'decScaleFactor','binScaleFactor','lengthOfPlainLanguage',
-                     'plainLanguage','type'],
+                     'plainLanguage','type','validDate'],
                   2:[],
                   4:['packingFlags','numberOfPackedValues','primaryMissingValue',
                      'secondaryMissingValue','overallMinValue','numberOfGroups']}
@@ -90,18 +91,23 @@ class Minute:
 
 
 class RefDate:
+    """Reference date as a `datetime.datetime` object"""
     def __get__(self, obj, objtype=None):
-        return obj.is1[7]
+        return datetime.datetime(*obj.is1[2:7])
     def __set__(self, obj, value):
-        obj.is1[7] = value
-        _y = int(str(value)[0:4])
-        _m = int(str(value)[4:6])
-        _d = int(str(value)[6:8])
-        _h = int(str(value)[8:10])
-        if _y != obj.year: obj.year = _y
-        if _m != obj.month: obj.month = _m
-        if _d != obj.day: obj.day = _d
-        if _h != obj.hour: obj.hour = _h
+        if isinstance(value,datetime.datetime):
+            obj.is1[2] = value.year
+            obj.is1[3] = value.month
+            obj.is1[4] = value.day
+            obj.is1[5] = value.hour
+            obj.is1[6] = value.minute
+        elif isinstance(value,int):
+            self.__set__(obj,str(value))
+        elif isinstance(value,str):
+            self.__set__(obj,datetime.datetime.strptime(value,_DATE_FORMAT))
+        else:
+            err = 'Reference date must be a datetime.datetime object.'
+            raise TypeError(err)
 
 
 class VariableID1:
@@ -146,11 +152,14 @@ class VariableID:
 
 class LeadTime:
     def __get__(self, obj, objtype=None):
-        return obj.is1[12]
+        return datetime.timedelta(hours=int(obj.is1[12]))
     def __set__(self, obj, value):
-        obj.is1[12] = value
-        lt = str(obj.id3.zfill(9))[-3:]
-        if value != lt: obj.id3 = int(str(obj.id3)[:6]+str(value).zfill(3))
+        if isinstance(value,datetime.timedelta):
+            self.__set__(obj, int(value.total_seconds()/3600.0))
+        elif isinstance(value,int):
+            obj.is1[12] = value
+            lt = str(obj.id3.zfill(9))[-3:]
+            if value != lt: obj.id3 = int(str(obj.id3)[:6]+str(value).zfill(3))
 
 
 class LeadTimeMinutes:
@@ -204,6 +213,12 @@ class PlainLanguage:
         for n,s in enumerate(value[:obj.is1[21]]):
             obj.is1[22+n] = np.int32(ord(s))
 
+
+class ValidDate:
+    def __get__(self, obj, objtype=None):
+        return obj.refDate + obj.leadTime
+    def __set__(self, obj, value):
+        pass
 
 # --------------------------------------------------------------------------------------
 # Section 2

@@ -299,6 +299,7 @@ their entirety do not need to be read.
 from dataclasses import dataclass, field
 import builtins
 import collections
+import datetime
 import numpy as np
 import os
 import struct
@@ -411,8 +412,8 @@ class open(object):
         self._hasindex = True
 
         # Index at end of _build_index()
-        if self._hasindex:
-            self.dates = tuple(sorted(set([rec.refDate for rec in self._index['record'] if hasattr(rec,'refDate')])))
+        #if self._hasindex:
+        #    self.dates = tuple(sorted(set([rec.refDate for rec in self._index['record'] if hasattr(rec,'refDate')])))
 
     def _randomaccess_file_indexer(self):
         """
@@ -660,6 +661,7 @@ class _TdlpackRecord:
     binScaleFactor: int = field(init=False,repr=False,default=templates.BinScaleFactor())
     lengthOfPlainLanguage: int = field(init=False,repr=False,default=templates.LengthOfPlainLanguage())
     plainLanguage: str = field(init=False,repr=False,default=templates.PlainLanguage())
+    validDate: int = field(init=False,repr=False,default=templates.ValidDate())
 
     # Section 4 looked up attributes
     packingFlags: int = field(init=False,repr=False,default=templates.PackingFlags())
@@ -688,8 +690,10 @@ class _TdlpackRecord:
         """
         """
         ids = ' '.join([str(i).zfill(z) for (i,z) in zip(self.id,[9,9,9,10])])
-        return (f'{self._recnum}:d={self.refDate:010d}:{ids}:'
-                f'{self.leadTime:3d}-HR FCST:{self.plainLanguage}')
+        date = self.refDate.strftime(templates._DATE_FORMAT)
+        lead = int(self.leadTime.total_seconds()/3600.)
+        return (f'{self._recnum}:d={date}:{ids}:'
+                f'{lead:3d}-HR FCST:{self.plainLanguage}')
 
     def attrs_by_section(self, sect, values=False):
         """

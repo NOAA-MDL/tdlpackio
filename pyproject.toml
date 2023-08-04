@@ -39,6 +39,9 @@ dependencies = [
 ] 
 dynamic = ["version"]
 
+[project.scripts]
+itdlp = "tdlpackio:itdlp._itdlp_main"
+
 [project.urls]
 Documentation = "https://eengl.github.io/tdlpackio"
 Respository = "https://github.com/eengl/tdlpackio"
