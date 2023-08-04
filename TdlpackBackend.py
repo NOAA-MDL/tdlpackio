@@ -508,6 +508,10 @@ def make_variables(index, name_scheme, filters, f):
 
         dims = [k for k in ordered_meta if c[k] is not None]
 
+        for dim in dims:
+            if frame[dim].value_counts().nunique() > 1:
+                raise ValueError(f'un-even numer of records associated with dimension: {dim}\n unique values for {dim}: {frame[dim].unique()} ')
+
         frame = frame.sort_values(dims)
         frame = frame.set_index(dims)
 
