@@ -315,6 +315,27 @@ python module tdlpacklib ! in
             integer intent(out) :: ier
             character*(*) optional,intent(in) :: file
         end subroutine openlog
+        subroutine unpack_meta_wrapper(nd5,ipack,nd7,is0,is1,is2,is4,ier) ! in :tdlpacklib:unpack_wrapper.f90
+            integer(kind=4), optional,intent(in),check(shape(ipack, 0) == nd5),depend(ipack) :: nd5=shape(ipack, 0)
+            integer(kind=4) dimension(nd5),intent(in) :: ipack
+            integer(kind=4) intent(in) :: nd7
+            integer(kind=4) dimension(nd7),intent(out),depend(nd7) :: is0
+            integer(kind=4) dimension(nd7),intent(out),depend(nd7) :: is1
+            integer(kind=4) dimension(nd7),intent(out),depend(nd7) :: is2
+            integer(kind=4) dimension(nd7),intent(out),depend(nd7) :: is4
+            integer(kind=4) intent(out) :: ier
+        end subroutine unpack_meta_wrapper
+        subroutine unpack_data_wrapper(nd5,ipack,nd7,is0,is1,is2,is4,data,ier) ! in :tdlpacklib:unpack_wrapper.f90
+            integer(kind=4), optional,intent(in),check(shape(ipack, 0) == nd5),depend(ipack) :: nd5=shape(ipack, 0)
+            integer(kind=4) dimension(nd5),intent(in) :: ipack
+            integer(kind=4) intent(in) :: nd7
+            integer(kind=4) dimension(nd7),intent(out),depend(nd7) :: is0
+            integer(kind=4) dimension(nd7),intent(out),depend(nd7) :: is1
+            integer(kind=4) dimension(nd7),intent(out),depend(nd7) :: is2
+            integer(kind=4) dimension(nd7),intent(out),depend(nd7) :: is4
+            real(kind=4) dimension(nd5),intent(out),depend(nd5) :: data
+            integer(kind=4) intent(out) :: ier
+        end subroutine unpack_data_wrapper
     end interface 
 end python module tdlpacklib
 
