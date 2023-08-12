@@ -336,6 +336,33 @@ python module tdlpacklib ! in
             real(kind=4) dimension(nd5),intent(out),depend(nd5) :: data
             integer(kind=4) intent(out) :: ier
         end subroutine unpack_data_wrapper
+        subroutine pack1d_wrapper(nd7,is0,is1,is2,is4,nd,data,nd5,ipack,ioctet,ier) ! in :tdlpacklib:pack_wrapper.f90
+            integer(kind=4), optional,intent(in),check(shape(is0, 0) == nd7),depend(is0) :: nd7=shape(is0, 0)
+            integer(kind=4) dimension(nd7),intent(in) :: is0
+            integer(kind=4) dimension(nd7),intent(in),depend(nd7) :: is1
+            integer(kind=4) dimension(nd7),intent(in),depend(nd7) :: is2
+            integer(kind=4) dimension(nd7),intent(in),depend(nd7) :: is4
+            integer(kind=4), optional,intent(in),check(shape(data, 0) == nd),depend(data) :: nd=shape(data, 0)
+            real(kind=4) dimension(nd),intent(in) :: data
+            integer(kind=4) intent(in) :: nd5
+            integer(kind=4) dimension(nd5),intent(out),depend(nd5) :: ipack
+            integer(kind=4) intent(out) :: ioctet
+            integer(kind=4) intent(out) :: ier
+        end subroutine pack1d_wrapper
+        subroutine pack2d_wrapper(nd7,is0,is1,is2,is4,nx,ny,data,nd5,ipack,ioctet,ier) ! in :tdlpacklib:pack_wrapper.f90
+            integer(kind=4), optional,intent(in),check(shape(is0, 0) == nd7),depend(is0) :: nd7=shape(is0, 0)
+            integer(kind=4) dimension(nd7),intent(in) :: is0
+            integer(kind=4) dimension(nd7),intent(in),depend(nd7) :: is1
+            integer(kind=4) dimension(nd7),intent(in),depend(nd7) :: is2
+            integer(kind=4) dimension(nd7),intent(in),depend(nd7) :: is4
+            integer(kind=4), optional,intent(in),check(shape(data, 0) == nx),depend(data) :: nx=shape(data, 0)
+            integer(kind=4), optional,intent(in),check(shape(data, 1) == ny),depend(data) :: ny=shape(data, 1)
+            real(kind=4) dimension(nx,ny),intent(in) :: data
+            integer(kind=4) intent(in) :: nd5
+            integer(kind=4) dimension(nd5),intent(out),depend(nd5) :: ipack
+            integer(kind=4) intent(out) :: ioctet
+            integer(kind=4) intent(out) :: ier
+        end subroutine pack2d_wrapper
     end interface 
 end python module tdlpacklib
 
