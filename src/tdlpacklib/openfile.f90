@@ -1,4 +1,4 @@
-subroutine openfile(kstdout,file,mode,l3264b,lun,byteorder,ftype,ier,ra_maxent,ra_nbytes)
+subroutine openfile(kstdout,file,mode,lun,byteorder,ftype,ier,ra_template)
 implicit none
 
 ! ---------------------------------------------------------------------------------------- 
@@ -7,18 +7,17 @@ implicit none
 integer, intent(in) :: kstdout
 character(len=*), intent(in) :: file
 character(len=*), intent(in) :: mode
-integer, intent(in) :: l3264b
 integer, intent(inout) :: byteorder
 integer, intent(inout) :: ftype
 integer, intent(out) :: lun
 integer, intent(out) :: ier
-integer, intent(in), optional :: ra_maxent
-integer, intent(in), optional :: ra_nbytes
+character(len=*), intent(in), optional :: ra_template
 
 ! ---------------------------------------------------------------------------------------- 
 ! Local Variables
 ! ---------------------------------------------------------------------------------------- 
 integer :: ios,itemp
+integer :: l3264b,maxent,nbytes
 character(len=:), allocatable :: caccess
 character(len=:), allocatable :: caction
 character(len=:), allocatable :: cstatus
@@ -33,6 +32,7 @@ integer, save :: lunx=65535
 ! ---------------------------------------------------------------------------------------- 
 ier=0
 ios=0
+l3264b=32
 caccess=""
 caction="readwrite"
 cstatus=""
@@ -83,8 +83,15 @@ elseif(mode.eq."w".or.mode.eq."x")then
 
    if(ftype.eq.1)then
       ! Random-Access
-      if(present(ra_maxent).and.present(ra_nbytes))then
-         call createra(kstdout,file,l3264b,lun,ra_maxent,ra_nbytes,ier)
+      if(present(ra_template))then
+         if(ra_template.eq."small")then
+            maxent=300
+            nbytes=2000
+         elseif(ra_template.eq."large")then
+            maxent=840
+            nbytes=20000
+         endif
+         call createra(kstdout,file,l3264b,lun,maxent,nbytes,ier)
          byteorder=1
       endif
    elseif(ftype.eq.2)then

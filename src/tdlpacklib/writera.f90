@@ -1,30 +1,33 @@
-subroutine openlog(kstdout,path)
+subroutine writera(kfildo,kfilx,cfilx,id,nd5,ipack,nrepla,ncheck,ier)
 implicit none
 
 ! ---------------------------------------------------------------------------------------- 
 ! Input/Output Variables
 ! ---------------------------------------------------------------------------------------- 
-integer, intent(in) :: kstdout
-character(len=*), intent(in), optional :: path
+integer, intent(in) :: kfildo
+integer, intent(in) :: kfilx
+character(len=*), intent(in) :: cfilx
+integer, intent(in), dimension(4) :: id
+integer, intent(in) :: nd5
+integer, intent(in), dimension(nd5) :: ipack
+integer, intent(in) :: nrepla
+integer, intent(in) :: ncheck
+integer, intent(out) :: ier
 
 ! ---------------------------------------------------------------------------------------- 
 ! Local Variables
 ! ---------------------------------------------------------------------------------------- 
-integer :: ios
+integer :: l3264b
 
 ! ---------------------------------------------------------------------------------------- 
 ! Initialize
 ! ---------------------------------------------------------------------------------------- 
-ios=0
+l3264b=32
 
 ! ---------------------------------------------------------------------------------------- 
-! Open log file accordingly.
+! Call WRTDLM
 ! ---------------------------------------------------------------------------------------- 
-if(present(path))then
-   open(unit=kstdout,file=path,form="formatted",status="replace",iostat=ios)
-else
-   open(unit=kstdout,form="formatted",status="replace",iostat=ios)
-endif
+call wrtdlm(kfildo,kfilx,cfilx,id,ipack,nd5,nrepla,ncheck,l3264b,ier)
 
 return
-end subroutine openlog
+end subroutine writera

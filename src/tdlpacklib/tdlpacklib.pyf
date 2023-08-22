@@ -9,17 +9,15 @@ python module tdlpacklib ! in
             integer intent(in) :: ftype
             integer intent(out) :: ier
         end subroutine closefile
-        subroutine openfile(kstdout,file,mode,l3264b,lun,byteorder,ftype,ier,ra_maxent,ra_nbytes) ! in :tdlpacklib:openfile.f90
+        subroutine openfile(kstdout,file,mode,lun,byteorder,ftype,ier,ra_template) ! in :tdlpacklib:openfile.f90
             integer intent(in) :: kstdout
             character*(*) intent(in) :: file
             character*(*) intent(in) :: mode
-            integer intent(in) :: l3264b
             integer intent(out) :: lun
             integer intent(in,out) :: byteorder
             integer intent(in,out) :: ftype
             integer intent(out) :: ier
-            integer, optional,intent(in) :: ra_maxent
-            integer, optional,intent(in) :: ra_nbytes
+            character*(*), optional,intent(in) :: ra_template
         end subroutine openfile
         subroutine pack(kfildo,ic,nxy,is0,is1,is2,is4,nd7,ipack,nd5,second,ifirst,ifod,missp,misss,minpk,lx,ioctet,l3264b,ier) ! in :tdlpacklib:pack.f
             integer :: kfildo
@@ -310,10 +308,9 @@ python module tdlpacklib ! in
             integer dimension(2) :: nraend
             common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
         end subroutine wrtdlm
-        subroutine openlog(kstdout,ier,file) ! in :tdlpacklib:openlog.f90
+        subroutine openlog(kstdout,path) ! in :tdlpacklib:openlog.f90
             integer intent(in) :: kstdout
-            integer intent(out) :: ier
-            character*(*) optional,intent(in) :: file
+            character*(*) optional,intent(in) :: path
         end subroutine openlog
         subroutine unpack_meta_wrapper(nd5,ipack,nd7,is0,is1,is2,is4,ier) ! in :tdlpacklib:unpack_wrapper.f90
             integer(kind=4), optional,intent(in),check(shape(ipack, 0) == nd5),depend(ipack) :: nd5=shape(ipack, 0)
@@ -363,6 +360,26 @@ python module tdlpacklib ! in
             integer(kind=4) intent(out) :: ioctet
             integer(kind=4) intent(out) :: ier
         end subroutine pack2d_wrapper
+        subroutine createra(kstdout,file,l3264b,lun,maxent,nbytes,ier) ! in :tdlpacklib:createra.f90
+            integer intent(in) :: kstdout
+            character*(*) intent(in) :: file
+            integer intent(in) :: l3264b
+            integer intent(in) :: lun
+            integer intent(in) :: maxent
+            integer intent(in) :: nbytes
+            integer intent(out) :: ier
+        end subroutine createra
+        subroutine writera(kfildo,kfilx,cfilx,id,nd5,ipack,nrepla,ncheck,ier) ! in :tdlpacklib:writera.f90
+            integer intent(in) :: kfildo
+            integer intent(in) :: kfilx
+            character*(*) intent(in) :: cfilx
+            integer dimension(4),intent(in) :: id
+            integer, optional,intent(in),check(shape(ipack, 0) == nd5),depend(ipack) :: nd5=shape(ipack, 0)
+            integer dimension(nd5),intent(in) :: ipack
+            integer intent(in) :: nrepla
+            integer intent(in) :: ncheck
+            integer intent(out) :: ier
+        end subroutine writera
     end interface 
 end python module tdlpacklib
 
