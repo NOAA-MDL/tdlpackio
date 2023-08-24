@@ -18,6 +18,7 @@ character(len=*), intent(in), optional :: ra_template
 ! ---------------------------------------------------------------------------------------- 
 integer :: ios,itemp
 integer :: l3264b,maxent,nbytes
+character(len=1) :: mode1
 character(len=:), allocatable :: caccess
 character(len=:), allocatable :: caction
 character(len=:), allocatable :: cstatus
@@ -33,6 +34,7 @@ integer, save :: lunx=65535
 ier=0
 ios=0
 l3264b=32
+mode1=mode(1:1)
 caccess=""
 caction="readwrite"
 cstatus=""
@@ -47,7 +49,7 @@ ienter=ienter+1
 ! ---------------------------------------------------------------------------------------- 
 ! Perform the following for read (only) and append (can be read and/or write).
 ! ---------------------------------------------------------------------------------------- 
-if(mode.eq."r".or.mode.eq."a")then
+if(mode1.eq."r".or.mode1.eq."a")then
 
    ! Open file for stream access; read first 4 bytes; close.
    open(unit=lun,file=file,form="unformatted",access="stream",status="old",iostat=ios)
@@ -65,10 +67,10 @@ if(mode.eq."r".or.mode.eq."a")then
       call ckfilend(kstdout,lun,file,isysend,byteorder,convertx,ier)
       ftype=2
       cstatus="old"
-      if(mode.eq."r")then
+      if(mode1.eq."r")then
          caccess="sequential"
          caction="read"
-      elseif(mode.eq."a")then
+      elseif(mode1.eq."a")then
          caccess="append"
       endif
       open(unit=lun,file=file,form="unformatted",convert="big_endian",status=cstatus,&
@@ -79,7 +81,7 @@ if(mode.eq."r".or.mode.eq."a")then
 ! ---------------------------------------------------------------------------------------- 
 ! Perform the following for new files.
 ! ---------------------------------------------------------------------------------------- 
-elseif(mode.eq."w".or.mode.eq."x")then
+elseif(mode1.eq."w".or.mode1.eq."x")then
 
    if(ftype.eq.1)then
       ! Random-Access
@@ -96,8 +98,8 @@ elseif(mode.eq."w".or.mode.eq."x")then
       endif
    elseif(ftype.eq.2)then
       ! Sequential
-      if(mode.eq."w")cstatus="replace"
-      if(mode.eq."x")cstatus="new"
+      if(mode1.eq."w")cstatus="replace"
+      if(mode1.eq."x")cstatus="new"
       byteorder=1
       ftype=2
       open(unit=lun,file=file,form="unformatted",convert="big_endian",status=cstatus,&
