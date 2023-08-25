@@ -380,6 +380,17 @@ python module tdlpacklib ! in
             integer intent(in) :: ncheck
             integer intent(out) :: ier
         end subroutine writera
+        subroutine writera_char(kfildo,kfilx,cfilx,id,nd5,ipack,nrepla,ncheck,ier) ! in :tdlpacklib:writera.f90
+            integer intent(in) :: kfildo
+            integer intent(in) :: kfilx
+            character*(*) intent(in) :: cfilx
+            integer dimension(4),intent(in) :: id
+            integer, optional,intent(in),check(shape(ipack, 0) == nd5),depend(ipack) :: nd5=shape(ipack, 0)
+            character(len=4) dimension(nd5),intent(in) :: ipack
+            integer intent(in) :: nrepla
+            integer intent(in) :: ncheck
+            integer intent(out) :: ier
+        end subroutine writera_char
     end interface 
 end python module tdlpacklib
 
