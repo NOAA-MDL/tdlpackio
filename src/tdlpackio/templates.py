@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 import datetime
+import struct
 
 _DATE_FORMAT = '%Y%m%d%H'
 
@@ -13,8 +14,19 @@ _section_attrs = {0:['edition'],
                      'secondaryMissingValue','overallMinValue','numberOfGroups']}
 
 
+# --------------------------------------------------------------------------------------
+# Descriptor classes for dealing with stations
+# --------------------------------------------------------------------------------------
 class Stations:
     def __get__(self, obj, objtype=None):
+        if obj._stations is None:
+            from ._tdlpackio import _open_file_store
+            _open_file_store[obj._source]._filehandle.seek(_open_file_store[obj._source]._index['offset'][obj._recnum])
+            sdata = _open_file_store[obj._source]._filehandle.read(_open_file_store[obj._source]._index['size'][obj._recnum])
+            nsta = int(struct.unpack('>q',sdata[:8])[0]/8)
+            if nsta != obj.numberOfStations:
+                raise ValueError(f'wrong number of stations; expecting {obj.numberOfStations} stations.')
+            obj._stations = [s.decode().strip() for s in struct.unpack('>'+'8s'*obj.numberOfStations,sdata[8:])]
         return obj._stations
     def __set__(self, obj, value):
         obj.numberOfStations = len(value)
@@ -24,7 +36,7 @@ class NumberOfStations:
     def __get__(self, obj, objtype=None):
         return obj._numberOfStations
     def __set__(self, obj, value):
-        if obj.stations is None:        
+        if obj._stations is None:
             obj._numberOfStations = value
         else:
             raise AttributeError("cannot change station count if stations exist.")
