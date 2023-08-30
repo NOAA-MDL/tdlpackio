@@ -357,25 +357,26 @@ class open:
         self._byteorder = 0
         self._hasindex = False
         self._index = {}
-        self._counter = 0
         self.mode = mode
         self.name = os.path.abspath(path)
-        _open_file_store[self.name] = self
         self.records = 0
+
         # Perform indexing on read
         if 'r' in self.mode:
             self._filehandle = builtins.open(path,mode=mode,buffering=_ONE_MB)
             self.filetype = self._get_tdlpack_file_type()
             self._build_index()
         elif 'w' in self.mode:
-            if format is None: format = 'sequential'
-            self.filetype = format
+            self.bytes_written = 0
+            self.records_written = 0
+            self.filetype = format if format is not None else 'sequential'
             if self.filetype == 'random-access':
                 ifiletype = 1
-                if ra_template is None: ra_template = 'small'
+                ra_template = 'small' if ra_template is None else ra_template
                 self._lun,self._byteorder,ifiletype,ier = \
                 tdlpacklib.openfile(_FORTRAN_STDOUT_LUN,self.name,self.mode,self._byteorder,ifiletype,ra_template=ra_template)
             elif self.filetype == 'sequential':
+                self._filehandle = builtins.open(path,mode=mode,buffering=_ONE_MB)
                 ifiletype = 2
                 self._lun,self._byteorder,ifiletype,ier = \
                 tdlpacklib.openfile(_FORTRAN_STDOUT_LUN,self.name,self.mode,self._byteorder,ifiletype)
@@ -385,6 +386,8 @@ class open:
             self.size = os.path.getsize(self.name)
         except(FileNotFoundError):
             self.size = 0
+        # Add self to file data store
+        _open_file_store[self.name] = self
 
     def __enter__(self):
         """
@@ -426,9 +429,10 @@ class open:
         Determine the type of TDLPACK file.
         """
         self._filehandle.seek(0)
-        i = struct.unpack('>i',self._filehandle.read(4))[0]
+        a = struct.unpack('>i',self._filehandle.read(4))[0]
+        b = struct.unpack('>i',self._filehandle.read(4))[0]
         self._filehandle.seek(0)
-        return 'random-access' if i == 0 else 'sequential'
+        return 'random-access' if [a,b] == [0,4] else 'sequential'
         
     def _build_index(self):
         """
@@ -486,8 +490,7 @@ class open:
                 offset = (prec1-1)*nbytes
                 self._filehandle.seek(offset)
                 self._index['offset'].append(offset)
-                self._index['size'].append(n)
-                print(f'{offset=}, {n=}')
+                self._index['size'].append(n*_NBYPWD)
 
                 # Determine record type.  Since the 4-word ID is stored in the
                 # key record, we can use it to determine station call letter
@@ -501,7 +504,6 @@ class open:
                     rec.numberOfStations = int(n/2)
                     self._index['record'].append(rec)
                     self._index['type'].append('station')
-                    self._index['size'][-1] *= _NBYPWD
                 else:
                     # TDLPACK data record
                     ipack = np.frombuffer(self._filehandle.read(132),dtype='>i4')
@@ -612,27 +614,53 @@ class open:
                 self._filehandle.seek(0)
                 break
 
+    def read(self, n):
+        """
+        """
+        if 'w' in self.mode: pass # Remove this at some point....
+        # Position file pointer to the beginning of the TDLPACK record.
+        self._filehandle.seek(self._index['offset'][n])
+        if self.filetype == 'sequential':
+            size = np.frombuffer(self._filehandle.read(8),dtype='>i8')[0]
+        elif self.filetype == 'random-access':
+            size = self._index['size'][n]
+
+        if self._index['type'][n] in ['data','trailer']:
+            return np.frombuffer(self._filehandle.read(size),dtype='>i4')
+        elif self._index['type'][n] == 'station':
+            return np.frombuffer(self._filehandle.read(size),dtype='S8')
 
     def write(self, record):
         """
         """
+        if isinstance(record,list):
+            for rec in record:
+                self.write(rec)
+            return
+
         if self.filetype == 'random-access':
-            record.pack(to_bytes=False)
+            if not hasattr(record,'_ipack'): record.pack()
             nreplace, ncheck = 0, 0
             if isinstance(record,TdlpackStationRecord):
-                print(record._ipack)
-                ier = tdlpacklib.writera_char(_FORTRAN_STDOUT_LUN,self._lun,self.name,record.id,record._ipack,nreplace,ncheck)
-            elif isinstance(record,TdlpackRecord):
-                ier = tdlpacklib.writera(_FORTRAN_STDOUT_LUN,self._lun,self.name,record.id,record._ipack,nreplace,ncheck)
+                ipack = np.ndarray((record.numberOfStations*2),dtype='S4')
+                for n,s in enumerate(record.stations):
+                    s = s.ljust(8)
+                    ipack[n*2] = s[:4]
+                    ipack[(n*2)+1] = s[-4:]
+                print(ipack)
+                ier = tdlpacklib.writera_char(_FORTRAN_STDOUT_LUN,self._lun,self.name,record.id,ipack,nreplace,ncheck)
+            elif issubclass(record.__class__,_TdlpackRecord):
+                ier = tdlpacklib.writefile(_FORTRAN_STDOUT_LUN,self.name,self._lun,1,record._ipack,nreplace=nreplace,ncheck=ncheck)
         elif self.filetype == 'sequential':
-            record.pack()
-            fheader = struct.pack('>i',len(record._ipack)+8)
-            self._filehandle.write(fheader)
-            self._filehandle.write(struct.pack('>i',0))
-            self._filehandle.write(struct.pack('>i',len(record._ipack)))
-            self._filehandle.write(record._ipack)
-            self._filehandle.write(fheader)
-            self._filehandle.flush()
+            if isinstance(record,TdlpackStationRecord):
+                if self.records > 0:
+                    ier = tdlpacklib.trail(_FORTRAN_STDOUT_LUN,self._lun,_L3264B,_L3264W,self.bytes_written,self.records_written)
+                ipack = [s.ljust(_NCHAR) for s in record.stations]
+                ntotby, ntotrc = 0, 0
+                ntotby, ntotrc, ier = tdlpacklib.writesq_station_record(_FORTRAN_STDOUT_LUN,self._lun,ipack,ntotby,ntotrc)
+            elif issubclass(record.__class__,_TdlpackRecord):
+                if not hasattr(record,'_ipack'): record.pack()
+                ier = tdlpacklib.writefile(_FORTRAN_STDOUT_LUN,self.name,self._lun,2,record._ipack)
             self._type_lastrecord_written = record.type
         self.records += 1
 
@@ -642,9 +670,7 @@ class open:
         """
         if 'w' in self.mode:
             if self.filetype == 'sequential' and self._type_lastrecord_written == 'vector':
-                rec = TdlpackTrailerRecord()
-                rec.pack()
-                self.write(rec)
+                ier = tdlpacklib.trail(_FORTRAN_STDOUT_LUN,self._lun,_L3264B,_L3264W,self.bytes_written,self.records_written)
             elif self.filetype == 'random-access':
                 ier = tdlpacklib.clfilm(_FORTRAN_STDOUT_LUN,self._lun)
         if hasattr(self,'_filehandle'): self._filehandle.close()
@@ -739,6 +765,7 @@ class _TdlpackRecord:
     def __post_init__(self):
         """
         """
+        self._data_modified = False
         self._recnum = -1
         self._linked_station_record = -1
         self.type = 'vector' if np.all(self.is2==0) else 'grid'
@@ -756,7 +783,10 @@ class _TdlpackRecord:
         """
         """
         ids = ' '.join([str(i).zfill(z) for (i,z) in zip(self.id,[9,9,9,10])])
-        date = self.refDate.strftime(templates._DATE_FORMAT)
+        try:
+            date = self.refDate.strftime(templates._DATE_FORMAT)
+        except(ValueError):
+            date = '0'.zfill(10)
         lead = int(self.leadTime.total_seconds()/3600.)
         return (f'{self._recnum}:d={date}:{ids}:'
                 f'{lead:3d}-HR FCST:{self.plainLanguage}')
@@ -804,20 +834,26 @@ class _TdlpackRecord:
         else:
             return attrs
 
-    def pack(self, to_bytes=False):
+    def pack(self):
         """
         """
-        if self.type == 'grid':
-            self._ipack, ioctet, ier = tdlpacklib.pack2d_wrapper(self.is0,self.is1,
-                                                   self.is2,self.is4,
-                                                   self.data.T,_ND5)
-        elif self.type == 'vector':
-            self._ipack, ioctet, ier = tdlpacklib.pack1d_wrapper(self.is0,self.is1,
-                                                   self.is2,self.is4,
-                                                   self.data,_ND5)
-        self._ipack = self._ipack[:int(ioctet/_NBYPWD)].astype('>i4')
-        if to_bytes: self._ipack = self._ipack.tobytes()
-        
+        if isinstance(self._data,TdlpackRecordOnDiskArray):
+            # No data read yet, so get packed message from file
+            self._ipack = _open_file_store[self._source].read(self._recnum)
+        elif isinstance(self._data,np.ndarray):
+            # Data has been read or set, so check that, or just read the packed message.
+            if self._data_modified:
+                if self.type == 'grid':
+                    self._ipack, ioctet, ier = tdlpacklib.pack2d_wrapper(self.is0,self.is1,
+                                               self.is2,self.is4,
+                                               self.data.T,_ND5)
+                elif self.type == 'vector':
+                    self._ipack, ioctet, ier = tdlpacklib.pack1d_wrapper(self.is0,self.is1,
+                                               self.is2,self.is4,
+                                               self.data,_ND5)
+                self._ipack = self._ipack[:int(ioctet/_NBYPWD)]
+            else:
+                self._ipack = _open_file_store[self._source].read(self._recnum)
         
     def unpack(self):
         """
@@ -845,7 +881,12 @@ class _TdlpackRecord:
     def data(self, data):
         if not isinstance(data, np.ndarray):
             raise ValueError('TdlpackRecord data only supports numpy arrays')
+        if self.type == 'grid' and len(data.shape) != 2:
+            raise ValueError('data must be 2D array for TDLPACK gridded record')
+        elif self.type == 'vector' and len(data.shape) != 1:
+            raise ValueError('data must be 1D array for TDLPACK station record')
         self._data = data
+        self._data_modified = True
 
     def __getitem__(self, item):
         """
@@ -909,13 +950,6 @@ def _data(filehandle: open, filetype: str, rec: TdlpackRecord, offset: int, size
     del _ipack
     is0,is1,is2,is4,xdata,ier = tdlpacklib.unpack_data_wrapper(ipack,_ND7)
 
-    # Unpack stations if needed
-    if rec.type == 'vector' and rec.stations is None:
-        _open_file_store[rec._source]._filehandle.seek(_open_file_store[rec._source]._index['offset'][rec._linked_station_record])
-        sdata = _open_file_store[rec._source]._filehandle.read(_open_file_store[rec._source]._index['size'][rec._linked_station_record])
-        _open_file_store[rec._source][rec._linked_station_record].unpack(sdata[8:])
-        del sdata
-
     if rec.type == 'grid':
         xdata = np.reshape(xdata,(rec.nx,rec.ny))
         return xdata.T
@@ -939,19 +973,15 @@ class TdlpackStationRecord:
         return (f'{self._recnum}:d=0000000000:'
                 f'STATION CALL LETTER RECORD:{self.numberOfStations}')
 
-    def pack(self, to_bytes=True):
+    def pack(self):
         """
         """
-        self._ipack = np.ndarray((self.numberOfStations*2),dtype='<U4')
-        for n,s in enumerate(self.stations):
-            sta = s.ljust(int(_NCHAR),' ')
-            self._ipack[n*2] = sta[0:int(_NCHAR/2)]
-            self._ipack[(n*2)+1] = sta[int(_NCHAR/2):int(_NCHAR)]
-        if to_bytes:
-            self._ipack = self._ipack.to_bytes()
+        pass
 
-    def unpack(self, record):
-        self._stations = [s.decode().strip() for s in struct.unpack('>'+'8s'*self.numberOfStations,record)]
+    def unpack(self):
+        """
+        """
+        pass
 
 
 @dataclass
@@ -961,10 +991,8 @@ class TdlpackTrailerRecord:
     def __str__(self):
         return (f'{self._recnum}:d=0000000000:TRAILER RECORD')
 
-    def pack(self, to_bytes=True):
+    def pack(self):
         self._ipack = np.array([0, 0, 0, 0, 9999, 0],dtype=np.int32)
-        if to_bytes:
-            self._ipack = struct.pack('>iiiiii',*self._ipack.to_list())
 
     def unpack(self,record):
         pass

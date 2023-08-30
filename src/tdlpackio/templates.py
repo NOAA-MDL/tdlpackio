@@ -21,12 +21,7 @@ class Stations:
     def __get__(self, obj, objtype=None):
         if obj._stations is None:
             from ._tdlpackio import _open_file_store
-            _open_file_store[obj._source]._filehandle.seek(_open_file_store[obj._source]._index['offset'][obj._recnum])
-            sdata = _open_file_store[obj._source]._filehandle.read(_open_file_store[obj._source]._index['size'][obj._recnum])
-            nsta = int(struct.unpack('>q',sdata[:8])[0]/8)
-            if nsta != obj.numberOfStations:
-                raise ValueError(f'wrong number of stations; expecting {obj.numberOfStations} stations.')
-            obj._stations = [s.decode().strip() for s in struct.unpack('>'+'8s'*obj.numberOfStations,sdata[8:])]
+            obj._stations = [s.decode('ascii').strip() for s in _open_file_store[obj._source].read(obj._recnum).tolist()]
         return obj._stations
     def __set__(self, obj, value):
         obj.numberOfStations = len(value)
