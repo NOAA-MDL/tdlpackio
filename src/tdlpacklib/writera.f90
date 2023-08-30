@@ -47,7 +47,7 @@ integer, intent(in) :: kfilx
 character(len=*), intent(in) :: cfilx
 integer, intent(in), dimension(4) :: id
 integer, intent(in) :: nd5
-character(len=32/8), intent(in), dimension(nd5) :: ipack
+character(len=4), intent(in), dimension(nd5) :: ipack
 integer, intent(in) :: nrepla
 integer, intent(in) :: ncheck
 integer, intent(out) :: ier

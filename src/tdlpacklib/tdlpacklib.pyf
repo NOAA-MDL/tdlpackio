@@ -3,6 +3,11 @@
 
 python module tdlpacklib ! in 
     interface  ! in :tdlpacklib
+        module tdlpacklib_mod ! in :tdlpacklib:tdlpack_mod.f90
+            integer, parameter,public,optional,depend(l3264b) :: l3264b=storage_size(l3264b)
+            integer, parameter,public,optional,depend(l3264b) :: l3264w=(64/l3264b)
+            integer, parameter,public,optional,depend(l3264b) :: nbypwd=(l3264b/4)
+        end module tdlpacklib_mod
         subroutine closefile(kstdout,lun,ftype,ier) ! in :tdlpacklib:closefile.f90
             integer intent(in) :: kstdout
             integer intent(in) :: lun
@@ -19,70 +24,6 @@ python module tdlpacklib ! in
             integer intent(out) :: ier
             character*(*), optional,intent(in) :: ra_template
         end subroutine openfile
-        subroutine pack(kfildo,ic,nxy,is0,is1,is2,is4,nd7,ipack,nd5,second,ifirst,ifod,missp,misss,minpk,lx,ioctet,l3264b,ier) ! in :tdlpacklib:pack.f
-            integer :: kfildo
-            integer dimension(nxy) :: ic
-            integer, optional,check(len(ic)>=nxy),depend(ic) :: nxy=len(ic)
-            integer dimension(nd7) :: is0
-            integer dimension(nd7),depend(nd7) :: is1
-            integer dimension(nd7),depend(nd7) :: is2
-            integer dimension(nd7),depend(nd7) :: is4
-            integer, optional,check(len(is0)>=nd7),depend(is0) :: nd7=len(is0)
-            integer dimension(nd5) :: ipack
-            integer, optional,check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
-            logical :: second
-            integer :: ifirst
-            integer :: ifod
-            integer :: missp
-            integer :: misss
-            integer :: minpk
-            integer :: lx
-            integer :: ioctet
-            integer :: l3264b
-            integer :: ier
-        end subroutine pack
-        subroutine pack1d(kfildo,a,ic,nsta,is0,is1,is2,is4,nd7,xmissp,xmisss,ipack,nd5,minpk,lx,ioctet,l3264b,ier) ! in :tdlpacklib:pack1d.f
-            integer :: kfildo
-            real dimension(nsta) :: a
-            integer dimension(nsta),depend(nsta) :: ic
-            integer, optional,check(len(a)>=nsta),depend(a) :: nsta=len(a)
-            integer dimension(nd7) :: is0
-            integer dimension(nd7),depend(nd7) :: is1
-            integer dimension(nd7),depend(nd7) :: is2
-            integer dimension(nd7),depend(nd7) :: is4
-            integer, optional,check(len(is0)>=nd7),depend(is0) :: nd7=len(is0)
-            real :: xmissp
-            real :: xmisss
-            integer dimension(nd5) :: ipack
-            integer, optional,check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
-            integer :: minpk
-            integer :: lx
-            integer intent(out) :: ioctet
-            integer :: l3264b
-            integer intent(out) :: ier
-        end subroutine pack1d
-        subroutine pack2d(kfildo,a,ia,ic,nx,ny,is0,is1,is2,is4,nd7,xmissp,xmisss,ipack,nd5,minpk,lx,ioctet,l3264b,ier) ! in :tdlpacklib:pack2d.f
-            integer :: kfildo
-            real dimension(nx,ny) :: a
-            integer dimension(nx,ny),depend(nx,ny) :: ia
-            integer dimension(nx*ny),depend(nx,ny) :: ic
-            integer, optional,check(shape(a,0)==nx),depend(a) :: nx=shape(a,0)
-            integer, optional,check(shape(a,1)==ny),depend(a) :: ny=shape(a,1)
-            integer dimension(nd7) :: is0
-            integer dimension(nd7),depend(nd7) :: is1
-            integer dimension(nd7),depend(nd7) :: is2
-            integer dimension(nd7),depend(nd7) :: is4
-            integer, optional,check(len(is0)>=nd7),depend(is0) :: nd7=len(is0)
-            real :: xmissp
-            real :: xmisss
-            integer dimension(nd5) :: ipack
-            integer, optional,check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
-            integer :: minpk
-            integer :: lx
-            integer intent(out) :: ioctet
-            integer :: l3264b
-            integer intent(out) :: ier
-        end subroutine pack2d
         subroutine readfile(kstdout,file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,id) ! in :tdlpacklib:readfile.f90
             integer intent(in) :: kstdout
             character*(*) intent(in) :: file
@@ -95,14 +36,12 @@ python module tdlpacklib ! in
             integer intent(out) :: ier
             integer, optional,dimension(4),intent(in) :: id
         end subroutine readfile
-        subroutine writefile(kstdout,file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,nreplace,ncheck) ! in :tdlpacklib:writefile.f90
+        subroutine writefile(kstdout,file,lun,ftype,nd5,ipack,ier,nreplace,ncheck) ! in :tdlpacklib:writefile.f90
             integer intent(in) :: kstdout
             character*(*) intent(in) :: file
             integer intent(in) :: lun
             integer, optional,intent(in),check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
-            integer intent(in) :: l3264b
             integer intent(in) :: ftype
-            integer intent(in) :: ioctet
             integer dimension(nd5),intent(in) :: ipack
             integer intent(out) :: ier
             integer, optional,intent(in) :: nreplace
@@ -117,69 +56,6 @@ python module tdlpacklib ! in
             integer :: ntotrc
             integer intent(out) :: ier
         end subroutine trail
-        subroutine unpack(kfildo,ipack,iwork,data,nd5,is0,is1,is2,is4,nd7,misspx,misssx,igive,l3264b,ier) ! in :tdlpacklib:unpack.f
-            integer :: kfildo
-            integer dimension(nd5) :: ipack
-            integer dimension(nd5),depend(nd5) :: iwork
-            real dimension(nd5),depend(nd5),intent(out) :: data
-            integer, optional,check(len(ipack)>=nd5),depend(ipack) :: nd5=len(ipack)
-            integer dimension(nd7) :: is0
-            integer dimension(nd7),depend(nd7) :: is1
-            integer dimension(nd7),depend(nd7) :: is2
-            integer dimension(nd7),depend(nd7) :: is4
-            integer, optional,check(len(is0)>=nd7),depend(is0) :: nd7=len(is0)
-            integer :: misspx
-            integer :: misssx
-            integer :: igive
-            integer :: l3264b
-            integer intent(out) :: ier
-        end subroutine unpack
-        subroutine writep(kfildo,kfilio,ipack,nwords,ntotby,ntotrc,l3264b,ier) ! in :tdlpacklib:writep.f
-            integer intent(in) :: kfildo
-            integer intent(in) :: kfilio
-            integer dimension(nwords) :: ipack
-            integer, optional,check(len(ipack)>=nwords),depend(ipack) :: nwords=len(ipack)
-            integer intent(in,out) :: ntotby
-            integer intent(in,out) :: ntotrc
-            integer intent(in) :: l3264b
-            integer intent(out) :: ier
-        end subroutine writep
-        subroutine lmijll(kfildo,xi,yj,xmeshl,orient,xlat,xlatll,xlonll,alat,alon,ier) ! in :tdlpacklib:lmijll.f
-            integer :: kfildo
-            real :: xi
-            real :: yj
-            real :: xmeshl
-            real :: orient
-            real :: xlat
-            real :: xlatll
-            real :: xlonll
-            real :: alat
-            real :: alon
-            integer :: ier
-        end subroutine lmijll
-        subroutine mcijll(kfildo,xi,yj,xmeshl,xlat,xlatll,xlonll,alat,alon) ! in :tdlpacklib:mcijll.f
-            integer :: kfildo
-            real :: xi
-            real :: yj
-            real :: xmeshl
-            real :: xlat
-            real :: xlatll
-            real :: xlonll
-            real :: alat
-            real :: alon
-        end subroutine mcijll
-        subroutine psijll(kfildo,xi,yj,xmeshl,orient,xlat,xlatll,xlonll,alat,alon) ! in :tdlpacklib:psijll.f
-            integer :: kfildo
-            real :: xi
-            real :: yj
-            real :: xmeshl
-            real :: orient
-            real :: xlat
-            real :: xlatll
-            real :: xlonll
-            real :: alat
-            real :: alon
-        end subroutine psijll
         subroutine gridij_to_latlon(kstdout,nx,ny,mproj,xmeshl,orient,xlat,xlatll,xlonll,lats,lons,ier) ! in :tdlpacklib:gridij_to_latlon.f90
             integer intent(in) :: kstdout
             integer intent(in) :: nx
@@ -207,14 +83,6 @@ python module tdlpacklib ! in
             real, intent(out) :: xi
             real, intent(out) :: yj
         end subroutine latlon_to_gridij
-        subroutine backspacefile(lun,ier) ! in :tdlpacklib:fileaction.f
-            integer intent(in) :: lun
-            integer intent(out) :: ier
-        end subroutine backspacefile
-        subroutine rewindfile(lun,ier) ! in :tdlpacklib:fileaction.f
-            integer intent(in) :: lun
-            integer intent(out) :: ier
-        end subroutine rewindfile
         subroutine clfilm(kfildo,kfilx,ier) ! in :tdlpacklib:clfilm.f
             integer intent(in) :: kfildo
             integer intent(in) :: kfilx
@@ -233,81 +101,6 @@ python module tdlpacklib ! in
             integer dimension(2) :: nraend
             common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
         end subroutine clfilm
-        subroutine flopnm(kfildo,kfilx,cfilx,irw,nt,l3264b,iraend,ier) ! in :tdlpacklib:flopnm.f
-            integer :: kfildo
-            integer :: kfilx
-            character*1024 :: cfilx
-            integer :: irw
-            integer :: nt
-            integer :: l3264b
-            integer :: iraend
-            integer :: ier
-            integer dimension(2) :: nopen
-            integer dimension(2,2) :: lstrd
-            character dimension(2,1024),intent(c) :: cfile
-            integer dimension(2) :: kuse
-            integer dimension(2) :: nirw
-            integer dimension(7,2) :: master
-            integer dimension(6,2) :: noprec
-            integer dimension(6,840,2) :: keyrec
-            character dimension(20,1024),intent(c) :: clist
-            integer dimension(20) :: nfilsz
-            integer :: kount
-            integer dimension(2) :: nraend
-            common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
-        end subroutine flopnm
-        subroutine rdtdlm(kfildo,kfilx,cfilx,id,record,nsize,nvalue,l3264b,ier) ! in :tdlpacklib:rdtdlm.f
-            ! This interface has been modified from what f2py generated.
-            integer intent(in) :: kfildo
-            integer intent(in) :: kfilx
-            character*1024 :: cfilx
-            integer dimension(4) :: id
-            integer dimension(nsize),intent(out),depend(nsize) :: record
-            integer intent(in) :: nsize
-            !integer, optional,check(len(record)>=nsize),depend(record) :: nsize=len(record)
-            integer intent(out) :: nvalue
-            integer intent(in):: l3264b
-            integer intent(out):: ier
-            integer dimension(2) :: nopen
-            integer dimension(2,2) :: lstrd
-            character dimension(2,1024),intent(c) :: cfile
-            integer dimension(2) :: kuse
-            integer dimension(2) :: nirw
-            integer dimension(7,2) :: master
-            integer dimension(6,2) :: noprec
-            integer dimension(6,840,2) :: keyrec
-            character dimension(20,1024),intent(c) :: clist
-            integer dimension(20) :: nfilsz
-            integer :: kount
-            integer dimension(2) :: nraend
-            common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
-        end subroutine rdtdlm
-        subroutine wrtdlm(kfildo,kfilx,cfilx,id,record,nsize,nrepla,ncheck,l3264b,ier) ! in :tdlpacklib:wrtdlm.f
-            ! This interface has been modified from what f2py generated.
-            integer intent(in) :: kfildo
-            integer intent(in) :: kfilx
-            character*1024 intent(in) :: cfilx
-            integer intent(in),dimension(4) :: id
-            integer intent(in),dimension(nsize) :: record
-            integer, optional,check(len(record)>=nsize),depend(record) :: nsize=len(record)
-            integer intent(in) :: nrepla
-            integer intent(in) :: ncheck
-            integer intent(in) :: l3264b
-            integer intent(out) :: ier
-            integer dimension(2) :: nopen
-            integer dimension(2,2) :: lstrd
-            character dimension(2,1024),intent(c) :: cfile
-            integer dimension(2) :: kuse
-            integer dimension(2) :: nirw
-            integer dimension(7,2) :: master
-            integer dimension(6,2) :: noprec
-            integer dimension(6,840,2) :: keyrec
-            character dimension(20,1024),intent(c) :: clist
-            integer dimension(20) :: nfilsz
-            integer :: kount
-            integer dimension(2) :: nraend
-            common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
-        end subroutine wrtdlm
         subroutine openlog(kstdout,path) ! in :tdlpacklib:openlog.f90
             integer intent(in) :: kstdout
             character*(*) optional,intent(in) :: path
@@ -391,6 +184,15 @@ python module tdlpacklib ! in
             integer intent(in) :: ncheck
             integer intent(out) :: ier
         end subroutine writera_char
+        subroutine writesq_station_record(kfildo,kfilio,nd5,ipack,ntotby,ntotrc,ier) ! in :tdlpacklib:writesq.f90
+            integer intent(in) :: kfildo
+            integer intent(in) :: kfilio
+            integer, optional,intent(in),check(shape(ipack, 0) == nd5),depend(ipack) :: nd5=shape(ipack, 0)
+            character(len=8) dimension(nd5),intent(in) :: ipack
+            integer intent(in,out) :: ntotby
+            integer intent(in,out) :: ntotrc
+            integer intent(out) :: ier
+        end subroutine writesq_station_record
     end interface 
 end python module tdlpacklib
 

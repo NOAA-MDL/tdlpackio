@@ -1,4 +1,5 @@
-subroutine writefile(kstdout,file,lun,nd5,l3264b,ftype,ioctet,ipack,ier,nreplace,ncheck)
+subroutine writefile(kstdout,file,lun,ftype,nd5,ipack,ier,nreplace,ncheck)
+use tdlpacklib_mod
 implicit none
 
 ! ---------------------------------------------------------------------------------------- 
@@ -8,9 +9,7 @@ integer, intent(in) :: kstdout
 character(len=*), intent(in) :: file
 integer, intent(in) :: lun
 integer, intent(in) :: nd5
-integer, intent(in) :: l3264b
 integer, intent(in) :: ftype
-integer, intent(in) :: ioctet
 integer, intent(in), dimension(nd5) :: ipack
 integer, intent(out) :: ier
 integer, intent(in), optional :: nreplace
@@ -19,7 +18,7 @@ integer, intent(in), optional :: ncheck
 ! ---------------------------------------------------------------------------------------- 
 ! Local Variables
 ! ---------------------------------------------------------------------------------------- 
-integer :: n,ios,ntrash,nsize
+integer :: n,ios,ioctet,ntrash,nsize
 integer :: nreplacex,ncheckx
 integer, dimension(4) :: id
 
@@ -28,6 +27,7 @@ integer, dimension(4) :: id
 ! ---------------------------------------------------------------------------------------- 
 ier=0
 ios=0
+ioctet=nd5*nbypwd
 ncheckx=0
 nreplacex=0
 nsize=0
@@ -47,17 +47,16 @@ if(ftype.eq.1)then
       id(1)=400001000
       id(2:4)=0
    endif
-   nsize=ioctet/(l3264b/8)
+   nsize=nd5
    call wrtdlm(kstdout,lun,file,id,ipack,nsize,nreplacex,ncheckx,l3264b,ier)
 elseif(ftype.eq.2)then
    ! Sequential
    if(l3264b.eq.32)then
-      write(lun,iostat=ios)ntrash,ioctet,(ipack(n),n=1,(ioctet/(l3264b/8)))
-      ier=ios
+      write(lun,iostat=ios)ntrash,ioctet,(ipack(n),n=1,nd5)
    elseif(l3264b.eq.64)then
-      write(lun,iostat=ios)ioctet,(ipack(n),n=1,(ioctet/(l3264b/8)))
-      ier=ios
+      write(lun,iostat=ios)ioctet,(ipack(n),n=1,nd5)
    endif
+   ier=ios
 endif
 
 return
