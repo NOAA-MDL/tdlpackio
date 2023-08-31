@@ -1,4 +1,5 @@
 subroutine unpack_meta_wrapper(nd5,ipack,nd7,is0,is1,is2,is4,ier)
+use tdlpacklib_mod
 implicit none
 
 integer(kind=4), intent(in) :: nd5
@@ -10,7 +11,7 @@ integer(kind=4), intent(out), dimension(nd7) :: is2
 integer(kind=4), intent(out), dimension(nd7) :: is4
 integer(kind=4), intent(out) :: ier
 
-integer(kind=4) :: igive,kfildo,l3264b
+integer(kind=4) :: igive,kfildo
 integer(kind=4) :: misspx,misssx
 
 integer(kind=4), allocatable, dimension(:) :: iwork
@@ -19,7 +20,6 @@ real(kind=4), allocatable, dimension(:) :: data
 ier=0
 igive=1
 kfildo=6
-l3264b=storage_size(nd5)
 misspx=9999
 misssx=9997
 
@@ -42,6 +42,7 @@ end subroutine unpack_meta_wrapper
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 subroutine unpack_data_wrapper(nd5,ipack,nd7,is0,is1,is2,is4,data,ier)
+use tdlpacklib_mod
 implicit none
 
 integer(kind=4), intent(in) :: nd5
@@ -54,7 +55,7 @@ integer(kind=4), intent(out), dimension(nd7) :: is4
 real(kind=4), intent(out), dimension(nd5) :: data
 integer(kind=4), intent(out) :: ier
 
-integer(kind=4) :: igive,kfildo,l3264b
+integer(kind=4) :: igive,kfildo
 integer(kind=4) :: misspx,misssx
 
 integer(kind=4), allocatable, dimension(:) :: iwork
@@ -62,7 +63,6 @@ integer(kind=4), allocatable, dimension(:) :: iwork
 ier=0
 igive=2
 kfildo=6
-l3264b=storage_size(nd5)
 misspx=9999
 misssx=9997
 
