@@ -274,9 +274,11 @@ class OrientationLongitude:
 
 class GridLength:
     def __get__(self, obj, objtype=None):
-        return obj.is2[7]*1e-6
+        # Return in units of meters
+        return obj.is2[7]*1e-3
     def __set__(self, obj, value):
-        obj.is2[7] = value*1e+6
+        # Set in units of mm
+        obj.is2[7] = value*1e+3
 
 
 class StandardLatitude:
@@ -292,7 +294,7 @@ class GridDefinitionSection():
     nx: int = field(init=False, repr=False, default=Nx())
     ny: int = field(init=False, repr=False, default=Ny())
     latitudeLowerLeft: float = field(init=False, repr=False, default=LatitudeLowerLeft())
-    longtiudeLowerLeft: float = field(init=False, repr=False, default=LongitudeLowerLeft())
+    longitudeLowerLeft: float = field(init=False, repr=False, default=LongitudeLowerLeft())
     orientationLongitude: float = field(init=False, repr=False, default=OrientationLongitude())
     gridLength: float = field(init=False, repr=False, default=GridLength())
     standardLatitude: float = field(init=False, repr=False, default=StandardLatitude())
