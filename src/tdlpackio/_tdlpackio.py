@@ -300,10 +300,11 @@ from dataclasses import dataclass, field
 import builtins
 import collections
 import datetime
+import hashlib
 import numpy as np
 import os
 import struct
-import sys  
+import sys
 
 from . import tdlpacklib
 from . import templates
@@ -324,8 +325,9 @@ ONE_MB = 1048576
 PMISS = 9999.
 SMISS = 9997.
 
-_record_class_store = dict()
+_latlon_store = dict()
 _open_file_store = dict()
+_record_class_store = dict()
 
 tdlpacklib.openlog(FORTRAN_STDOUT_LUN,path=os.devnull)
 
@@ -434,7 +436,7 @@ class open:
         b = struct.unpack('>i',self._filehandle.read(4))[0]
         self._filehandle.seek(0)
         return 'random-access' if [a,b] == [0,4] else 'sequential'
-        
+
     def _build_index(self):
         """
         Record Indexer
@@ -731,7 +733,7 @@ class _TdlpackRecord:
 
     # Section 0 looked up attributes
     edition: int = field(init=False,repr=False,default=templates.Edition())
-    
+
     # Section 1 looked up attributes
     sectionFlags: int = field(init=False,repr=False,default=templates.SectionFlags())
     year: int = field(init=False,repr=False,default=templates.Year())
@@ -770,6 +772,10 @@ class _TdlpackRecord:
         self._recnum = -1
         self._linked_station_record = -1
         self.type = 'vector' if np.all(self.is2==0) else 'grid'
+        try:
+            self._sha1_is2 = hashlib.sha1(self.is2).hexdigest()
+        except(AttributeError):
+            pass
 
     def __repr__(self):
         """
@@ -836,6 +842,31 @@ class _TdlpackRecord:
         else:
             return attrs
 
+    def latlons(self):
+        """
+        Returns a tuple of latitudes and lontiude numpy.float32 arrays
+        for the TDLPACK record. If the record is station, then return
+        is None.
+
+        Returns
+        -------
+
+        **`lats, lons : tuple of arrays`**
+
+        Tuple of numpy.float32 arrays of grid latitudes and longitudes.
+        If `self.grid = 'station'`, then None are returned.
+        """
+        if self.type == 'vector':
+            return (None, None)
+        if self._sha1_is2 in _latlon_store.keys():
+            return _latlon_store[self._sha1_is2]
+        lats, lons, ier = tdlpacklib.gridij_to_latlon(FORTRAN_STDOUT_LUN,self.nx,self.ny,
+                          self.mapProjection,self.gridLength,self.orientationLongitude,
+                          self.standardLatitude,self.latitudeLowerLeft,
+                          self.longitudeLowerLeft)
+        _latlon_store[self._sha1_is2] = (lats.T, -1.0*lons.T)
+        return _latlon_store[self._sha1_is2]
+
     def pack(self):
         """
         """
@@ -856,7 +887,7 @@ class _TdlpackRecord:
                 self._ipack = self._ipack[:int(ioctet/NBYPWD)]
             else:
                 self._ipack = _open_file_store[self._source].read(self._recnum)
-        
+
     def unpack(self):
         """
         """
@@ -952,11 +983,7 @@ def _data(filehandle: open, filetype: str, rec: TdlpackRecord, offset: int, size
     del _ipack
     is0,is1,is2,is4,xdata,ier = tdlpacklib.unpack_data_wrapper(ipack,ND7)
 
-    if rec.type == 'grid':
-        xdata = np.reshape(xdata,(rec.nx,rec.ny))
-        return xdata.T
-    else:
-        return xdata
+    return xdata.reshape((rec.ny,rec.nx)) if rec.type == 'grid' else xdata
 
 
 @dataclass
