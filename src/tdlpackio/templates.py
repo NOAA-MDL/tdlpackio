@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 import datetime
 import struct
 
-_DATE_FORMAT = '%Y%m%d%H'
+DATE_FORMAT = '%Y%m%d%H'
 
 _section_attrs = {0:['edition'],
                   1:['sectionFlags','year','month','day','hour','minute','refDate',
@@ -111,7 +111,7 @@ class RefDate:
         elif isinstance(value,int):
             self.__set__(obj,str(value))
         elif isinstance(value,str):
-            self.__set__(obj,datetime.datetime.strptime(value,_DATE_FORMAT))
+            self.__set__(obj,datetime.datetime.strptime(value,DATE_FORMAT))
         else:
             err = 'Reference date must be a datetime.datetime object.'
             raise TypeError(err)
