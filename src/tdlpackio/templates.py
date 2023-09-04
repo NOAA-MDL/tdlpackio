@@ -150,11 +150,8 @@ class VariableID:
     def __get__(self, obj, objtype=None):
         return obj.is1[8:12]
     def __set__(self, obj, value):
-        obj.id = value
-        if value[0] != obj.id1: obj.id1 = value[0]
-        if value[1] != obj.id2: obj.id2 = value[1]
-        if value[2] != obj.id3: obj.id3 = value[2]
-        if value[3] != obj.id4: obj.id4 = value[3]
+        obj.is1[8:12] = value
+        obj.is1[12] = int(str(value[2]).zfill(9)[-3:])
 
 
 class LeadTime:
@@ -325,14 +322,14 @@ class PrimaryMissingValue:
     def __get__(self, obj, objtype=None):
         return obj.is4[3]
     def __set__(self, obj, value):
-        pass
+        obj.is4[3] = value
 
 
 class SecondaryMissingValue:
     def __get__(self, obj, objtype=None):
         return obj.is4[4]
     def __set__(self, obj, value):
-        pass
+        obj.is4[4] = value
 
 
 class OverallMinValue:
