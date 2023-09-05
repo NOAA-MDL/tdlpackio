@@ -723,12 +723,17 @@ class open:
                 ier = tdlpacklib.writefile(FORTRAN_STDOUT_LUN,self.name,self._lun,1,record._ipack,nreplace=nreplace,ncheck=ncheck)
         elif self.filetype == 'sequential':
             if isinstance(record,TdlpackStationRecord):
-                if self.records > 0:
+                if self.records > 0 and self._type_lastrecord_written != 'trailer':
                     ier = tdlpacklib.trail(FORTRAN_STDOUT_LUN,self._lun,L3264B,L3264W,self.bytes_written,self.records_written)
+                    self._type_lastrecord_written = 'trailer'
+                    self.records += 1
                 ipack = [s.ljust(NCHAR) for s in record.stations]
                 ntotby, ntotrc = 0, 0
                 ntotby, ntotrc, ier = tdlpacklib.writesq_station_record(FORTRAN_STDOUT_LUN,self._lun,ipack,ntotby,ntotrc)
             elif issubclass(record.__class__,_TdlpackRecord):
+                if not hasattr(record,'_ipack'): record.pack()
+                ier = tdlpacklib.writefile(FORTRAN_STDOUT_LUN,self.name,self._lun,2,record._ipack)
+            elif isinstance(record,TdlpackTrailerRecord):
                 if not hasattr(record,'_ipack'): record.pack()
                 ier = tdlpacklib.writefile(FORTRAN_STDOUT_LUN,self.name,self._lun,2,record._ipack)
             self._type_lastrecord_written = record.type
@@ -739,10 +744,13 @@ class open:
         Close the file handle
         """
         if 'w' in self.mode:
-            if self.filetype == 'sequential' and self._type_lastrecord_written == 'vector':
-                ier = tdlpacklib.trail(FORTRAN_STDOUT_LUN,self._lun,L3264B,L3264W,self.bytes_written,self.records_written)
+            if self.filetype == 'sequential':
+                filetype = 2
+                if self._type_lastrecord_written == 'vector':
+                    ier = tdlpacklib.trail(FORTRAN_STDOUT_LUN,self._lun,L3264B,L3264W,self.bytes_written,self.records_written)
             elif self.filetype == 'random-access':
-                ier = tdlpacklib.clfilm(FORTRAN_STDOUT_LUN,self._lun)
+                filetype = 1
+            ier = tdlpacklib.closefile(FORTRAN_STDOUT_LUN,self._lun,filetype)
         if hasattr(self,'_filehandle'): self._filehandle.close()
         del _open_file_store[self.name]
 

@@ -83,24 +83,6 @@ python module tdlpacklib ! in
             real, intent(out) :: xi
             real, intent(out) :: yj
         end subroutine latlon_to_gridij
-        subroutine clfilm(kfildo,kfilx,ier) ! in :tdlpacklib:clfilm.f
-            integer intent(in) :: kfildo
-            integer intent(in) :: kfilx
-            integer intent(out) :: ier
-            integer dimension(2) :: nopen
-            integer dimension(2,2) :: lstrd
-            character dimension(2,1024),intent(c) :: cfile
-            integer dimension(2) :: kuse
-            integer dimension(2) :: nirw
-            integer dimension(7,2) :: master
-            integer dimension(6,2) :: noprec
-            integer dimension(6,840,2) :: keyrec
-            character dimension(20,1024),intent(c) :: clist
-            integer dimension(20) :: nfilsz
-            integer :: kount
-            integer dimension(2) :: nraend
-            common /argc/ nopen,lstrd,cfile,kuse,nirw,master,noprec,keyrec,clist,nfilsz,kount,nraend
-        end subroutine clfilm
         subroutine openlog(kstdout,path) ! in :tdlpacklib:openlog.f90
             integer intent(in) :: kstdout
             character*(*) optional,intent(in) :: path
