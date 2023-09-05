@@ -92,10 +92,9 @@ def _itdlp_main():
     # Open input file and create iterable collection of records based on user
     # supplied args
     f = tdlpackio.open(args.file)
-    if 'rec' in args:
+    fiter = f
+    if args.rec is not None:
         fiter = [f[r] for r in args.rec]
-    else:
-        fiter = f
 
     # Check if writing to new file.
     if args.tdlp is not None: fout = tdlpackio.open(args.tdlp,mode='w',format='sequential')
