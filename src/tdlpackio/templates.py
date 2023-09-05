@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 import datetime
+import numpy as np
 import struct
 
 DATE_FORMAT = '%Y%m%d%H'
@@ -7,8 +8,7 @@ DATE_FORMAT = '%Y%m%d%H'
 _section_attrs = {0:['edition'],
                   1:['sectionFlags','year','month','day','hour','minute','refDate',
                      'id1','id2','id3','id4','id','leadTime','leadTimeMinutes',
-                     'decScaleFactor','binScaleFactor','lengthOfPlainLanguage',
-                     'plainLanguage','type','validDate'],
+                     'decScaleFactor','binScaleFactor','name','type','validDate'],
                   2:[],
                   4:['packingFlags','numberOfPackedValues','primaryMissingValue',
                      'secondaryMissingValue','overallMinValue','numberOfGroups']}
@@ -203,17 +203,14 @@ class BinScaleFactor:
         obj.is1[17] = value
 
 
-class LengthOfPlainLanguage:
-    def __get__(self, obj, objtype=None):
-        return obj.is1[21]
-    def __set__(self, obj, value):
-        pass
-
-
-class PlainLanguage:
+class VariableName:
+    """
+    This is the TDLPACK "Plain Language" description of the variable
+    """
     def __get__(self, obj, objtype=None):
         return ''.join([chr(i) for i in obj.is1[22:]])
     def __set__(self, obj, value):
+        obj.is1[21] = 32
         for n,s in enumerate(value[:obj.is1[21]]):
             obj.is1[22+n] = np.int32(ord(s))
 

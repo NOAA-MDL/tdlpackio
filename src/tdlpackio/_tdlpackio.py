@@ -226,8 +226,7 @@ Section 1: leadTime = 0:00:00
 Section 1: leadTimeMinutes = 0
 Section 1: decScaleFactor = 0
 Section 1: binScaleFactor = 0
-Section 1: lengthOfPlainLanguage = 32
-Section 1: plainLanguage = 1000 MB HGT GFS
+Section 1: name = 1000 MB HGT GFS
 Section 1: type = grid
 Section 1: validDate = 2017-02-01 00:00:00
 Section 2: mapProjection = 5
@@ -832,8 +831,7 @@ class _TdlpackRecord:
     modelSequenceID: int = field(init=False,repr=False,default=templates.ModelSequenceID())
     decScaleFactor: int = field(init=False,repr=False,default=templates.DecScaleFactor())
     binScaleFactor: int = field(init=False,repr=False,default=templates.BinScaleFactor())
-    lengthOfPlainLanguage: int = field(init=False,repr=False,default=templates.LengthOfPlainLanguage())
-    plainLanguage: str = field(init=False,repr=False,default=templates.PlainLanguage())
+    name: str = field(init=False,repr=False,default=templates.VariableName())
     validDate: int = field(init=False,repr=False,default=templates.ValidDate())
 
     # Section 4 looked up attributes
@@ -870,13 +868,13 @@ class _TdlpackRecord:
         """
         ids = ' '.join([str(i).zfill(z) for (i,z) in zip(self.id,[9,9,9,10])])
         try:
-            date = self.refDate.strftime(templates._DATE_FORMAT)
+            date = self.refDate.strftime(templates.DATE_FORMAT)
         except(ValueError):
             date = '0'.zfill(10)
         lead = int(self.leadTime.total_seconds()/3600.)
-        pl = self.plainLanguage.rstrip()
+        name = self.name.rstrip()
         return (f'{self._recnum}:d={date}:{ids}:'
-                f'{lead:3d}-HR FCST:{pl}')
+                f'{lead:3d}-HR FCST:{name}')
 
     def attrs_by_section(self, sect, values=False):
         """
