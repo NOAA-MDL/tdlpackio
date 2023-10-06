@@ -597,7 +597,7 @@ class open:
                 _last_station_id_record = self.records # This should be OK.
 
             # Break loop here, at last key record
-            if prec_next_key == 99999999: break
+            if prec_next_key in [9999,99999999]: break
             offset = (prec_next_key-1)*nbytes
             self._filehandle.seek(offset)
 
