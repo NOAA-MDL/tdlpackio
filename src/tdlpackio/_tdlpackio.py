@@ -373,6 +373,7 @@ import sys
 
 from . import tdlpacklib
 from . import templates
+from . import utils
 
 FORTRAN_STDOUT_LUN = 12
 
@@ -797,7 +798,7 @@ class TdlpackRecord:
         if np.all(is1==0):
             is1[1] = 1 if rectype == 'grid' else 0
 
-        # For new record, make sure valid date is present
+        # For new record, make sure the reference date is present
         if np.all(is1[2:8]==0):
             d = datetime.datetime.utcfromtimestamp(0)
             is1[2:7] = d.timetuple()[:5]
@@ -856,6 +857,7 @@ class _TdlpackRecord:
         self._data_modified = False
         self._recnum = -1
         self._linked_station_record = -1
+        self._type = 'data'
         if self.is2 is None:
             self.type = 'vector'
         else:
@@ -883,6 +885,10 @@ class _TdlpackRecord:
         name = self.name.rstrip()
         return (f'{self._recnum}:d={date}:{ids}:'
                 f'{lead:3d}-HR FCST:{name}')
+
+    @property
+    def parseid(self):
+        return utils.parse_id(self.id)
 
     def attrs_by_section(self, sect, values=False):
         """
@@ -1085,6 +1091,7 @@ class TdlpackStationRecord:
 
     def __post_init__(self):
         self.id = [400001000, 0, 0, 0]
+        self._type = 'station'
 
     def __str__(self):
         return (f'{self._recnum}:d=0000000000:'
@@ -1104,6 +1111,9 @@ class TdlpackStationRecord:
 @dataclass
 class TdlpackTrailerRecord:
     type: str = field(init=False,repr=False,default='trailer')
+
+    def __post_init__(self):
+        self._type = 'trailer'
 
     def __str__(self):
         return (f'{self._recnum}:d=0000000000:TRAILER RECORD')
