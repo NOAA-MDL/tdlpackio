@@ -407,19 +407,15 @@ class open:
 
         Parameters
         ----------
-
         **`path : str`**
-
-        File name.
+            File name.
 
         **`mode : str, optional, default = 'r'`**
-
-        File handle mode.  The default is open for reading ('r').
+            File handle mode.  The default is open for reading ('r').
 
         **`format : str, optional, default = 'sequential'`**
-
-        File type when creating a new file.  Valid values are
-        'sequential` (DEFAULT) or 'random-access'.
+            File type when creating a new file.  Valid values are 'sequential` 
+            (DEFAULT) or 'random-access'.
         """
         if mode == 'r' or mode == 'w': mode = mode+'b'
         if mode == 'a': mode = 'wb'
@@ -896,19 +892,16 @@ class _TdlpackRecord:
 
         Parameters
         ----------
-
         **`sect : int`**
-
-        The TDLPACK section number.
+            The TDLPACK section number.
 
         **`values : bool, optional`**
-
-        Optional (default is `False`) arugment to return attributes values.
+            Optional (default is `False`) arugment to return attributes values.
 
         Returns
         -------
-
-        A List attribute names or Dict if `values = True`.
+        **`list`** of attribute names or **`dict`** if `values = True` where the
+        attribute names are keys and values are the attribute values.
         """
         if sect in {0,1,4}:
             attrs = templates._section_attrs[sect]
@@ -941,11 +934,9 @@ class _TdlpackRecord:
 
         Returns
         -------
-
         **`lats, lons : tuple of arrays`**
-
-        Tuple of numpy.float32 arrays of grid latitudes and longitudes.
-        If `self.grid = 'station'`, then None are returned.
+            Tuple of numpy.float32 arrays of grid latitudes and longitudes.
+            If `self.grid = 'station'`, then None are returned.
         """
         if self.type == 'vector':
             return (None, None)
@@ -1057,10 +1048,7 @@ def _data(filehandle: open, filetype: str, rec: TdlpackRecord, offset: int, size
 
     Returns
     -------
-
-    **`numpy.ndarray`**
-
-    A numpy.ndarray with shape (ny,nx). By default the array dtype is np.float32.
+    **`numpy.ndarray`** with shape (ny,nx). By default the array dtype is np.float32.
     """
 
     # Position file pointer to the beginning of the TDLPACK record.
