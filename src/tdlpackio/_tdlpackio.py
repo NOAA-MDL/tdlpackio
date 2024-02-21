@@ -41,14 +41,14 @@ occurs.
 Download
 ========
 
-- Latest code from [github repository](https://github.com/eengl/tdlpackio).
-- Latest [releases](https://github.com/eengl/tdlpackio/releases) on GitHub.
+- Latest code from [github repository](https://github.com/NOAA-MDL/tdlpackio).
+- Latest [releases](https://github.com/NOAA-MDL/tdlpackio/releases) on GitHub.
 - [PyPI](https://pypi.org/project/tdlpackio)
 
 Requires
 ========
 
-- Python 3.8+
+- Python 3.8, 3.9, 3.10, and 3.11
 - [numpy array module](http://numpy.scipy.org), version 1.22 or later.
 - [setuptools](https://pypi.python.org/pypi/setuptools), version 34.0 or later.
 - Fortran compiler: GNU (gfortran) and Intel (ifort) have been tested.
