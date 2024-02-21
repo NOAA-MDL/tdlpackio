@@ -92,9 +92,9 @@ if "build" in sys.argv:
 # Define Extension object. For Fortran 77 source files, use "extra_f77_compile_args".
 # For Fortran 90+ source files, use "extra_f90_compile_args".
 # ----------------------------------------------------------------------------------------
-f77_sources = glob.glob("src/tdlpacklib/*.f")
-f90_sources = glob.glob("src/tdlpacklib/*.f90")
-all_sources = ["src/tdlpacklib/tdlpacklib.pyf"]+f77_sources+f90_sources
+f77_sources = glob.glob("src/ext/tdlpacklib/*.f")
+f90_sources = glob.glob("src/ext/tdlpacklib/*.f90")
+all_sources = ["src/ext/tdlpacklib/tdlpacklib.pyf"]+f77_sources+f90_sources
 ext = Extension(name  = 'tdlpackio.tdlpacklib',
                 sources = all_sources,
                 include_dirs = [numpy.get_include()],
