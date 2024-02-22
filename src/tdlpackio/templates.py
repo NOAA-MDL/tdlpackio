@@ -6,9 +6,10 @@ import struct
 DATE_FORMAT = '%Y%m%d%H'
 
 _section_attrs = {0:['edition'],
-                  1:['sectionFlags','year','month','day','hour','minute','refDate',
-                     'id1','id2','id3','id4','id','leadTime','leadTimeMinutes',
-                     'decScaleFactor','binScaleFactor','name','type','validDate'],
+                  1:['sectionFlags', 'year', 'month', 'day', 'hour', 'minute', 'refDate',
+                     'id1', 'id2', 'id3', 'id4', 'id', 'leadTime', 'leadTimeMinutes',
+                     'modelID', 'modelSequenceID', 'decScaleFactor', 'binScaleFactor',
+                     'name', 'validDate'],
                   2:[],
                   4:['packingFlags','numberOfPackedValues','primaryMissingValue',
                      'secondaryMissingValue','overallMinValue','numberOfGroups']}
