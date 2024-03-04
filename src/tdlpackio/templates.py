@@ -48,7 +48,6 @@ class Edition:
     def __set__(self, obj, value):
         pass
 
-
 # --------------------------------------------------------------------------------------
 # Section 1
 # --------------------------------------------------------------------------------------
@@ -58,14 +57,12 @@ class SectionFlags:
     def __set__(self, obj, value):
         obj.is1[1] = value
 
-
 class Year:
     def __get__(self, obj, objtype=None):
         return obj.is1[2]
     def __set__(self, obj, value):
         obj.is1[2] = value
         obj.refDate = (value*1000000)+(obj.month*10000)+(obj.day*100)+obj.hour
-
 
 class Month:
     def __get__(self, obj, objtype=None):
@@ -74,14 +71,12 @@ class Month:
         obj.is1[3] = value
         obj.refDate = (obj.year*1000000)+(value*10000)+(obj.day*100)+obj.hour
 
-
 class Day:
     def __get__(self, obj, objtype=None):
         return obj.is1[4]
     def __set__(self, obj, value):
         obj.is1[4] = value
         obj.refDate = (obj.year*1000000)+(obj.month*10000)+(value*100)+obj.hour
-
 
 class Hour:
     def __get__(self, obj, objtype=None):
@@ -90,13 +85,11 @@ class Hour:
         obj.is1[5] = value
         obj.refDate = (obj.year*1000000)+(obj.month*10000)+(obj.day*100)+value
 
-
 class Minute:
     def __get__(self, obj, objtype=None):
         return obj.is1[6]
     def __set__(self, obj, value):
         obj.is1[6] = value
-
 
 class RefDate:
     """Reference date as a `datetime.datetime` object"""
@@ -117,7 +110,6 @@ class RefDate:
             err = 'Reference date must be a datetime.datetime object.'
             raise TypeError(err)
 
-
 class VariableID1:
     def __get__(self, obj, objtype=None):
         return obj.id[0]
@@ -125,13 +117,11 @@ class VariableID1:
         obj.is1[8] = value
         obj.is1[14] = int(str(value)[-2:])
 
-
 class VariableID2:
     def __get__(self, obj, objtype=None):
         return obj.id[1]
     def __set__(self, obj, value):
         obj.is1[9] = value
-
 
 class VariableID3:
     def __get__(self, obj, objtype=None):
@@ -139,13 +129,11 @@ class VariableID3:
     def __set__(self, obj, value):
         obj.is1[10] = value
 
-
 class VariableID4:
     def __get__(self, obj, objtype=None):
         return obj.id[3]
     def __set__(self, obj, value):
         obj.is1[11] = value
-
 
 class VariableID:
     def __get__(self, obj, objtype=None):
@@ -153,7 +141,6 @@ class VariableID:
     def __set__(self, obj, value):
         obj.is1[8:12] = value
         obj.is1[12] = int(str(value[2]).zfill(9)[-3:])
-
 
 class LeadTime:
     def __get__(self, obj, objtype=None):
@@ -166,13 +153,11 @@ class LeadTime:
             lt = str(obj.id3.zfill(9))[-3:]
             if value != lt: obj.id3 = int(str(obj.id3)[:6]+str(value).zfill(3))
 
-
 class LeadTimeMinutes:
     def __get__(self, obj, objtype=None):
         return obj.is1[13]
     def __set__(self, obj, value):
         obj.is1[13] = value
-
 
 class ModelID:
     def __get__(self, obj, objtype=None):
@@ -182,13 +167,11 @@ class ModelID:
         dd = str(obj.id1.zfill(9))[-2:]
         if value != dd: obj.id1 = int(str(obj.id1)[:7]+str(value).zfill(2))
 
-
 class ModelSequenceID:
     def __get__(self, obj, objtype=None):
         return obj.is1[15]
     def __set__(self, obj, value):
         obj.is1[15] = value
-
 
 class DecScaleFactor:
     def __get__(self, obj, objtype=None):
@@ -196,13 +179,11 @@ class DecScaleFactor:
     def __set__(self, obj, value):
         obj.is1[16] = value
 
-
 class BinScaleFactor:
     def __get__(self, obj, objtype=None):
         return obj.is1[17]
     def __set__(self, obj, value):
         obj.is1[17] = value
-
 
 class VariableName:
     """
@@ -214,7 +195,6 @@ class VariableName:
         obj.is1[21] = 32
         for n,s in enumerate(value[:obj.is1[21]]):
             obj.is1[22+n] = np.int32(ord(s))
-
 
 class ValidDate:
     def __get__(self, obj, objtype=None):
@@ -231,13 +211,11 @@ class MapProjection:
     def __set__(self, obj, value):
         pass
 
-
 class Nx:
     def __get__(self, obj, objtype=None):
         return obj.is2[2]
     def __set__(self, obj, value):
         pass
-
 
 class Ny:
     def __get__(self, obj, objtype=None):
@@ -245,13 +223,11 @@ class Ny:
     def __set__(self, obj, value):
         pass
 
-
 class LatitudeLowerLeft:
     def __get__(self, obj, objtype=None):
         return obj.is2[4]*1e-4
     def __set__(self, obj, value):
         obj.is2[4] = value*1e+4
-
 
 class LongitudeLowerLeft:
     def __get__(self, obj, objtype=None):
@@ -259,13 +235,11 @@ class LongitudeLowerLeft:
     def __set__(self, obj, value):
         obj.is2[5] = value*1e+4
 
-
 class OrientationLongitude:
     def __get__(self, obj, objtype=None):
         return obj.is2[6]*1e-4
     def __set__(self, obj, value):
         obj.is2[6] = value*1e+4
-
 
 class GridLength:
     def __get__(self, obj, objtype=None):
@@ -275,13 +249,11 @@ class GridLength:
         # Set in units of mm
         obj.is2[7] = value*1e+3
 
-
 class StandardLatitude:
     def __get__(self, obj, objtype=None):
         return obj.is2[8]*1e-4
     def __set__(self, obj, value):
         obj.is2[8] = value*1e+4
-
 
 @dataclass(init=False)
 class GridDefinitionSection():
@@ -298,7 +270,6 @@ class GridDefinitionSection():
     def _attrs(cls):
         return list(cls.__dataclass_fields__.keys())
 
-
 # --------------------------------------------------------------------------------------
 # Section 4
 # --------------------------------------------------------------------------------------
@@ -308,13 +279,11 @@ class PackingFlags:
     def __set__(self, obj, value):
         pass
 
-
 class NumberOfPackedValues:
     def __get__(self, obj, objtype=None):
         return obj.is4[2]
     def __set__(self, obj, value):
         pass
-
 
 class PrimaryMissingValue:
     def __get__(self, obj, objtype=None):
@@ -322,20 +291,17 @@ class PrimaryMissingValue:
     def __set__(self, obj, value):
         obj.is4[3] = value
 
-
 class SecondaryMissingValue:
     def __get__(self, obj, objtype=None):
         return obj.is4[4]
     def __set__(self, obj, value):
         obj.is4[4] = value
 
-
 class OverallMinValue:
     def __get__(self, obj, objtype=None):
         return obj.is4[5]
     def __set__(self, obj, value):
         pass
-
 
 class NumberOfGroups:
     def __get__(self, obj, objtype=None):
