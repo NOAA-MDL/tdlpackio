@@ -1026,6 +1026,16 @@ class _TdlpackRecord:
         """
         raise NotImplementedError('assignment of data not supported via setitem')
 
+    @property
+    def lats(self):
+        """Return latitudes."""
+        return self.latlons()[0]
+
+    @property
+    def lons(self):
+        """Return longitudes."""
+        return self.latlons()[1]
+
 
 @dataclass
 class TdlpackRecordOnDiskArray:
