@@ -289,6 +289,8 @@ Use the `latlons()` method to get latitude and longitude values for gridded reco
          -15.      ,  -15.      ]], dtype=float32))
 ```
 
+TdlpackRecord object also contain properties `lats` and `lons`.
+
 ## <div id='section4'>4) Creating a TDLPACK Station Record.
 
 The constructor for `pytdlpack.TdlpackStationRecord` provides two methods of
@@ -1023,7 +1025,9 @@ class _TdlpackRecord:
         Accessing the data attribute loads data into memmory
         """
         if hasattr(self,'_data'):
-            self._data = np.asarray(self._data)
+            if isinstance(self._data, TdlpackRecordOnDiskArray):
+                self._ondiskarray = self._data
+                self._data = np.asarray(self._data)
             return self._data
         raise ValueError
 
@@ -1037,6 +1041,11 @@ class _TdlpackRecord:
             raise ValueError('data must be 1D array for TDLPACK station record')
         self._data = data
         self._data_modified = True
+
+    def flush_data(self):
+        """Flush the unpacked data values from the TdlpackRecord object."""
+        del self._data
+        self._data = self._ondiskarray
 
     def __getitem__(self, item):
         """
@@ -1127,6 +1136,12 @@ class TdlpackStationRecord:
         return (f'{self._recnum}:d=0000000000:'
                 f'STATION CALL LETTER RECORD:{self.numberOfStations}')
 
+    @property
+    def data(self):
+        """
+        """
+        pass
+
     def pack(self):
         """
         """
@@ -1147,6 +1162,12 @@ class TdlpackTrailerRecord:
 
     def __str__(self):
         return (f'{self._recnum}:d=0000000000:TRAILER RECORD')
+
+    @property
+    def data(self):
+        """
+        """
+        pass
 
     def pack(self):
         self._ipack = np.array([0, 0, 0, 0, 9999, 0],dtype=np.int32)
