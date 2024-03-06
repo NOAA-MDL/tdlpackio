@@ -525,7 +525,9 @@ class open:
         # Set file position to first key record
         self._filehandle.seek(nbytes)
 
-        last_station = -1
+        last_station_id_rec = -1
+        last_station_lat_rec = -1
+        last_station_lon_rec = -1
 
         # Iterate over all key records
         while True:
@@ -563,20 +565,26 @@ class open:
                 if m[0] == 400001000:
                     # Station ID record...not in TDLPACK format
                     rec = TdlpackStationRecord()
-                    last_station = self.records
+                    last_station_id_rec = self.records
                     rec._recnum = self.records
                     rec._source = self.name
                     rec.numberOfStations = int(n/2)
                     self._index['record'].append(rec)
                     self._index['type'].append('station')
                 else:
+                    if m[0] == 400006000:
+                        last_station_lat_rec = self.records
+                    elif m[0] == 400007000:
+                        last_station_lon_rec = self.records
                     # TDLPACK data record
                     ipack = np.frombuffer(self._filehandle.read(132),dtype='>i4')
                     is0, is1, is2, is4, ier = tdlpacklib.unpack_meta_wrapper(ipack,ND7)
                     if np.all(is2==0): is2 = None
                     rec = TdlpackRecord(is0,is1,is2,is4)
                     rec._recnum = self.records
-                    rec._linked_station_record = last_station
+                    rec._linked_station_id_record = last_station_id_rec
+                    rec._linked_station_lat_record = last_station_lat_rec
+                    rec._linked_station_lon_record = last_station_lon_rec
                     rec._source = self.name
                     shape = (rec.ny,rec.nx) if rec.type == 'grid' else (rec.numberOfPackedValues,)
                     ndim = len(shape)
@@ -602,7 +610,10 @@ class open:
         """
         Indexer for sequential TDLPACK files.
         """
-        last_station = -1
+        last_station_id_rec = -1
+        last_station_lat_rec = -1
+        last_station_lon_rec = -1
+
         # Iterate
         while True:
             try:
@@ -622,6 +633,10 @@ class open:
                 # Check to first 4 bytes of the data record to determine the data
                 # record type.
                 if _header == 'PLDT':
+                    if ipack[5] == 400006000:
+                        last_station_lat_rec = self.records
+                    elif ipack[5] == 400007000:
+                        last_station_lon_rec = self.records
                     # TDLPACK data record
                     is0, is1, is2, is4, ier = tdlpacklib.unpack_meta_wrapper(ipack,ND7)
                     self._index['offset'].append(pos)
@@ -629,7 +644,9 @@ class open:
                     if np.all(is2==0): is2 = None
                     rec = TdlpackRecord(is0,is1,is2,is4)
                     rec._recnum = self.records
-                    rec._linked_station_record = last_station
+                    rec._linked_station_id_record = last_station_id_rec
+                    rec._linked_station_lat_record = last_station_lat_rec
+                    rec._linked_station_lon_record = last_station_lon_rec
                     rec._source = self.name
                     shape = (rec.ny,rec.nx) if rec.type == 'grid' else (rec.numberOfPackedValues,)
                     ndim = len(shape)
@@ -653,7 +670,7 @@ class open:
                     else:
                         # Station ID record
                         rec = TdlpackStationRecord()
-                        last_station = self.records
+                        last_station_id_rec = self.records
                         rec._recnum = self.records
                         rec._source = self.name
                         rec.numberOfStations = int(ioctet/8)
@@ -852,7 +869,9 @@ class _TdlpackRecord:
         """
         self._data_modified = False
         self._recnum = -1
-        self._linked_station_record = -1
+        self._linked_station_id_record = -1
+        self._linked_station_lat_record = -1
+        self._linked_station_lon_record = -1
         self._type = 'data'
         if self.is2 is None:
             self.type = 'vector'
@@ -983,7 +1002,7 @@ class _TdlpackRecord:
         """
         """
         return None if self.type == 'grid' else \
-        _open_file_store[self._source][self._linked_station_record].stations
+        _open_file_store[self._source][self._linked_station_id_record].stations
 
     @property
     def data(self) -> np.array:
