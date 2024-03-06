@@ -875,9 +875,10 @@ class _TdlpackRecord:
         self._type = 'data'
         if self.is2 is None:
             self.type = 'vector'
+            self._sha1_latlon = None
         else:
             self.type = 'grid'
-            self._sha1_is2 = hashlib.sha1(self.is2).hexdigest()
+            self._sha1_latlon = hashlib.sha1(self.is2).hexdigest()
 
     def __repr__(self):
         """
@@ -947,29 +948,41 @@ class _TdlpackRecord:
 
     def latlons(self):
         """
-        Returns a tuple of latitudes and lontiude numpy.float32 arrays
-        for the TDLPACK record. If the record is station, then return
-        is None.
+        Return a tuple of latitude and longitude arrays.
+
+        This method supports grid and vector (i.e. station) TDLPACK
+        records. Some vector TDLPACK files might not contain latitude
+        or longitude records. In this scenario, None is returned.
 
         Returns
         -------
         **`lats, lons : tuple of arrays`**
-            Tuple of numpy.float32 arrays of grid latitudes and longitudes.
-            If `self.grid = 'station'`, then None are returned.
+            Tuple of numpy.float32 arrays of latitudes and longitudes.
         """
+        if self._sha1_latlon in _latlon_store.keys():
+            return _latlon_store[self._sha1_latlon]
+
         if self.type == 'vector':
-            return (None, None)
-        if self._sha1_is2 in _latlon_store.keys():
-            return _latlon_store[self._sha1_is2]
-        lats, lons, ier = tdlpacklib.gridij_to_latlon(FORTRAN_STDOUT_LUN,self.nx,self.ny,
-                          self.mapProjection,self.gridLength,self.orientationLongitude,
-                          self.standardLatitude,self.latitudeLowerLeft,
-                          self.longitudeLowerLeft)
-        _latlon_store[self._sha1_is2] = (lats.T, -1.0*lons.T)
-        return _latlon_store[self._sha1_is2]
+            if self._sha1_latlon is None:
+                self._sha1_latlon = hashlib.sha1(''.join([s for s in self.stations]).encode('ASCII')).hexdigest()
+                if {self._linked_station_lat_record,self._linked_station_lon_record} == {-1,-1}:
+                    _latlon_store[self._sha1_latlon] = (None, None)
+                else:
+                    lats = _open_file_store[self._source][self._linked_station_lat_record].data
+                    lons = _open_file_store[self._source][self._linked_station_lon_record].data
+                    _latlon_store[self._sha1_latlon] = (lats, -1.0*lons)
+            return _latlon_store[self._sha1_latlon]
+        elif self.type == 'grid':
+            lats, lons, ier = tdlpacklib.gridij_to_latlon(FORTRAN_STDOUT_LUN,self.nx,self.ny,
+                              self.mapProjection,self.gridLength,self.orientationLongitude,
+                              self.standardLatitude,self.latitudeLowerLeft,
+                              self.longitudeLowerLeft)
+            _latlon_store[self._sha1_latlon] = (lats.T, -1.0*lons.T)
+            return _latlon_store[self._sha1_latlon]
 
     def pack(self):
         """
+        Pack TDLPACK section information and data values.
         """
         # Make sure TDLPACK sections are well-formed.
         if self.is0[0] == 0: self.is0[0] = TDLP_HEADER
