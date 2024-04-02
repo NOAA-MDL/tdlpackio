@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 name = "tdlpackio"
 description = "Python interface for reading and writing TDLPACK data"
 authors = [
-  {name = "Eric Engle", email = "eric.engle@mac.com"},
+  {name = "Eric Engle", email = "eric.engle@noaa.gov"},
 ]
 requires-python = ">=3.8"
 keywords = [
@@ -43,13 +43,13 @@ dynamic = ["version"]
 itdlp = "tdlpackio:itdlp._itdlp_main"
 
 [project.urls]
-Documentation = "https://eengl.github.io/tdlpackio"
-Respository = "https://github.com/eengl/tdlpackio"
+Documentation = "https://noaa-mdl.github.io/tdlpackio"
+Respository = "https://github.com/NOAA-MDL/tdlpackio"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
 packages = ["tdlpackio"]
 zip-safe = false
 
-#[tool.setuptools.dynamic]
-#version = {attr = "grib2io_interp.__config__.grib2io_interp_version"}
+[tool.setuptools.dynamic]
+version = {attr = "tdlpackio.__config__.tdlpackio_version"}

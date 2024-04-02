@@ -115,9 +115,6 @@ with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 # ----------------------------------------------------------------------------------------
 # Run setup
 # ----------------------------------------------------------------------------------------
-setup(name             = 'tdlpackio',
-      version          = VERSION,
-      ext_modules      = [ext],
-      long_description  = long_description,
-      long_description_content_type = 'text/markdown'
-)
+setup(ext_modules = [ext],
+      long_description = long_description,
+      long_description_content_type = 'text/markdown')
