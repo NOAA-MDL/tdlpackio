@@ -1207,6 +1207,7 @@ class TdlpackID:
 
         Returns
         -------
+            An instance of TdlpackID.
         """
         delim = idstr[9]
         if {idstr[19],idstr[29]} != {delim,delim}:
