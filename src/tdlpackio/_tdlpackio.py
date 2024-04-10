@@ -1194,6 +1194,25 @@ class TdlpackID:
     def __repr__(self):
         return repr(utils.unparse_id(self._id))
 
+    @classmethod
+    def from_string(cls, idstr):
+        """
+        Create a TdlpackID object from a TDLPACK ID string.
+
+        Parameters
+        ----------
+        idstr : str
+            String containing the TDLPACK ID with leading zeros and delimited
+            by a non-numeric character.
+
+        Returns
+        -------
+        """
+        delim = idstr[9]
+        if {idstr[19],idstr[29]} != {delim,delim}:
+            raise ValueError(f'Invalid TDLPACK ID string format')
+        return cls([int(i.lstrip('0')) if len(i.lstrip('0')) > 0 else 0 for i in idstr.split(delim)])
+
     def to_string(self, delim=' '):
         """
         Return TDLPACK variable ID as string.
@@ -1218,7 +1237,8 @@ class TdlpackID:
         newid = utils.unparse_id(self._id)
         newid[0] = value
         self._id = utils.parse_id(newid)
-        self._rec.is1[8] = newid[0]
+        if self._rec is not None:
+            self._rec.is1[8] = newid[0]
 
     @property
     def word2(self):
@@ -1228,7 +1248,8 @@ class TdlpackID:
         newid = utils.unparse_id(self._id)
         newid[1] = value
         self._id = utils.parse_id(newid)
-        self._rec.is1[9] = newid[1]
+        if self._rec is not None:
+            self._rec.is1[9] = newid[1]
 
     @property
     def word3(self):
@@ -1238,7 +1259,8 @@ class TdlpackID:
         newid = utils.unparse_id(self._id)
         newid[2] = value
         self._id = utils.parse_id(newid)
-        self._rec.is1[10] = newid[2]
+        if self._rec is not None:
+            self._rec.is1[10] = newid[2]
 
     @property
     def word4(self):
@@ -1248,7 +1270,8 @@ class TdlpackID:
         newid = utils.unparse_id(self._id)
         newid[3] = value
         self._id = utils.parse_id(newid)
-        self._rec.is1[11] = newid[3]
+        if self._rec is not None:
+            self._rec.is1[11] = newid[3]
 
     @property
     def ccc(self):
@@ -1256,7 +1279,8 @@ class TdlpackID:
     @ccc.setter
     def ccc(self, value):
         self._id['ccc'] = value
-        self._rec.is1[8] = utils.unparse_id(self._id)[0]
+        if self._rec is not None:
+            self._rec.is1[8] = utils.unparse_id(self._id)[0]
 
     @property
     def fff(self):
@@ -1264,7 +1288,8 @@ class TdlpackID:
     @fff.setter
     def fff(self, value):
         self._id['fff'] = value
-        self._rec.is1[8] = utils.unparse_id(self._id)[0]
+        if self._rec is not None:
+            self._rec.is1[8] = utils.unparse_id(self._id)[0]
 
     @property
     def b(self):
@@ -1272,7 +1297,8 @@ class TdlpackID:
     @b.setter
     def b(self, value):
         self._id['b'] = value
-        self._rec.is1[8] = utils.unparse_id(self._id)[0]
+        if self._rec is not None:
+            self._rec.is1[8] = utils.unparse_id(self._id)[0]
 
     @property
     def dd(self):
@@ -1281,7 +1307,8 @@ class TdlpackID:
     def dd(self, value):
         self._id['dd'] = value
         self._rec.is1[8] = utils.unparse_id(self._id)[0]
-        self._rec.is1[14] = value
+        if self._rec is not None:
+            self._rec.is1[14] = value
 
     @property
     def v(self):
@@ -1289,7 +1316,8 @@ class TdlpackID:
     @v.setter
     def v(self, value):
         self._id['v'] = value
-        self._rec.is1[9] = utils.unparse_id(self._id)[1]
+        if self._rec is not None:
+            self._rec.is1[9] = utils.unparse_id(self._id)[1]
 
     @property
     def llll(self):
@@ -1297,7 +1325,8 @@ class TdlpackID:
     @llll.setter
     def llll(self, value):
         self._id['llll'] = value
-        self._rec.is1[9] = utils.unparse_id(self._id)[1]
+        if self._rec is not None:
+            self._rec.is1[9] = utils.unparse_id(self._id)[1]
 
     @property
     def uuuu(self):
@@ -1305,7 +1334,8 @@ class TdlpackID:
     @uuuu.setter
     def uuuu(self, value):
         self._id['uuuu'] = value
-        self._rec.is1[9] = utils.unparse_id(self._id)[1]
+        if self._rec is not None:
+            self._rec.is1[9] = utils.unparse_id(self._id)[1]
 
     @property
     def t(self):
@@ -1313,7 +1343,8 @@ class TdlpackID:
     @t.setter
     def t(self, value):
         self._id['t'] = value
-        self._rec.is1[10] = utils.unparse_id(self._id)[2]
+        if self._rec is not None:
+            self._rec.is1[10] = utils.unparse_id(self._id)[2]
 
     @property
     def rr(self):
@@ -1321,7 +1352,8 @@ class TdlpackID:
     @rr.setter
     def rr(self, value):
         self._id['rr'] = value
-        self._rec.is1[10] = utils.unparse_id(self._id)[2]
+        if self._rec is not None:
+            self._rec.is1[10] = utils.unparse_id(self._id)[2]
 
     @property
     def o(self):
@@ -1329,7 +1361,8 @@ class TdlpackID:
     @o.setter
     def o(self, value):
         self._id['o'] = value
-        self._rec.is1[10] = utils.unparse_id(self._id)[2]
+        if self._rec is not None:
+            self._rec.is1[10] = utils.unparse_id(self._id)[2]
 
     @property
     def hh(self):
@@ -1337,16 +1370,18 @@ class TdlpackID:
     @hh.setter
     def hh(self, value):
         self._id['hh'] = value
-        self._rec.is1[10] = utils.unparse_id(self._id)[2]
+        if self._rec is not None:
+            self._rec.is1[10] = utils.unparse_id(self._id)[2]
 
     @property
-    def ttt(self):
-        return self._id['ttt']
-    @ttt.setter
-    def ttt(self, value):
-        self._id['ttt'] = value
-        self._rec.is1[10] = utils.unparse_id(self._id)[2]
-        self._rec.is1[12] = value
+    def tau(self):
+        return self._id['tau']
+    @tau.setter
+    def tau(self, value):
+        self._id['tau'] = value
+        if self._rec is not None:
+            self._rec.is1[10] = utils.unparse_id(self._id)[2]
+            self._rec.is1[12] = value
 
     @property
     def thresh(self):
@@ -1354,7 +1389,8 @@ class TdlpackID:
     @thresh.setter
     def thresh(self, value):
         self._id['thresh'] = value
-        self._rec.is1[11] = utils.unparse_id(self._id)[3]
+        if self._rec is not None:
+            self._rec.is1[11] = utils.unparse_id(self._id)[3]
 
     @property
     def i(self):
@@ -1362,7 +1398,8 @@ class TdlpackID:
     @i.setter
     def i(self, value):
         self._id['i'] = value
-        self._rec.is1[11] = utils.unparse_id(self._id)[3]
+        if self._rec is not None:
+            self._rec.is1[11] = utils.unparse_id(self._id)[3]
 
     @property
     def s(self):
@@ -1370,7 +1407,8 @@ class TdlpackID:
     @s.setter
     def s(self, value):
         self._id['s'] = value
-        self._rec.is1[11] = utils.unparse_id(self._id)[3]
+        if self._rec is not None:
+            self._rec.is1[11] = utils.unparse_id(self._id)[3]
 
     @property
     def g(self):
@@ -1378,4 +1416,5 @@ class TdlpackID:
     @g.setter
     def g(self, value):
         self._id['g'] = value
-        self._rec.is1[11] = utils.unparse_id(self._id)[3]
+        if self._rec is not None:
+            self._rec.is1[11] = utils.unparse_id(self._id)[3]
