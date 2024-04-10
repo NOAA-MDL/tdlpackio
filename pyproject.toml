@@ -40,7 +40,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.scripts]
-itdlp = "tdlpackio:itdlp._itdlp_main"
+lstdlp = "tdlpackio:lstdlp._lstdlp_main"
 
 [project.urls]
 Documentation = "https://noaa-mdl.github.io/tdlpackio"

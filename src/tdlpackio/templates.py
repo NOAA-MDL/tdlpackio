@@ -1,19 +1,17 @@
 from dataclasses import dataclass, field
 import datetime
 import numpy as np
-import struct
 
 DATE_FORMAT = '%Y%m%d%H'
 
 _section_attrs = {0:['edition'],
                   1:['sectionFlags', 'year', 'month', 'day', 'hour', 'minute', 'refDate',
-                     'id1', 'id2', 'id3', 'id4', 'id', 'leadTime', 'leadTimeMinutes',
+                     'id', 'leadTime', 'leadTimeMinutes',
                      'modelID', 'modelSequenceID', 'decScaleFactor', 'binScaleFactor',
                      'name', 'validDate'],
                   2:[],
                   4:['packingFlags','numberOfPackedValues','primaryMissingValue',
                      'secondaryMissingValue','overallMinValue','numberOfGroups']}
-
 
 # --------------------------------------------------------------------------------------
 # Descriptor classes for dealing with stations
@@ -110,38 +108,6 @@ class RefDate:
             err = 'Reference date must be a datetime.datetime object.'
             raise TypeError(err)
 
-class VariableID1:
-    def __get__(self, obj, objtype=None):
-        return obj.id[0]
-    def __set__(self, obj, value):
-        obj.is1[8] = value
-        obj.is1[14] = int(str(value)[-2:])
-
-class VariableID2:
-    def __get__(self, obj, objtype=None):
-        return obj.id[1]
-    def __set__(self, obj, value):
-        obj.is1[9] = value
-
-class VariableID3:
-    def __get__(self, obj, objtype=None):
-        return obj.id[2]
-    def __set__(self, obj, value):
-        obj.is1[10] = value
-
-class VariableID4:
-    def __get__(self, obj, objtype=None):
-        return obj.id[3]
-    def __set__(self, obj, value):
-        obj.is1[11] = value
-
-class VariableID:
-    def __get__(self, obj, objtype=None):
-        return obj.is1[8:12]
-    def __set__(self, obj, value):
-        obj.is1[8:12] = value
-        obj.is1[12] = int(str(value[2]).zfill(9)[-3:])
-
 class LeadTime:
     def __get__(self, obj, objtype=None):
         return datetime.timedelta(hours=int(obj.is1[12]))
@@ -150,8 +116,7 @@ class LeadTime:
             self.__set__(obj, int(value.total_seconds()/3600.0))
         elif isinstance(value,int):
             obj.is1[12] = value
-            lt = str(obj.id3.zfill(9))[-3:]
-            if value != lt: obj.id3 = int(str(obj.id3)[:6]+str(value).zfill(3))
+            obj.id.ttt = value
 
 class LeadTimeMinutes:
     def __get__(self, obj, objtype=None):
@@ -164,8 +129,7 @@ class ModelID:
         return obj.is1[14]
     def __set__(self, obj, value):
         obj.is1[14] = value
-        dd = str(obj.id1.zfill(9))[-2:]
-        if value != dd: obj.id1 = int(str(obj.id1)[:7]+str(value).zfill(2))
+        obj.id.dd = value
 
 class ModelSequenceID:
     def __get__(self, obj, objtype=None):

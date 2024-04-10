@@ -409,13 +409,13 @@ class open:
 
         Parameters
         ----------
-        **`path : str`**
+        path : str
             File name.
 
-        **`mode : str, optional, default = 'r'`**
+        mode : str, optional, default = 'r'
             File handle mode.  The default is open for reading ('r').
 
-        **`format : str, optional, default = 'sequential'`**
+        format : str, optional, default = 'sequential'
             File type when creating a new file.  Valid values are 'sequential` 
             (DEFAULT) or 'random-access'.
         """
@@ -844,11 +844,6 @@ class _TdlpackRecord:
     hour: int = field(init=False,repr=False,default=templates.Hour())
     minute: int = field(init=False,repr=False,default=templates.Minute())
     refDate: int = field(init=False,repr=False,default=templates.RefDate())
-    id1: int = field(init=False,repr=False,default=templates.VariableID1())
-    id2: int = field(init=False,repr=False,default=templates.VariableID2())
-    id3: int = field(init=False,repr=False,default=templates.VariableID3())
-    id4: int = field(init=False,repr=False,default=templates.VariableID4())
-    id: int = field(init=False,repr=False,default=templates.VariableID())
     leadTime: int = field(init=False,repr=False,default=templates.LeadTime())
     leadTimeMinutes: int = field(init=False,repr=False,default=templates.LeadTimeMinutes())
     modelID: int = field(init=False,repr=False,default=templates.ModelID())
@@ -881,6 +876,7 @@ class _TdlpackRecord:
         else:
             self.type = 'grid'
             self._sha1_latlon = hashlib.sha1(self.is2).hexdigest()
+        self.id = TdlpackID(self.is1[8:12].tolist(), self)
 
     def __repr__(self):
         """
@@ -894,7 +890,7 @@ class _TdlpackRecord:
     def __str__(self):
         """
         """
-        ids = ' '.join([str(i).zfill(z) for (i,z) in zip(self.id,[9,9,9,10])])
+        ids = self.id.to_string()
         try:
             date = self.refDate.strftime(templates.DATE_FORMAT)
         except(ValueError):
@@ -914,15 +910,15 @@ class _TdlpackRecord:
 
         Parameters
         ----------
-        **`sect : int`**
+        sect : int
             The TDLPACK section number.
 
-        **`values : bool, optional`**
+        values : bool, optional
             Optional (default is `False`) arugment to return attributes values.
 
         Returns
         -------
-        **`list`** of attribute names or **`dict`** if `values = True` where the
+        list of attribute names or dict if `values = True` where the
         attribute names are keys and values are the attribute values.
         """
         if sect in {0,1,4}:
@@ -958,7 +954,7 @@ class _TdlpackRecord:
 
         Returns
         -------
-        **`lats, lons : tuple of arrays`**
+        lats, lons : tuple of arrays
             Tuple of numpy.float32 arrays of latitudes and longitudes.
         """
         if self._sha1_latlon in _latlon_store.keys():
@@ -1030,7 +1026,6 @@ class _TdlpackRecord:
                 self._data = np.asarray(self._data)
             return self._data
         raise ValueError
-
     @data.setter
     def data(self, data):
         if not isinstance(data, np.ndarray):
@@ -1099,7 +1094,7 @@ def _data(filehandle: open, filetype: str, rec: TdlpackRecord, offset: int, size
 
     Returns
     -------
-    **`numpy.ndarray`** with shape (ny,nx). By default the array dtype is np.float32.
+    numpy.ndarray with shape (ny,nx). By default the array dtype is np.float32.
     """
 
     # Position file pointer to the beginning of the TDLPACK record.
@@ -1174,3 +1169,213 @@ class TdlpackTrailerRecord:
 
     def unpack(self,record):
         pass
+
+
+class TdlpackID:
+    """
+    TDLPACK variable ID class.
+    """
+    __slots__ = ('_id', '_rec')
+    def __init__(self, id, linked_rec=None):
+        """
+        Initialize TDLPACK variable ID
+
+        Parameters
+        ----------
+        id : list of ints
+            The 4-word TDLPACK variable ID
+        linked_rec : TdlpackRecord, optional
+            TDLPACK record object. This optional argument provides a mechanism
+            for updating the TDLPACK variable ID in the TdlpackRecord is1 array.
+        """
+        self._id = utils.parse_id(id)
+        self._rec = linked_rec
+
+    def __repr__(self):
+        return repr(utils.unparse_id(self._id))
+
+    def to_string(self, delim=' '):
+        """
+        Return TDLPACK variable ID as string.
+
+        Parameters
+        ----------
+        delim : str, optional
+            Delimiter character between each TDLPACK variable ID word.
+
+        Returns
+        -------
+            String of the 4-word TDLPACK variable ID.
+        """
+        strlen = (9, 9, 9, 10)
+        return delim.join([str(i).zfill(l) for l,i in zip(strlen,utils.unparse_id(self._id))])
+
+    @property
+    def word1(self):
+        return utils.unparse_id(self._id)[0]
+    @word1.setter
+    def word1(self, value):
+        newid = utils.unparse_id(self._id)
+        newid[0] = value
+        self._id = utils.parse_id(newid)
+        self._rec.is1[8] = newid[0]
+
+    @property
+    def word2(self):
+        return utils.unparse_id(self._id)[1]
+    @word2.setter
+    def word2(self, value):
+        newid = utils.unparse_id(self._id)
+        newid[1] = value
+        self._id = utils.parse_id(newid)
+        self._rec.is1[9] = newid[1]
+
+    @property
+    def word3(self):
+        return utils.unparse_id(self._id)[2]
+    @word3.setter
+    def word3(self, value):
+        newid = utils.unparse_id(self._id)
+        newid[2] = value
+        self._id = utils.parse_id(newid)
+        self._rec.is1[10] = newid[2]
+
+    @property
+    def word4(self):
+        return utils.unparse_id(self._id)[3]
+    @word4.setter
+    def word4(self, value):
+        newid = utils.unparse_id(self._id)
+        newid[3] = value
+        self._id = utils.parse_id(newid)
+        self._rec.is1[11] = newid[3]
+
+    @property
+    def ccc(self):
+        return self._id['ccc']
+    @ccc.setter
+    def ccc(self, value):
+        self._id['ccc'] = value
+        self._rec.is1[8] = utils.unparse_id(self._id)[0]
+
+    @property
+    def fff(self):
+        return self._id['fff']
+    @fff.setter
+    def fff(self, value):
+        self._id['fff'] = value
+        self._rec.is1[8] = utils.unparse_id(self._id)[0]
+
+    @property
+    def b(self):
+        return self._id['b']
+    @b.setter
+    def b(self, value):
+        self._id['b'] = value
+        self._rec.is1[8] = utils.unparse_id(self._id)[0]
+
+    @property
+    def dd(self):
+        return self._id['dd']
+    @dd.setter
+    def dd(self, value):
+        self._id['dd'] = value
+        self._rec.is1[8] = utils.unparse_id(self._id)[0]
+        self._rec.is1[14] = value
+
+    @property
+    def v(self):
+        return self._id['v']
+    @v.setter
+    def v(self, value):
+        self._id['v'] = value
+        self._rec.is1[9] = utils.unparse_id(self._id)[1]
+
+    @property
+    def llll(self):
+        return self._id['llll']
+    @llll.setter
+    def llll(self, value):
+        self._id['llll'] = value
+        self._rec.is1[9] = utils.unparse_id(self._id)[1]
+
+    @property
+    def uuuu(self):
+        return self._id['uuuu']
+    @uuuu.setter
+    def uuuu(self, value):
+        self._id['uuuu'] = value
+        self._rec.is1[9] = utils.unparse_id(self._id)[1]
+
+    @property
+    def t(self):
+        return self._id['t']
+    @t.setter
+    def t(self, value):
+        self._id['t'] = value
+        self._rec.is1[10] = utils.unparse_id(self._id)[2]
+
+    @property
+    def rr(self):
+        return self._id['rr']
+    @rr.setter
+    def rr(self, value):
+        self._id['rr'] = value
+        self._rec.is1[10] = utils.unparse_id(self._id)[2]
+
+    @property
+    def o(self):
+        return self._id['o']
+    @o.setter
+    def o(self, value):
+        self._id['o'] = value
+        self._rec.is1[10] = utils.unparse_id(self._id)[2]
+
+    @property
+    def hh(self):
+        return self._id['hh']
+    @hh.setter
+    def hh(self, value):
+        self._id['hh'] = value
+        self._rec.is1[10] = utils.unparse_id(self._id)[2]
+
+    @property
+    def ttt(self):
+        return self._id['ttt']
+    @ttt.setter
+    def ttt(self, value):
+        self._id['ttt'] = value
+        self._rec.is1[10] = utils.unparse_id(self._id)[2]
+        self._rec.is1[12] = value
+
+    @property
+    def thresh(self):
+        return self._id['thresh']
+    @thresh.setter
+    def thresh(self, value):
+        self._id['thresh'] = value
+        self._rec.is1[11] = utils.unparse_id(self._id)[3]
+
+    @property
+    def i(self):
+        return self._id['i']
+    @i.setter
+    def i(self, value):
+        self._id['i'] = value
+        self._rec.is1[11] = utils.unparse_id(self._id)[3]
+
+    @property
+    def s(self):
+        return self._id['s']
+    @s.setter
+    def s(self, value):
+        self._id['s'] = value
+        self._rec.is1[11] = utils.unparse_id(self._id)[3]
+
+    @property
+    def g(self):
+        return self._id['g']
+    @g.setter
+    def g(self, value):
+        self._id['g'] = value
+        self._rec.is1[11] = utils.unparse_id(self._id)[3]

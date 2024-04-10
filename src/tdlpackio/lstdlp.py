@@ -5,7 +5,8 @@ import sys
 import tdlpackio
 
 DESCRIPTION = """
-itdlp - a command line utility to inventory MDL's MOS-2000 TDLPACK files.
+lstdlp - a command-line utility to inventory MDL's MOS-2000 TDLPACK files based
+the tdlpackio Python package.
 """
 
 QUIET_HELP = """
@@ -73,11 +74,11 @@ def verbose(rec):
     return ''.join([s for s in output])
 
 
-def _itdlp_main():
+def _lstdlp_main():
     """
     """
     # Define and parse args
-    parser = argparse.ArgumentParser(prog='itdlp',
+    parser = argparse.ArgumentParser(prog='lstdlp',
                                      description=DESCRIPTION)
     parser.add_argument('file')
     parser.add_argument('-q', dest='quiet', action='store_true', help=QUIET_HELP)
