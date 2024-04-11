@@ -42,7 +42,7 @@ python setup.py install [--user |--prefix=PREFIX]
 
 ## Development
 
-The intention of tdlpackio is to become the offical Python interface for the NCEP g2c library.  Therefore, the development evolution of tdlpackio will mainly focus on how best to serve that purpose and its primary user's -- mainly meteorologists, physical scientists, and software developers supporting the missions within NOAA's National Weather Service (NWS) and National Centers for Environmental Prediction (NCEP), and other NOAA organizations.
+The development evolution of tdlpackio will mainly focus on how best to serve that purpose and its primary user's -- mainly meteorologists, physical scientists, and software developers supporting the missions within NOAA's National Weather Service (NWS) and National Centers for Environmental Prediction (NCEP), and other NOAA organizations.
 
 ## Disclaimer
 
