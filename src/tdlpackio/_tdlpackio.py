@@ -876,6 +876,7 @@ class _TdlpackRecord:
         else:
             self.type = 'grid'
             self._sha1_latlon = hashlib.sha1(self.is2).hexdigest()
+        self.duration = datetime.timedelta(hours=0)
         self.id = TdlpackID(self.is1[8:12].tolist(), self)
 
     def __repr__(self):

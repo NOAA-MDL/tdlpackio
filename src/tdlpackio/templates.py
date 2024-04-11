@@ -8,7 +8,7 @@ _section_attrs = {0:['edition'],
                   1:['sectionFlags', 'year', 'month', 'day', 'hour', 'minute', 'refDate',
                      'id', 'leadTime', 'leadTimeMinutes',
                      'modelID', 'modelSequenceID', 'decScaleFactor', 'binScaleFactor',
-                     'name', 'validDate'],
+                     'name', 'validDate', 'duration'],
                   2:[],
                   4:['packingFlags','numberOfPackedValues','primaryMissingValue',
                      'secondaryMissingValue','overallMinValue','numberOfGroups']}
