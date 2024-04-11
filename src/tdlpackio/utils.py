@@ -77,7 +77,7 @@ def unparse_id(parsedid: dict) -> list:
           str(parsedid['s'])+\
           str(parsedid['g'])
 
-    return [int(id1.lstrip('0')), int(id2.lstrip('0') or 0),
+    return [int(id1.lstrip('0') or 0), int(id2.lstrip('0') or 0),
             int(id3.lstrip('0') or 0), int(id4.lstrip('0') or 0)]
 
 def encode_threshold_for_id(thresh: float):

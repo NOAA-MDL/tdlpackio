@@ -60,34 +60,35 @@ class Year:
         return obj.is1[2]
     def __set__(self, obj, value):
         obj.is1[2] = value
-        obj.refDate = (value*1000000)+(obj.month*10000)+(obj.day*100)+obj.hour
+        obj.refDate = datetime.datetime(*obj.is1[2:7])
 
 class Month:
     def __get__(self, obj, objtype=None):
         return obj.is1[3]
     def __set__(self, obj, value):
         obj.is1[3] = value
-        obj.refDate = (obj.year*1000000)+(value*10000)+(obj.day*100)+obj.hour
+        obj.refDate = datetime.datetime(*obj.is1[2:7])
 
 class Day:
     def __get__(self, obj, objtype=None):
         return obj.is1[4]
     def __set__(self, obj, value):
         obj.is1[4] = value
-        obj.refDate = (obj.year*1000000)+(obj.month*10000)+(value*100)+obj.hour
+        obj.refDate = datetime.datetime(*obj.is1[2:7])
 
 class Hour:
     def __get__(self, obj, objtype=None):
         return obj.is1[5]
     def __set__(self, obj, value):
         obj.is1[5] = value
-        obj.refDate = (obj.year*1000000)+(obj.month*10000)+(obj.day*100)+value
+        obj.refDate = datetime.datetime(*obj.is1[2:7])
 
 class Minute:
     def __get__(self, obj, objtype=None):
         return obj.is1[6]
     def __set__(self, obj, value):
         obj.is1[6] = value
+        obj.refDate = datetime.datetime(*obj.is1[2:7])
 
 class RefDate:
     """Reference date as a `datetime.datetime` object"""
