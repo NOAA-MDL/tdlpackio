@@ -1192,6 +1192,13 @@ class TdlpackID:
         self._id = utils.parse_id(id)
         self._rec = linked_rec
 
+    def __eq__(self, value):
+        if isinstance(value, list) or isinstance(value, tuple):
+            return self.word1 == value[0] and self.word2 == value[1] and \
+                   self.word3 == value[2] and self.word4 == value[3]
+        else:
+            return False
+
     def __repr__(self):
         return repr(utils.unparse_id(self._id))
 
