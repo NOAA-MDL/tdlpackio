@@ -1086,6 +1086,16 @@ class _TdlpackRecord:
         "Return data minimum"
         return np.nanmin(self.data)
 
+    @property
+    def mean(self):
+        """Return mean value of data."""
+        return np.nanmean(self.data)
+
+    @property
+    def median(self):
+        """Return median value of data."""
+        return np.nanmedian(self.data)
+
 
 @dataclass
 class TdlpackRecordOnDiskArray:
