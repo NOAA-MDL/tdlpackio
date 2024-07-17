@@ -522,8 +522,10 @@ class open:
         # Read master key
         version, nids, nwords, nkyrec, maxent, lastky = struct.unpack('>iiiiii',self._filehandle.read(24))
         nbytes = nwords*NBYPWD
-        self.master_key = dict(version=version,nids=nids,nwords=nwords,
-                               nkyrec=nkyrec,maxent=maxent,lastky=lastky)
+        last_key_check = [99999999] if lastky > 9999 else [9999,99999999]
+        self.master_key = dict(version=version, nids=nids, nwords=nwords,
+                               nkyrec=nkyrec, maxent=maxent, lastky=lastky)
+        self.key_records = []
         # Set file position to first key record
         self._filehandle.seek(nbytes)
 
@@ -535,7 +537,8 @@ class open:
         while True:
 
             # Read key record "header" data
-            nkeys, nprec_this_key, prec_next_key = struct.unpack('>iii',self._filehandle.read(12))
+            nkeys, prec_this_key, prec_next_key = struct.unpack('>iii',self._filehandle.read(12))
+            self.key_records.append(dict(nkeys=nkeys, prec_this_key=prec_this_key, prec_next_key=prec_next_key))
 
             ids = list()
             nsize = list()
@@ -604,7 +607,7 @@ class open:
                 _last_station_id_record = self.records # This should be OK.
 
             # Break loop here, at last key record
-            if prec_next_key in [9999,99999999]: break
+            if prec_next_key in last_key_check: break
             offset = (prec_next_key-1)*nbytes
             self._filehandle.seek(offset)
 
@@ -1072,6 +1075,16 @@ class _TdlpackRecord:
     def lons(self):
         """Return longitudes."""
         return self.latlons()[1]
+
+    @property
+    def max(self):
+        "Return data minimum"
+        return np.nanmax(self.data)
+
+    @property
+    def min(self):
+        "Return data minimum"
+        return np.nanmin(self.data)
 
 
 @dataclass
