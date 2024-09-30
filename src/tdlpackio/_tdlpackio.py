@@ -1245,6 +1245,16 @@ class TdlpackID:
             raise ValueError(f'Invalid TDLPACK ID string format')
         return cls([int(i.lstrip('0')) if len(i.lstrip('0')) > 0 else 0 for i in idstr.split(delim)])
 
+    def to_dict(self):
+        """
+        Return TDLPACK variable ID as dict.
+
+        Returns
+        -------
+            String of the 4-word TDLPACK variable ID.
+        """
+        return self._id
+
     def to_string(self, delim=' '):
         """
         Return TDLPACK variable ID as string.
