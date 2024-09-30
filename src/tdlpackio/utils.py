@@ -34,7 +34,7 @@ def parse_id(mosid: list) -> dict:
     idprs['rr'] = int(id3[1:3].lstrip('0') or 0)
     idprs['o'] = int(id3[3])
     idprs['hh'] = int(id3[4:6].lstrip('0') or 0)
-    idprs['ttt'] = int(id3[6:9].lstrip('0') or 0)
+    idprs['tau'] = int(id3[6:9].lstrip('0') or 0)
     idprs['i'] = int(id4[7])
     idprs['s'] = int(id4[8])
     idprs['g'] = int(id4[9])
@@ -71,7 +71,7 @@ def unparse_id(parsedid: dict) -> list:
           str(parsedid['uuuu']).zfill(4)
     id3 = str(parsedid['t'])+str(parsedid['rr']).zfill(2)+\
           str(parsedid['o'])+str(parsedid['hh']).zfill(2)+\
-          str(parsedid['ttt']).zfill(3)
+          str(parsedid['tau']).zfill(3)
     id4 = encode_threshold_for_id(parsedid['thresh'])+\
           str(parsedid['i'])+\
           str(parsedid['s'])+\

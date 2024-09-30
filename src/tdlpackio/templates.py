@@ -91,33 +91,37 @@ class Minute:
         obj.refDate = datetime.datetime(*obj.is1[2:7])
 
 class RefDate:
-    """Reference date as a `datetime.datetime` object"""
+    """Reference Date. NOTE: This is a `datetime.datetime` object."""
     def __get__(self, obj, objtype=None):
         return datetime.datetime(*obj.is1[2:7])
     def __set__(self, obj, value):
-        if isinstance(value,datetime.datetime):
+        if isinstance(value, np.datetime64):
+            timestamp = (value - np.datetime64("1970-01-01T00:00:00")) / np.timedelta64(
+                1, "s"
+            )
+            value = datetime.datetime.utcfromtimestamp(timestamp)
+        if isinstance(value, datetime.datetime):
             obj.is1[2] = value.year
             obj.is1[3] = value.month
             obj.is1[4] = value.day
             obj.is1[5] = value.hour
             obj.is1[6] = value.minute
-        elif isinstance(value,int):
-            self.__set__(obj,str(value))
-        elif isinstance(value,str):
-            self.__set__(obj,datetime.datetime.strptime(value,DATE_FORMAT))
+            obj.is1[7] = int(value.strftime(DATE_FORMAT))
         else:
-            err = 'Reference date must be a datetime.datetime object.'
-            raise TypeError(err)
+            msg = "Reference date must be a datetime.datetime or np.datetime64 object."
+            raise TypeError(msg)
 
 class LeadTime:
+    """Forecast Lead Time. NOTE: This is a `datetime.timedelta` object."""
     def __get__(self, obj, objtype=None):
         return datetime.timedelta(hours=int(obj.is1[12]))
     def __set__(self, obj, value):
-        if isinstance(value,datetime.timedelta):
-            self.__set__(obj, int(value.total_seconds()/3600.0))
-        elif isinstance(value,int):
-            obj.is1[12] = value
-            obj.id.ttt = value
+        if isinstance(value, np.timedelta64):
+            # Allows setting from xarray
+            value = datetime.timedelta(
+                seconds=int(value/np.timedelta64(1, 's')))
+        obj.is1[12] = int(value.total_seconds()/3600)
+        obj.id.tau = obj.is1[12]
 
 class LeadTimeMinutes:
     def __get__(self, obj, objtype=None):
