@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# TdlpackBackend is a backend entrypoint for decoding sequential tdlpack files with the engine 'tdlpack'
-# TdlpackBackend is pre-release and the API is subject to change without backward compatability
 from pathlib import Path
 import shutil
 import datetime
@@ -22,8 +19,8 @@ from xarray.backends.common import (
 )
 from xarray.core import indexing
 from xarray.backends.locks import SerializableLock
-import pytdlpack
-import TdlpackIO
+#import pytdlpack
+import tdlpackio
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +56,7 @@ class TdlpackBackendEntrypoint(BackendEntrypoint):
     ):
 
         # read and parse metadata from tdlpack file
-        f = TdlpackIO.open(filename)
+        f = tdlpackio.open(filename)
         file_index = pd.DataFrame(f._index)
 
         file_index = parse_tdlpackio_index_to_components(file_index)
@@ -241,7 +238,7 @@ class OnDiskArray:
 
     def __getitem__(self, item) -> np.array:
         # dimensions not in index are internal to tdlpack records; 2 dims for grids; 1 dim for stations
-        f = TdlpackIO.open(self.file_name)
+        f = tdlpackio.open(self.file_name)
 
         index_slicer = item[:-self.geo_ndim]
         index_slicer = tuple([[i] if isinstance(i, int) else i for i in index_slicer]) # maintain all multindex levels
@@ -814,15 +811,15 @@ class TdlpDataset:
         store.mkdir(parents=True)
 
         prodicized = product(*[meta[k] for k in coord_meta])
-        f = pytdlpack.open(store / filepath.name, mode='w', format='sequential')
+        f = tdlpackio.open(store / filepath.name, mode='w', format='sequential')
         if station:
-            template_rec = pytdlpack.TdlpackRecord(date=0, id=[0,0,0,0], data=np.array([0]))
-            stations = pytdlpack.TdlpackStationRecord(list(self._obj.station.data))
+            template_rec = tdlpackio.TdlpackRecord(date=0, id=[0,0,0,0], data=np.array([0]))
+            stations = tdlpackio.TdlpackStationRecord(list(self._obj.station.data))
             stations.pack()
             f.write(stations)
         else:
             # the grid doesn't matter ( can tweak/clean later)
-            template_rec = pytdlpack.TdlpackRecord(date=0, id=[0,0,0,0], grid=pytdlpack.grids['nbmak'], data=np.array([0]))
+            template_rec = tdlpackio.TdlpackRecord(date=0, id=[0,0,0,0], grid=pytdlpack.grids['nbmak'], data=np.array([0]))
             template_rec.is2 = da.encoding['tdlp_is2'] # this loads the grid metadata
         template_rec.primary_missing_value = 9999.0
 
