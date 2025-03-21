@@ -615,6 +615,7 @@ class open:
             offset = (prec_next_key-1)*nbytes
             self._filehandle.seek(offset)
 
+
     def _sequential_file_indexer(self):
         """
         Indexer for sequential TDLPACK files.
@@ -682,7 +683,7 @@ class open:
                         last_station_id_rec = self.records
                         rec._recnum = self.records
                         rec._source = self.name
-                        rec.numberOfStations = int(ioctet/8)
+                        rec._nsta_expected = int(ioctet/8)
                         self._index['offset'].append(pos)
                         self._index['size'].append(fortran_header)
                         self._index['type'].append('station')
@@ -707,6 +708,7 @@ class open:
                 self._filehandle.seek(0)
                 break
 
+
     def read(self, n):
         """
         """
@@ -723,61 +725,74 @@ class open:
         elif self._index['type'][n] == 'station':
             return np.frombuffer(self._filehandle.read(size),dtype='S8')
 
+
     def write(self, record):
         """
+        Write packed data to file.
         """
         if isinstance(record,list):
             for rec in record:
                 self.write(rec)
             return
 
+        nreplace, ncheck = 0, 0
         ntotby, ntotrc = 0, 0
 
-        if self.filetype == 'random-access':
-            if not hasattr(record,'_ipack'): record.pack()
-            nreplace, ncheck = 0, 0
-            if isinstance(record,TdlpackStationRecord):
-                ipack = np.ndarray((record.numberOfStations*2),dtype='S4')
-                for n,s in enumerate(record.stations):
-                    s = s.ljust(8)
-                    ipack[n*2] = s[:4]
-                    ipack[(n*2)+1] = s[-4:]
-                print(ipack)
-                iret, ntotby, ntotrc = tdlpacklib.write_station_record(self.name, self,_lun, self._ifiletype, record.stations, ntotby, ntotrc, nreplace, ncheck)
-            elif issubclass(record.__class__,_TdlpackRecord):
-                iret, ntotby, ntotrc = tdlpacklib.write_tdlpack_record(self.name, self,_lun, self._ifiletype, record._ipack, ntotby, ntotrc, nreplace, ncheck)
-        elif self.filetype == 'sequential':
-            if isinstance(record,TdlpackStationRecord):
-                if self.records > 0 and self._type_lastrecord_written != 'trailer':
-                    iret, ntotby, ntotrc = tdlpacklib.write_trailer_record(self._lun, self._ifiletype, ntotby, ntotrc)
-                    self._type_lastrecord_written = 'trailer'
-                    self.records += 1
-                ipack = [s.ljust(NCHAR) for s in record.stations]
-                ntotby, ntotrc = 0, 0
-                iret, ntotby, ntotrc = tdlpacklib.write_station_record(self.name, self._lun, self._ifiletype, record.stations, ntotby, ntotrc)
-            elif issubclass(record.__class__,_TdlpackRecord):
-                if not hasattr(record,'_ipack'): record.pack()
-                iret, ntotby, ntotrc = tdlpacklib.write_tdlpack_record(self.name, self._lun, self._ifiletype, record._ipack, ntotby, ntotrc)
-            elif isinstance(record,TdlpackTrailerRecord):
-                if not hasattr(record,'_ipack'): record.pack()
-                iret, ntotby, ntotrc = tdlpacklib.write_trailer_record(self._lun, self._ifiletype, ntotby, ntotrc)
-            self._type_lastrecord_written = record.type
+        if isinstance(record, TdlpackStationRecord):
+            # Adjust string length of each station to NCHAR.
+            stns = [s.ljust(NCHAR) for s in record.stations]
+            iret, ntotby, ntotrc = tdlpacklib.write_station_record(
+                self.name,
+                self._lun,
+                self._ifiletype,
+                stns,
+                ntotby,
+                ntotrc,
+                nreplace,
+                ncheck,
+            )
+
+        elif issubclass(record.__class__,_TdlpackRecord):
+            iret, ntotby, ntotrc = tdlpacklib.write_tdlpack_record(
+                self.name,
+                self._lun,
+                self._ifiletype,
+                record._ipack,
+                ntotby,
+                ntotrc,
+                nreplace,
+                ncheck
+            )
+
+        elif isinstance(record,TdlpackTrailerRecord):
+            iret, ntotby, ntotrc = tdlpacklib.write_trailer_record(
+                self._lun,
+                self._ifiletype,
+                ntotby,
+                ntotrc
+            )
+
+        self._type_lastrecord_written = record.type
         self.records += 1
+
 
     def close(self):
         """
-        Close the file handle
+        Close the file.
         """
         if 'w' in self.mode:
             if self.filetype == 'sequential':
-                filetype = 2
                 if self._type_lastrecord_written == 'vector':
-                    iret = tdlpacklib.close_tdlpack_file(self._lun, self._ifiletype)
-            elif self.filetype == 'random-access':
-                filetype = 1
-            iret = tdlpacklib.close_tdlpack_file(self._lun, self._ifiletype)
-        if hasattr(self,'_filehandle'): self._filehandle.close()
+                    iret = tdlpacklib.write_trailer_record(
+                        self._lun,
+                        self._ifiletype,
+                        ntotby,
+                        ntotrc
+                    )
+        iret = tdlpacklib.close_tdlpack_file(self._lun, self._ifiletype)
+        self._filehandle.close()
         del _open_file_store[self.name]
+
 
     def select(self,**kwargs):
         """
@@ -1129,33 +1144,34 @@ def _data(filehandle: open, filetype: str, rec: TdlpackRecord, offset: int, size
         ioctet = np.frombuffer(filehandle.read(8),dtype='>i8').astype(np.int64)[0]
     elif filetype == 'random-access':
         ioctet = size
-    _ipack = np.frombuffer(filehandle.read(ioctet),dtype='>i4').astype(np.int32)
-
-    # Unpack data
-    ipack = np.zeros((rec.numberOfPackedValues),dtype='>i4').astype(np.int32)
-    ipack[0:_ipack.shape[0]] = np.copy(_ipack[:])
-    del _ipack
+    ipack = np.frombuffer(filehandle.read(ioctet),dtype='>i4').astype(np.int32)
     iret, ios0, is1, is2, is2, xdata = tdlpacklib.unpack_data(ipack)
+    del ipack
 
     return xdata.reshape((rec.ny,rec.nx)) if rec.type == 'grid' else xdata
 
 
 @dataclass
 class TdlpackStationRecord:
-    stations: list = field(init=False,repr=False,default=templates.Stations())
-    numberOfStations: int = field(init=False,repr=False,default=templates.NumberOfStations())
-    type: str = field(init=False,repr=False,default='station')
-
-    _stations: list = None
-    _numberOfStations: int = 0
+    stations: list[str] = field(init=True, repr=False, default=templates.Stations())
+    type: str = field(init=False, repr=False, default='station')
+    _stations: list[str] = field(init=False, repr=False, default=None)
 
     def __post_init__(self):
-        self.id = [400001000, 0, 0, 0]
-        self._type = 'station'
+        self.id = TdlpackID([400001000, 0, 0, 0], self)
 
     def __str__(self):
         return (f'{self._recnum}:d=0000000000:'
                 f'STATION CALL LETTER RECORD:{self.numberOfStations}')
+
+    @property
+    def numberOfStations(self):
+        if hasattr(self, '_source') and \
+            (isinstance(self._stations, templates.Stations) or
+            self._stations is None
+            ):
+            return self._nsta_expected
+        return len(self.stations)
 
     @property
     def data(self):
@@ -1191,9 +1207,13 @@ class TdlpackTrailerRecord:
         pass
 
     def pack(self):
-        self._ipack = np.array([0, 0, 0, 0, 9999, 0],dtype=np.int32)
+        """
+        """
+        pass
 
     def unpack(self,record):
+        """
+        """
         pass
 
 
