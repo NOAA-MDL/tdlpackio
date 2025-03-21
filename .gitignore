@@ -1,6 +1,5 @@
 build/
-src/ext/tdlpacklib/*.o
-src/ext/tdlpacklib/*.mod
+src/ext/tdlpacklib.c
 *.o
 *.so
 *.pyc
