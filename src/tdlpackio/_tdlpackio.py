@@ -383,9 +383,6 @@ FORTRAN_STDOUT_LUN = 12
 
 TDLP_HEADER = 1413762128 # "TDLP" converted to int
 
-#OLD L3264B = int(tdlpacklib.tdlpacklib_mod.l3264b)
-#OLD L3264W = int(tdlpacklib.tdlpacklib_mod.l3264w)
-#OLD NBYPWD = int(tdlpacklib.tdlpacklib_mod.nbypwd)
 L3264B = tdlpacklib.constants.L3264B
 L3264W = tdlpacklib.constants.L3264W
 NBYPWD = tdlpacklib.constants.NBYPWD
@@ -402,7 +399,6 @@ _latlon_store = dict()
 _open_file_store = dict()
 _record_class_store = dict()
 
-#OLD tdlpacklib.openlog(FORTRAN_STDOUT_LUN,path=os.devnull)
 tdlpacklib.open_log_file(FORTRAN_STDOUT_LUN, log_path=os.devnull)
 
 class open:
@@ -437,7 +433,6 @@ class open:
 
         # Perform indexing on read
         if 'r' in self.mode:
-            #OLD self._filehandle = builtins.open(path,mode=mode,buffering=ONE_MB)
             self._filehandle = builtins.open(path, mode=mode)
             self.filetype = self._get_tdlpack_file_type()
             self._build_index()
@@ -448,13 +443,9 @@ class open:
             self.filetype = format if format is not None else 'sequential'
             if self.filetype == 'random-access':
                 ra_template = 'small' if ra_template is None else ra_template
-                #OLD self._lun,self._byteorder,ifiletype,ier = \
-                #OLD tdlpacklib.openfile(FORTRAN_STDOUT_LUN,self.name,self.mode,self._byteorder,ifiletype,ra_template=ra_template)
                 iret, self._lun = tdlpacklib.open_tdlpack_file(self.name, self.mode, self._ifiletype, ra_template=ra_template)
             elif self.filetype == 'sequential':
                 self._filehandle = builtins.open(path,mode=mode,buffering=ONE_MB)
-                #OLD self._lun,self._byteorder,ifiletype,ier = \
-                #OLD tdlpacklib.openfile(FORTRAN_STDOUT_LUN,self.name,self.mode,self._byteorder,ifiletype)
                 iret, self._lun = tdlpacklib.open_tdlpack_file(self.name, self.mode, self._ifiletype, ra_template=ra_template)
 
         # Get file size
@@ -595,9 +586,7 @@ class open:
                     elif m[0] == 400007000:
                         last_station_lon_rec = self.records
                     # TDLPACK data record
-                    #OLD ipack = np.frombuffer(self._filehandle.read(132),dtype='>i4')
                     ipack = np.frombuffer(self._filehandle.read(132),dtype='>i4').astype(np.int32)
-                    #OLD is0, is1, is2, is4, ier = tdlpacklib.unpack_meta_wrapper(ipack,ND7)
                     iret, is0, is1, is2, is4 = tdlpacklib.unpack_meta(ipack)
                     if np.all(is2==0): is2 = None
                     rec = TdlpackRecord(is0,is1,is2,is4)
@@ -646,8 +635,6 @@ class open:
                     bytes_to_read = fortran_header
 
                 pos = self._filehandle.tell()
-                #OLD ioctet = np.frombuffer(self._filehandle.read(8),dtype='>i8')[0]
-                #OLD ipack = np.frombuffer(self._filehandle.read(bytes_to_read-8),dtype='>i4')
                 ioctet = np.frombuffer(self._filehandle.read(8),dtype='>i8').astype(np.int64)[0]
                 ipack = np.frombuffer(self._filehandle.read(bytes_to_read-8),dtype='>i4').astype(np.int32)
                 _header = struct.unpack('>4s',ipack[0])[0].decode()
@@ -660,7 +647,6 @@ class open:
                     elif ipack[5] == 400007000:
                         last_station_lon_rec = self.records
                     # TDLPACK data record
-                    #OLD is0, is1, is2, is4, ier = tdlpacklib.unpack_meta_wrapper(ipack,ND7)
                     iret, is0, is1, is2, is4 = tdlpacklib.unpack_meta(ipack)
                     self._index['offset'].append(pos)
                     self._index['size'].append(fortran_header) # Size given by Fortran header
@@ -728,13 +714,11 @@ class open:
         # Position file pointer to the beginning of the TDLPACK record.
         self._filehandle.seek(self._index['offset'][n])
         if self.filetype == 'sequential':
-            #OLD size = np.frombuffer(self._filehandle.read(8),dtype='>i8')[0]
             size = np.frombuffer(self._filehandle.read(8),dtype='>i8').astype(np.int64)[0]
         elif self.filetype == 'random-access':
             size = self._index['size'][n]
 
         if self._index['type'][n] in ['data','trailer']:
-            #OLD return np.frombuffer(self._filehandle.read(size),dtype='>i4')
             return np.frombuffer(self._filehandle.read(size),dtype='>i4').astype(np.int32)
         elif self._index['type'][n] == 'station':
             return np.frombuffer(self._filehandle.read(size),dtype='S8')
@@ -759,29 +743,23 @@ class open:
                     ipack[n*2] = s[:4]
                     ipack[(n*2)+1] = s[-4:]
                 print(ipack)
-                #OLD ier = tdlpacklib.writera_char(FORTRAN_STDOUT_LUN,self._lun,self.name,record.id,ipack,nreplace,ncheck)
                 iret, ntotby, ntotrc = tdlpacklib.write_station_record(self.name, self,_lun, self._ifiletype, record.stations, ntotby, ntotrc, nreplace, ncheck)
             elif issubclass(record.__class__,_TdlpackRecord):
-                #OLD ier = tdlpacklib.writefile(FORTRAN_STDOUT_LUN,self.name,self._lun,1,record._ipack,nreplace=nreplace,ncheck=ncheck)
                 iret, ntotby, ntotrc = tdlpacklib.write_tdlpack_record(self.name, self,_lun, self._ifiletype, record._ipack, ntotby, ntotrc, nreplace, ncheck)
         elif self.filetype == 'sequential':
             if isinstance(record,TdlpackStationRecord):
                 if self.records > 0 and self._type_lastrecord_written != 'trailer':
-                    #OLD ier = tdlpacklib.trail(FORTRAN_STDOUT_LUN,self._lun,L3264B,L3264W,self.bytes_written,self.records_written)
                     iret, ntotby, ntotrc = tdlpacklib.write_trailer_record(self._lun, self._ifiletype, ntotby, ntotrc)
                     self._type_lastrecord_written = 'trailer'
                     self.records += 1
                 ipack = [s.ljust(NCHAR) for s in record.stations]
                 ntotby, ntotrc = 0, 0
-                #OLD ntotby, ntotrc, ier = tdlpacklib.writesq_station_record(FORTRAN_STDOUT_LUN,self._lun,ipack,ntotby,ntotrc)
                 iret, ntotby, ntotrc = tdlpacklib.write_station_record(self.name, self._lun, self._ifiletype, record.stations, ntotby, ntotrc)
             elif issubclass(record.__class__,_TdlpackRecord):
                 if not hasattr(record,'_ipack'): record.pack()
-                #OLD ier = tdlpacklib.writefile(FORTRAN_STDOUT_LUN,self.name,self._lun,2,record._ipack)
                 iret, ntotby, ntotrc = tdlpacklib.write_tdlpack_record(self.name, self._lun, self._ifiletype, record._ipack, ntotby, ntotrc)
             elif isinstance(record,TdlpackTrailerRecord):
                 if not hasattr(record,'_ipack'): record.pack()
-                #OLD ier = tdlpacklib.writefile(FORTRAN_STDOUT_LUN,self.name,self._lun,2,record._ipack)
                 iret, ntotby, ntotrc = tdlpacklib.write_trailer_record(self._lun, self._ifiletype, ntotby, ntotrc)
             self._type_lastrecord_written = record.type
         self.records += 1
@@ -794,11 +772,9 @@ class open:
             if self.filetype == 'sequential':
                 filetype = 2
                 if self._type_lastrecord_written == 'vector':
-                    #OLD ier = tdlpacklib.trail(FORTRAN_STDOUT_LUN,self._lun,L3264B,L3264W,self.bytes_written,self.records_written)
                     iret = tdlpacklib.close_tdlpack_file(self._lun, self._ifiletype)
             elif self.filetype == 'random-access':
                 filetype = 1
-            #OLD ier = tdlpacklib.closefile(FORTRAN_STDOUT_LUN,self._lun,filetype)
             iret = tdlpacklib.close_tdlpack_file(self._lun, self._ifiletype)
         if hasattr(self,'_filehandle'): self._filehandle.close()
         del _open_file_store[self.name]
@@ -1006,10 +982,6 @@ class _TdlpackRecord:
                     _latlon_store[self._sha1_latlon] = (lats, -1.0*lons)
             return _latlon_store[self._sha1_latlon]
         elif self.type == 'grid':
-            #OLD lats, lons, ier = tdlpacklib.gridij_to_latlon(FORTRAN_STDOUT_LUN,self.nx,self.ny,
-            #OLD                   self.mapProjection,self.gridLength,self.orientationLongitude,
-            #OLD                   self.standardLatitude,self.latitudeLowerLeft,
-            #OLD                   self.longitudeLowerLeft)
             iret, lats, lons = tdlpacklib.gridij_to_latlon(self.nx, self.ny, self.mapProjection,
                                     self.gridLength, self.orientationLongitude,
                                     self.standardLatitude, self.latitudeLowerLeft,
@@ -1031,16 +1003,9 @@ class _TdlpackRecord:
             # Data has been read or set, so check that, or just read the packed message.
             if self._data_modified:
                 if self.type == 'grid':
-                    #OLD self._ipack, ioctet, ier = tdlpacklib.pack2d_wrapper(self.is0,self.is1,
-                    #OLD                            self.is2,self.is4,
-                    #OLD                            self.data.T,ND5)
                     iret, ioctet, self._ipack = tdlpacklib.pack_2d(self.is0, self.is1, self.is2, self.is4, self.data.T)
                 elif self.type == 'vector':
-                    #OLD self._ipack, ioctet, ier = tdlpacklib.pack1d_wrapper(self.is0,self.is1,
-                    #OLD                            self.is2,self.is4,
-                    #OLD                            self.data,ND5)
                     iret, ioctet, self._ipack = tdlpacklib.pack_2d(self.is0, self.is1, self.is2, self.is4, self.data.T)
-                #OLD self._ipack = self._ipack[:int(ioctet/NBYPWD)]
             else:
                 self._ipack = _open_file_store[self._source].read(self._recnum)
 
@@ -1161,18 +1126,15 @@ def _data(filehandle: open, filetype: str, rec: TdlpackRecord, offset: int, size
     # Position file pointer to the beginning of the TDLPACK record.
     filehandle.seek(offset)
     if filetype == 'sequential':
-        #OLD ioctet = np.frombuffer(filehandle.read(8),dtype='>i8')[0]
         ioctet = np.frombuffer(filehandle.read(8),dtype='>i8').astype(np.int64)[0]
     elif filetype == 'random-access':
         ioctet = size
-    #OLD _ipack = np.frombuffer(filehandle.read(ioctet),dtype='>i4')
     _ipack = np.frombuffer(filehandle.read(ioctet),dtype='>i4').astype(np.int32)
 
     # Unpack data
     ipack = np.zeros((rec.numberOfPackedValues),dtype='>i4').astype(np.int32)
     ipack[0:_ipack.shape[0]] = np.copy(_ipack[:])
     del _ipack
-    #OLD is0,is1,is2,is4,xdata,ier = tdlpacklib.unpack_data_wrapper(ipack,ND7)
     iret, ios0, is1, is2, is2, xdata = tdlpacklib.unpack_data(ipack)
 
     return xdata.reshape((rec.ny,rec.nx)) if rec.type == 'grid' else xdata
