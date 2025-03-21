@@ -427,6 +427,7 @@ class open:
         if mode == 'a': mode = 'wb'
         self._hasindex = False
         self._index = {}
+        self._lun = -1
         self.mode = mode
         self.name = os.path.abspath(path)
         self.records = 0
@@ -780,6 +781,8 @@ class open:
         """
         Close the file.
         """
+        if 'r' in self.mode:
+            self._filehandle.close()
         if 'w' in self.mode:
             if self.filetype == 'sequential':
                 if self._type_lastrecord_written == 'vector':
@@ -789,8 +792,7 @@ class open:
                         ntotby,
                         ntotrc
                     )
-        iret = tdlpacklib.close_tdlpack_file(self._lun, self._ifiletype)
-        self._filehandle.close()
+            iret = tdlpacklib.close_tdlpack_file(self._lun, self._ifiletype)
         del _open_file_store[self.name]
 
 
@@ -889,10 +891,11 @@ class _TdlpackRecord:
         """
         """
         self._data_modified = False
-        self._recnum = -1
         self._linked_station_id_record = -1
         self._linked_station_lat_record = -1
         self._linked_station_lon_record = -1
+        self._recnum = -1
+        self._source = None
         self._type = 'data'
         if self.is2 is None:
             self.type = 'vector'
@@ -1153,11 +1156,14 @@ def _data(filehandle: open, filetype: str, rec: TdlpackRecord, offset: int, size
 
 @dataclass
 class TdlpackStationRecord:
-    stations: list[str] = field(init=True, repr=False, default=templates.Stations())
+    stations: list = field(init=False, repr=False, default=templates.Stations())
     type: str = field(init=False, repr=False, default='station')
-    _stations: list[str] = field(init=False, repr=False, default=None)
+
+    _stations = None
 
     def __post_init__(self):
+        self._nsta_expected = 0
+        self._source = None
         self.id = TdlpackID([400001000, 0, 0, 0], self)
 
     def __str__(self):

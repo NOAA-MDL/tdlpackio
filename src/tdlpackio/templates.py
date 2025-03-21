@@ -19,10 +19,11 @@ _section_attrs = {0:['edition'],
 class Stations:
     def __get__(self, obj, objtype=None):
         if obj._stations is None:
-            from ._tdlpackio import _open_file_store
-            obj._stations = [s.decode('ascii').strip() for s in _open_file_store[obj._source].read(obj._recnum).tolist()]
-            if len(obj._stations) != obj._nsta_expected:
-                raise ValueError(f"Error reading stations, expected {obj._nsta_expected}, but got {len(obj._stations)}")
+            if obj._source is not None:
+                from ._tdlpackio import _open_file_store
+                obj._stations = [s.decode('ascii').strip() for s in _open_file_store[obj._source].read(obj._recnum).tolist()]
+                if len(obj._stations) != obj._nsta_expected:
+                    raise ValueError(f"Error reading stations, expected {obj._nsta_expected}, but got {len(obj._stations)}")
         return obj._stations
     def __set__(self, obj, value):
         obj._stations = value
