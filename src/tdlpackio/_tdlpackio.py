@@ -372,9 +372,7 @@ import numpy as np
 import os
 import struct
 import sys
-import weakref
 
-from . import _constants
 from . import tdlpacklib
 from . import templates
 from . import utils
@@ -423,8 +421,10 @@ class open:
             File type when creating a new file.  Valid values are 'sequential` 
             (DEFAULT) or 'random-access'.
         """
-        if mode == 'r' or mode == 'w': mode = mode+'b'
-        if mode == 'a': mode = 'wb'
+        if mode == 'r' or mode == 'w':
+            mode = mode+'b'
+        if mode == 'a':
+            mode = 'wb'
         self._hasindex = False
         self._index = {}
         self._lun = -1
@@ -516,8 +516,10 @@ class open:
         self._index['type'] = []
         self._index['record'] = []
 
-        if self.filetype == 'sequential': self._sequential_file_indexer()
-        if self.filetype == 'random-access': self._randomaccess_file_indexer()
+        if self.filetype == 'random-access':
+            self._randomaccess_file_indexer()
+        elif self.filetype == 'sequential':
+            self._sequential_file_indexer()
         self._hasindex = True
 
     def _randomaccess_file_indexer(self):
@@ -737,40 +739,39 @@ class open:
             return
 
         nreplace, ncheck = 0, 0
-        ntotby, ntotrc = 0, 0
 
         if isinstance(record, TdlpackStationRecord):
             # Adjust string length of each station to NCHAR.
             stns = [s.ljust(NCHAR) for s in record.stations]
-            iret, ntotby, ntotrc = tdlpacklib.write_station_record(
+            iret, self.bytes_written, self.records_written = tdlpacklib.write_station_record(
                 self.name,
                 self._lun,
                 self._ifiletype,
                 stns,
-                ntotby,
-                ntotrc,
+                self.bytes_written,
+                self.records_written,
                 nreplace,
                 ncheck,
             )
 
         elif issubclass(record.__class__,_TdlpackRecord):
-            iret, ntotby, ntotrc = tdlpacklib.write_tdlpack_record(
+            iret, self.bytes_written, self.records_written = tdlpacklib.write_tdlpack_record(
                 self.name,
                 self._lun,
                 self._ifiletype,
                 record._ipack,
-                ntotby,
-                ntotrc,
+                self.bytes_written,
+                self.records_written,
                 nreplace,
                 ncheck
             )
 
         elif isinstance(record,TdlpackTrailerRecord):
-            iret, ntotby, ntotrc = tdlpacklib.write_trailer_record(
+            iret, self.bytes_written, self.records_written = tdlpacklib.write_trailer_record(
                 self._lun,
                 self._ifiletype,
-                ntotby,
-                ntotrc
+                self.bytes_written,
+                self.records_written
             )
 
         self._type_lastrecord_written = record.type
@@ -789,8 +790,8 @@ class open:
                     iret = tdlpacklib.write_trailer_record(
                         self._lun,
                         self._ifiletype,
-                        ntotby,
-                        ntotrc
+                        self.bytes_written,
+                        self.records_written
                     )
             iret = tdlpacklib.close_tdlpack_file(self._lun, self._ifiletype)
         del _open_file_store[self.name]
