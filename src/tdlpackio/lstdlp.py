@@ -109,13 +109,18 @@ def _lstdlp_main():
             print(':'.join([s.rstrip() for s in recstr]),flush=True)
 
         #
-        if not hasattr(rec,'_data'): continue
+        if not hasattr(rec,'_data'):
+            continue
 
         # Verbose mode
-        if args.verbose and not args.quiet: print(verbose(rec),flush=True)
+        if args.verbose and not args.quiet:
+            print(verbose(rec),flush=True)
+            rec.flush_data()
 
         # Output records to new file
-        if args.tdlp is not None: fout.write(rec)
+        if args.tdlp is not None:
+            rec.pack()
+            fout.write(rec)
 
     # Close input file
     f.close()
