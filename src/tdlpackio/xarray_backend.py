@@ -19,7 +19,6 @@ from xarray.backends.common import (
 )
 from xarray.core import indexing
 from xarray.backends.locks import SerializableLock
-#import pytdlpack
 import tdlpackio
 
 logger = logging.getLogger(__name__)
@@ -27,14 +26,13 @@ logger = logging.getLogger(__name__)
 LOCK = SerializableLock()
 
 class TdlpackBackendEntrypoint(BackendEntrypoint):
-    ''' xarray backend engine entrypoint for opening and  decoding sequential tdlpack files.
+    """xarray backend engine entrypoint for opening and  decoding sequential tdlpack files.
 
     .. warning::
             This backend is pre-release and its signature may change without backward comaptability.
 
     Parameters
-    __________
-
+    ----------
     filename: str, Path, file-like
         sequential tdlpack file to be opened
     name_scheme: list of strings with tdlpack metadata, optional
@@ -45,7 +43,7 @@ class TdlpackBackendEntrypoint(BackendEntrypoint):
         applies whitelist filters to select data of interest; often useful for reducing data
         down to a non-sparse selection
         The tdlpack is considered not sparse when variables built have the same shape.
-    '''
+    """
     def open_dataset(
         self,
         filename,
@@ -54,21 +52,21 @@ class TdlpackBackendEntrypoint(BackendEntrypoint):
         name_scheme: list = ['ccc','fff'],
         filters: typing.Mapping[str, any] = None,
     ):
-
-        # read and parse metadata from tdlpack file
+        """"""
+        # Read and parse metadata from tdlpack file
         f = tdlpackio.open(filename)
         file_index = pd.DataFrame(f._index)
 
         file_index = parse_tdlpackio_index_to_components(file_index)
 
-        # divide up records by variable based on name scheme and filters
+        # Divide up records by variable based on name scheme and filters
         filters = copy(filters)
         frames, cube, extra_geo, one_sta_list, is2 = make_variables(file_index, name_scheme, filters, f)
         # return empty dataset if no data
         if frames is None:
             return xr.Dataset()
 
-        # create dataframe and add datarrays without any coords
+        # Create dataframe and add datarrays without any coords
         ds = xr.Dataset()
         for var_df in frames:
             da = build_da_without_coords(var_df, cube, f, one_sta_list)
@@ -89,7 +87,7 @@ class TdlpackBackendArray(BackendArray):
     def __init__(self, array, lock):
         self.array = array
         self.shape = array.shape
-        self.dtype = array.dtype
+        self.dtype = np.dtype(array.dtype)
         self.lock = lock
 
 
@@ -172,7 +170,7 @@ def dc_eq(dc1, dc2) -> bool:
 
 
 @dataclass(init=False)
-class TdlpCube:
+class TdlpackCube:
     date: pd.DatetimeIndex = PdIndex()
     lead: pd.TimedeltaIndex = PdIndex()
     ccc: pd.Index = PdIndex()
@@ -203,7 +201,7 @@ class TdlpCube:
         return dc_eq(self, other)
 
     def coords(self) -> typing.Dict[str, xr.Variable]:
-        keys = list(TdlpCube.__dataclass_fields__.keys())
+        keys = list(TdlpackCube.__dataclass_fields__.keys())
         keys.remove('x')
         keys.remove('y')
         coords = {k: xr.Variable(dims=k, data=self[k], attrs=dict(tdlp_name=k)) for k in keys if self[k] is not None}
@@ -213,7 +211,7 @@ class TdlpCube:
 class OnDiskArray:
     file_name: str
     index: pd.DataFrame = field(repr=False)
-    cube: TdlpCube = field(repr=False)
+    cube: TdlpackCube = field(repr=False)
     one_station_list_and_ordered: bool = field(repr=False)
     shape: typing.Tuple[int, ...] = field(init=False)
     ndim: int = field(init=False)
@@ -296,66 +294,45 @@ def dims_to_shape(d) -> tuple:
 
 def parse_tdlpackio_index_to_components(df, decode_time=True, decode_thresh=True, decode_lead=True, ttt='hours'):
     df = df[df.type != 'trailer']
-    record = df.index + 1
-    df = df.assign(record=record)
+    recnum = df.index + 1
+    df = df.assign(recnum=recnum)
 
-    ccc = (df.id1 // 1_000_000).astype('int32')
-    fff = (df.id1 % 1_000_000 // 1000).astype('int32')
-    cccfff = (df.id1 // 1000).astype('int32')
-    b = (df.id1 % 1000 // 100).astype('int32')
-    dd = (df.id1 % 100).astype('int32')
-
-    v = (df.id2 // 100_000_000).astype('int32')
-    llll = (df.id2 % 100_000_000 // 10_000).astype('int32')
-    uuuu = (df.id2 % 10_000).astype('int32')
-
-    t = (df.id3 // 100_000_000).astype('int32')
-    # rr is modifier on date
-    o = (df.id3 % 1_000_000 // 100_000).astype('int32')
-    # hh should always be zero (not read)
-    # ttt is lead
-    #df['ttt'] = df.id3 % 1_000
-
-    w = (df.id4 // 1_000_000_000).astype('int32')
-    thresh_sign = w.apply(lambda x: -1 if x == 1 else 1)
-    xxxx = (df.id4 % 1_000_000_000 // 100_000).astype('int32')
-    yy = (df.id4 % 100_000 // 1000).astype('int32')
-    yy[yy>=50] = (yy - 50) * -1
-    thresh = (xxxx/10000 * 10.0**yy * thresh_sign).astype('float')
-
-    i = (df.id4 % 1000 // 100).astype('int32')
-    s = (df.id4 % 100 // 10).astype('int32')
-    g = (df.id4 % 10).astype('int32')
-
-    rr = (df.id3 % 100_000_000 // 1_000_000).astype('int')
-    date = pd.to_datetime(df.date, format='%Y%m%d%H', errors='coerce')
-    lead = pd.to_timedelta(df.lead, unit='hours')
-
-    # parse dims to shape tuple
-    # order as yx
+    # Parse dims to shape tuple, order as (y, x).
     df = df[df.type == 'data']
-    record_shape = df.dims.apply(dims_to_shape)
 
-    df = df.assign(ccc=ccc, fff=fff, cccfff=cccfff, b=b, dd=dd,
-            v=v, llll=llll, uuuu=uuuu,
-            t=t, o=o,
-            thresh=thresh,
-            i=i, s=s, g=g,
-            date=date, lead=lead,
-            record_shape=record_shape)
+    df = df.assign(
+        ccc=df['record'].apply(lambda obj: obj.id.ccc),
+        fff=df['record'].apply(lambda obj: obj.id.fff),
+        cccfff=df['record'].apply(lambda obj: obj.id.cccfff),
+        b=df['record'].apply(lambda obj: obj.id.b),
+        dd=df['record'].apply(lambda obj: obj.id.dd),
+        v=df['record'].apply(lambda obj: obj.id.v),
+        llll=df['record'].apply(lambda obj: obj.id.llll),
+        uuuu=df['record'].apply(lambda obj: obj.id.uuuu),
+        t=df['record'].apply(lambda obj: obj.id.t),
+        o=df['record'].apply(lambda obj: obj.id.o),
+        thresh=df['record'].apply(lambda obj: obj.id.thresh),
+        i=df['record'].apply(lambda obj: obj.id.i),
+        s=df['record'].apply(lambda obj: obj.id.s),
+        g=df['record'].apply(lambda obj: obj.id.g),
+        refDate=df['record'].apply(lambda obj: obj.refDate),
+        leadTime=df['record'].apply(lambda obj: obj.leadTime),
+        record_shape=df['record'].apply(lambda obj: obj.shape),
+        linked_station_id_record=df['record'].apply(lambda obj: obj._linked_station_id_record),
+    )
 
-    df = df.drop(['id1', 'id2', 'id3', 'id4', 'dims'], axis = 1)
+    df = df.drop(['record'], axis = 1)
 
-    # remove any records with 1-9 stations as they are causing problems at the moment
-  # df = df[df.record_shape != (1,)]
-  # df = df[df.record_shape != (2,)]
-  # df = df[df.record_shape != (3,)]
-  # df = df[df.record_shape != (4,)]
-  # df = df[df.record_shape != (5,)]
-  # df = df[df.record_shape != (6,)]
-  # df = df[df.record_shape != (7,)]
-  # df = df[df.record_shape != (8,)]
-  # df = df[df.record_shape != (9,)]
+#    # remove any records with 1-9 stations as they are causing problems at the moment
+#    df = df[df.record_shape != (1,)]
+#    df = df[df.record_shape != (2,)]
+#    df = df[df.record_shape != (3,)]
+#    df = df[df.record_shape != (4,)]
+#    df = df[df.record_shape != (5,)]
+#    df = df[df.record_shape != (6,)]
+#    df = df[df.record_shape != (7,)]
+#    df = df[df.record_shape != (8,)]
+#    df = df[df.record_shape != (9,)]
 
     return df
 
@@ -375,7 +352,13 @@ meta_formats = {
         'thresh' : '{d}',
         }
 
-def build_da_without_coords(index, cube, file, one_sorted_station_list:bool) -> xr.DataArray:
+def build_da_without_coords(
+    index,
+    cube,
+    file,
+    one_sorted_station_list:bool
+) -> xr.DataArray:
+    """"""
     dim_names = [k for k in cube.__dataclass_fields__.keys() if cube[k] is not None]
     constant_meta_names = [k for k in cube.__dataclass_fields__.keys() if cube[k] is None]
     dims = {k: len(cube[k]) for k in dim_names}
@@ -481,26 +464,26 @@ def make_variables(index, name_scheme, filters, f):
         return None,None,None,None,None
 
 
-    ordered_meta = TdlpCube.__dataclass_fields__.keys()
+    ordered_meta = TdlpackCube.__dataclass_fields__.keys()
     cube = None
     ordered_frames = list()
     for key in index.index.unique():
         frame = index.loc[[key]]
         frame = frame.reset_index()
         # frame is a dataframe with all records for one variable
-        c = TdlpCube()
+        c = TdlpackCube()
         for colname in frame.columns:
             if len(frame[colname].unique()) > 1:
                 c[colname] = frame[colname].sort_values().unique()
 
         if c.date is None:
             # case where only one date; use date as unit dimesnion
-            c['date'] = [frame.date.iloc[0]]
+            c['refDate'] = [frame.refDate.iloc[0]]
             #setattr(cube, 'date', [frame.date.iloc[0]])
 
         if c.lead is None:
             # case where only one lead; use lead as unit dimesnion
-            c['lead'] = [frame.lead.iloc[0]]
+            c['leadTime'] = [frame.leadTime.iloc[0]]
 
 
         dims = [k for k in ordered_meta if c[k] is not None]
@@ -528,7 +511,7 @@ def make_variables(index, name_scheme, filters, f):
 
     # no variables
     if cube is None:
-        cube = TdlpCube()
+        cube = TdlpackCube()
 
     # check geography of data and assign to cube
     one_station_list = True
@@ -539,14 +522,14 @@ def make_variables(index, name_scheme, filters, f):
             # station records; check if the multiple station id records are identical
             station_id_records = index.linked_station_id_record.unique()
             if 0 in station_id_records:
-                raise ValueError('tdlp file has a mix of station and gridded records; cannot read')
+                raise ValueError('TDLPACK file has a mix of station and gridded records; cannot read.')
             if len(station_id_records) > 1:
                 station = pd.Series(f[int(station_id_records[0])].stations, name='station')
                 for station_record in station_id_records[1:]:
                     sta = pd.Series(f[int(station_record)].stations, name='station')
                     if not station.equals(sta):
                         # station lists on file are not all the same
-                        logger.warning(f'station lists on file are not identical; loading of data will be less efficient')
+                        logger.warning(f'Station lists on file are not identical; loading of data will be less efficient')
                         one_station_list = False
                         station = pd.merge(station, sta, how='outer').station
             if station.is_monotonic_increasing:
@@ -577,15 +560,15 @@ def make_variables(index, name_scheme, filters, f):
             cube.x = range(index.record_shape.iloc[0][1])
 
     extra_geo = None
-    rec = f[int(ordered_frames[0].record.iloc[0])]
+    rec = f[int(ordered_frames[0].recnum.iloc[0])]
     is2 = rec.is2
     if cube.x is not None:
         # we want the lat lons; make them via accessing a record; we are asuming all records are the same grid because they have the same shape;
         # may want a unique grid identifier from tdlpackio to avoid assuming this
         latitude, longitude = rec.latlons()
-        latitude = xr.DataArray(latitude.transpose(), dims=['y','x'])
+        latitude = xr.DataArray(latitude, dims=['y','x'])
         latitude.attrs['standard_name'] = 'latitude'
-        longitude = xr.DataArray(longitude.transpose() * -1, dims=['y','x'])
+        longitude = xr.DataArray(longitude, dims=['y','x'])
         longitude.attrs['standard_name'] = 'longitude'
         extra_geo = dict(latitude=latitude, longitude=longitude)
         one_station_list_and_ordered = None
@@ -673,7 +656,7 @@ class DateTime(Validator):
 
 
 @dataclass(init=False)
-class RequiredTdlpMeta():
+class RequiredTdlpackMeta():
     #Tdlpack metadata required as coord or in encoding
     date: datetime.datetime = DateTime()
 
@@ -724,8 +707,8 @@ class RequiredTdlpMeta():
         return[id1, id2, id3, 0]
 
 
-@xr.register_dataset_accessor("tdlp")
-class TdlpDataset:
+@xr.register_dataset_accessor("tdlpackio")
+class TdlpackDataset:
 
     def __init__(self, xarray_obj):
         self._obj = xarray_obj
@@ -771,11 +754,12 @@ class TdlpDataset:
 
 
 
-        meta = RequiredTdlpMeta()
+        meta = RequiredTdlpackMeta()
         keys = list(meta.__dataclass_fields__.keys())
         coord_meta = list()
         const_meta = list()
-        tdlpid = TdlpId()
+#        tdlpid = TdlpId()
+        tdlpid = tdlpackio.TdlpackID()
         for key in keys:
             if f'tdlp_{key}' in da.encoding:
                 meta[key] = da.encoding[f'tdlp_{key}']
@@ -867,7 +851,7 @@ class TdlpDataset:
         shutil.move(store / filepath.name, file)
         shutil.rmtree(store)
 
-@xr.register_dataarray_accessor("tdlp")
+@xr.register_dataarray_accessor("tdlpackio")
 class TdlpDataarray:
 
     def __init__(self, xarray_obj):

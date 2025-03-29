@@ -44,6 +44,12 @@ dependencies = [
 ] 
 dynamic = ["version"]
 
+[project.optional-dependencies]
+xarray = ["xarray"]
+
+[project.entry-points."xarray.backends"]
+tdlpackio = "tdlpackio.xarray_backend:TdlpackBackendEntrypoint"
+
 [project.scripts]
 lstdlp = "tdlpackio:lstdlp._lstdlp_main"
 

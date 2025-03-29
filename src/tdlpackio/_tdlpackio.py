@@ -656,7 +656,7 @@ class open:
                     rec._linked_station_lat_record = last_station_lat_rec
                     rec._linked_station_lon_record = last_station_lon_rec
                     rec._source = self.name
-                    shape = (rec.ny,rec.nx) if rec.type == 'grid' else (rec.numberOfPackedValues,)
+                    shape = (rec.ny, rec.nx) if rec.type == 'grid' else (rec.numberOfPackedValues,)
                     ndim = len(shape)
                     dtype = 'float32'
                     rec._data = TdlpackRecordOnDiskArray(
@@ -1116,6 +1116,13 @@ class _TdlpackRecord:
         """Return median value of data."""
         return np.nanmedian(self.data)
 
+    @property
+    def shape(self):
+        """Return shape of data."""
+        if self.type == 'grid':
+            return tuple([int(self.ny), int(self.nx)])
+        elif self.type == 'vector':
+            return tuple([int(self.numberOfPackedValues)])
 
 @dataclass
 class TdlpackRecordOnDiskArray:
@@ -1351,6 +1358,10 @@ class TdlpackID:
         self._id['fff'] = value
         if self._rec is not None:
             self._rec.is1[8] = utils.unparse_id(self._id)[0]
+
+    @property
+    def cccfff(self):
+        return int(self.word1/1000) 
 
     @property
     def b(self):
