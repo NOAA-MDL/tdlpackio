@@ -544,7 +544,7 @@ class open:
             for i in range(nkeys):
                 id1,id2,id3,id4,nd,bprec = struct.unpack('>iiiiii',self._filehandle.read(24))
                 ids.append([id1,id2,id3,id4])
-                nsizweakref.ref(rec).append(nd)
+                nsize.append(nd)
                 prec_begin.append(bprec)
 
             # Using key record info, move around file to inventory TDLPACK data
@@ -1206,6 +1206,7 @@ class TdlpackTrailerRecord:
     def __post_init__(self):
         """"""
         self._type = 'trailer'
+        self.id = TdlpackID([0, 0, 0, 0], self)
 
     def __str__(self):
         """"""
