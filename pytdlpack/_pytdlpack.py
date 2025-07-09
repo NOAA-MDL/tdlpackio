@@ -317,7 +317,7 @@ _DEFAULT_ND7 = np.int32(54)
 DEFAULT_MISSING_VALUE = np.float32(9999.0)
 FORTRAN_STDOUT_LUN = np.int32(12)
 L3264B = _DEFAULT_L3264B
-L3264W = np.int32(64/L3264B)
+L3264W = np.int32(64//L3264B)
 MINPK = _DEFAULT_MINPK
 NCHAR = np.int32(8)
 NCHAR_PLAIN = np.int32(32)
@@ -325,7 +325,7 @@ ND5 = _DEFAULT_ND5
 ND5_META_MIN = np.int32(24)
 ND5_META_MAX = np.int32(32)
 ND7 = _DEFAULT_ND7
-NBYPWD = np.int32(L3264B/8)
+NBYPWD = np.int32(L3264B//8)
 
 _starecdict = {} # Dictionary to store station lists.  Key is the Fortran LUN where list came from.
 _ccall = []
@@ -460,7 +460,7 @@ class TdlpackFile(object):
             else:
                 if not self.data_type: self.data_type = 'station'
                 kwargs['id'] = np.int32([400001000,0,0,0])
-                kwargs['number_of_stations'] = np.int32(deepcopy(ioctet/NCHAR))
+                kwargs['number_of_stations'] = np.int32(deepcopy(ioctet//NCHAR))
                 return TdlpackStationRecord(**kwargs)
         else:
             #raise
@@ -629,7 +629,7 @@ class TdlpackFile(object):
                                        record.ipack[0:_nwords],_ntotby,_ntotrc,L3264B)
         elif type(record) is TdlpackRecord:
             if self.position == 0: self.data_type = 'grid'
-            _nwords = np.int32(record.ioctet/NBYPWD)
+            _nwords = np.int32(record.ioctet//NBYPWD)
             if self.format == 'random-access':
                 record.ipack[0] = record.ipack[0].byteswap()
                 _ier = tdlpack.wrtdlm(FORTRAN_STDOUT_LUN,self.fortran_lun,self.name,
@@ -806,10 +806,10 @@ class TdlpackRecord(object):
             self.is2 = np.zeros(ND7,dtype=np.int32)
             self.is4 = np.zeros(ND7,dtype=np.int32)
 
-            self.is1[2] = np.int32(date/1000000)
-            self.is1[3] = np.int32((date/10000)-(self.is1[2]*100))
-            self.is1[4] = np.int32((date/100)-(self.is1[2]*10000)-(self.is1[3]*100))
-            self.is1[5] = np.int32(date-((date/100)*100))
+            self.is1[2] = np.int32(date//1_000_000)
+            self.is1[3] = np.int32((date//10_000)-(self.is1[2]*100))
+            self.is1[4] = np.int32((date//100)-(self.is1[2]*10_000)-(self.is1[3]*100))
+            self.is1[5] = np.int32(date-((date//100)*100))
             self.is1[6] = np.int32(0)
             self.is1[7] = np.int32(date)
             self.is1[8] = np.int32(id[0])
@@ -817,11 +817,11 @@ class TdlpackRecord(object):
             self.is1[10] = np.int32(id[2])
             self.is1[11] = np.int32(id[3])
             if lead is None:
-                self.is1[12] = np.int32(self.is1[10]-((self.is1[10]/1000)*1000))
+                self.is1[12] = np.int32(self.is1[10]-((self.is1[10]//1_000)*1_000))
             else:
                 self.is1[12] = np.int32(lead)
             self.is1[13] = np.int32(0)
-            self.is1[14] = np.int32(self.is1[8]-((self.is1[8]/100)*100))
+            self.is1[14] = np.int32(self.is1[8]-((self.is1[8]//100)*100))
             self.is1[15] = np.int32(0)
             self.is1[16] = np.int32(0)
             self.is1[17] = np.int32(0)
@@ -1029,11 +1029,11 @@ class TdlpackRecord(object):
             self.map_proj = self.is2[1]
             self.nx = self.is2[2]
             self.ny = self.is2[3]
-            self.lower_left_latitude = self.is2[4]/10000.
-            self.lower_left_longitude = self.is2[5]/10000.
-            self.origin_longitude = self.is2[6]/10000.
-            self.grid_length = self.is2[7]/1000.
-            self.standard_latitude = self.is2[8]/10000.
+            self.lower_left_latitude = self.is2[4]/10_000.
+            self.lower_left_longitude = self.is2[5]/10_000.
+            self.origin_longitude = self.is2[6]/10_000.
+            self.grid_length = self.is2[7]/1_000.
+            self.standard_latitude = self.is2[8]/10_000.
             self.grid_def = create_grid_definition(proj=self.map_proj,nx=self.nx,ny=self.ny,
                             latll=self.lower_left_latitude,lonll=self.lower_left_longitude,
                             orientlon=self.origin_longitude,stdlat=self.standard_latitude,
@@ -1047,7 +1047,7 @@ class TdlpackRecord(object):
 
         if data:
             self._data_unpacked = True
-            _nd5_local = max(self.is4[2],int(self.ioctet/NBYPWD))
+            _nd5_local = max(self.is4[2],int(self.ioctet//NBYPWD))
             _iwork = np.zeros((_nd5_local),dtype=np.int32)
             _data = np.zeros((_nd5_local),dtype=np.float32)
             # Check to make sure the size of self.ipack is long enough. If not, then
@@ -1170,11 +1170,11 @@ class TdlpackStationRecord(object):
         """
         #pdb.set_trace()
         self.ioctet = np.int32(self.number_of_stations*NCHAR)
-        self.ipack = np.ndarray(int(self.ioctet/(L3264B/NCHAR)),dtype=np.int32)
+        self.ipack = np.ndarray(int(self.ioctet//(L3264B//NCHAR)),dtype=np.int32)
         for n,s in enumerate(self.stations):
             sta = s.ljust(int(NCHAR),' ')
-            self.ipack[n*2] = np.copy(np.fromstring(sta[0:int(NCHAR/2)],dtype=np.int32).byteswap())
-            self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[int(NCHAR/2):int(NCHAR)],dtype=np.int32).byteswap())
+            self.ipack[n*2] = np.copy(np.fromstring(sta[0:int(NCHAR//2)],dtype=np.int32).byteswap())
+            self.ipack[(n*2)+1] = np.copy(np.fromstring(sta[int(NCHAR//2):int(NCHAR)],dtype=np.int32).byteswap())
 
     def unpack(self):
         """
@@ -1182,9 +1182,9 @@ class TdlpackStationRecord(object):
         """
         _stations = []
         _unpack_string_fmt = '>'+str(NCHAR)+'s'
-        nrange = range(0,int(self.ioctet/(NCHAR/2)),2)
+        nrange = range(0,int(self.ioctet//(NCHAR/2)),2)
         if _IS_PYTHON3:
-            nrange = list(range(0,int(self.ioctet/(NCHAR/2)),2))
+            nrange = list(range(0,int(self.ioctet//(NCHAR//2)),2))
         for n in nrange:
             tmp = struct.unpack(_unpack_string_fmt,self.ipack[n:n+2].byteswap())[0]
             if _IS_PYTHON3:
@@ -1264,10 +1264,10 @@ def open(name, mode='r', format=None, ra_template=None):
             if not ra_template: ra_template = 'small'
             if ra_template == 'small':
                 _maxent = np.int32(300)
-                _nbytes = np.int32(2000)
+                _nbytes = np.int32(2_000)
             elif ra_template == 'large':
                 _maxent = np.int32(840)
-                _nbytes = np.int32(20000)
+                _nbytes = np.int32(20_000)
             _filetype = np.int32(1)
             _lun,_byteorder,_filetype,_ier = tdlpack.openfile(FORTRAN_STDOUT_LUN,name,mode,L3264B,_byteorder,_filetype,
                                              ra_maxent=_maxent,ra_nbytes=_nbytes)

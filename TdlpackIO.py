@@ -253,7 +253,7 @@ class open(object):
                 recs.append(rec)
             elif self._index['type'][nn] == 'station':
                 kwargs['ipack'] = kwargs['ipack'].byteswap()
-                kwargs['number_of_stations'] = np.int32(kwargs['ioctet']/pytdlpack.NCHAR)
+                kwargs['number_of_stations'] = np.int32(kwargs['ioctet']//pytdlpack.NCHAR)
                 rec = pytdlpack.TdlpackStationRecord(**kwargs)
                 if unpack: rec.unpack()
                 recs.append(rec)
