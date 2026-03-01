@@ -190,18 +190,21 @@ class LatitudeLowerLeft:
         return obj.is2[4]*1e-4
     def __set__(self, obj, value):
         obj.is2[4] = value*1e+4
+        obj._update_sha1_latlon()
 
 class LongitudeLowerLeft:
     def __get__(self, obj, objtype=None):
         return obj.is2[5]*1e-4
     def __set__(self, obj, value):
         obj.is2[5] = value*1e+4
+        obj._update_sha1_latlon()
 
 class OrientationLongitude:
     def __get__(self, obj, objtype=None):
         return obj.is2[6]*1e-4
     def __set__(self, obj, value):
         obj.is2[6] = value*1e+4
+        obj._update_sha1_latlon()
 
 class GridLength:
     def __get__(self, obj, objtype=None):
@@ -210,12 +213,14 @@ class GridLength:
     def __set__(self, obj, value):
         # Set in units of mm
         obj.is2[7] = value*1e+3
+        obj._update_sha1_latlon()
 
 class StandardLatitude:
     def __get__(self, obj, objtype=None):
         return obj.is2[8]*1e-4
     def __set__(self, obj, value):
         obj.is2[8] = value*1e+4
+        obj._update_sha1_latlon()
 
 @dataclass(init=False)
 class GridDefinitionSection():

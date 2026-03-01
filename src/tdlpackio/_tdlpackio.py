@@ -811,18 +811,19 @@ class TdlpackRecord:
         self,
         is0: np.array = np.zeros((ND7), dtype=np.int32),
         is1: np.array = np.zeros((ND7), dtype=np.int32),
-        is2: np.array = None,
+        is2: np.array = np.zeros((ND7), dtype=np.int32),
         is4: np.array = np.zeros((ND7), dtype=np.int32),
         *args,
         **kwargs
     ):
 
         bases = list()
-        if is2 is None:
+        if not np.any(is2):
             rectype = 'vector'
         else:
             bases.append(templates.GridDefinitionSection)
             rectype = 'grid'
+            is1[1] = 1 # Flag in is1 to state that a grid definition section exists
 
         try:
             Record = _record_class_store['rectype']
@@ -831,10 +832,6 @@ class TdlpackRecord:
             class Record(_TdlpackRecord, *bases):
                 pass
             _record_class_store['rectype'] = Record
-
-        # For new record, set section flags
-        if np.all(is1==0):
-            is1[1] = 1 if rectype == 'grid' else 0
 
         # For new record, make sure the reference date is present
         if np.all(is1[2:8]==0):
@@ -891,12 +888,12 @@ class _TdlpackRecord:
         self._recnum = -1
         self._source = None
         self._type = 'data'
-        if self.is2 is None:
+        self._sha1_latlon = None
+        if not np.any(self.is2):
             self.type = 'vector'
-            self._sha1_latlon = None
         else:
             self.type = 'grid'
-            self._sha1_latlon = hashlib.sha1(self.is2).hexdigest()
+            self._update_sha1_latlon()
         self.duration = datetime.timedelta(hours=0)
         self.id = TdlpackID(self.is1[8:12].tolist(), self)
 
@@ -919,6 +916,14 @@ class _TdlpackRecord:
         name = self.name.rstrip()
         return (f'{self._recnum}:d={date}:{ids}:'
                 f'{lead:3d}-HR FCST:{name}')
+
+    def _update_sha1_latlon(self):
+        try:
+            newsha1 = hashlib.sha1(self.is2).hexdigest()
+            if newsha1 != self._sha1_latlon:
+                self._sha1_latlon = newsha1
+        except(TypeError):
+            pass
 
     @property
     def parseid(self):
