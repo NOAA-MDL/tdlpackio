@@ -838,7 +838,7 @@ class TdlpackRecord:
 
         # For new record, make sure the reference date is present
         if np.all(is1[2:8]==0):
-            d = datetime.datetime.utcfromtimestamp(0)
+            d = datetime.datetime.fromtimestamp(0, datetime.UTC)
             is1[2:7] = d.timetuple()[:5]
             is1[7] = np.int32(d.strftime(templates.DATE_FORMAT))
 
