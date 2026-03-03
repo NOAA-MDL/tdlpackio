@@ -862,6 +862,7 @@ class _TdlpackRecord:
     hour: int = field(init=False, repr=False, default=templates.Hour())
     minute: int = field(init=False, repr=False, default=templates.Minute())
     refDate: int = field(init=False, repr=False, default=templates.RefDate())
+    id: int = field(init=False, repr=False, default=templates.Id())
     leadTime: int = field(init=False, repr=False, default=templates.LeadTime())
     leadTimeMinutes: int = field(init=False, repr=False, default=templates.LeadTimeMinutes())
     modelID: int = field(init=False, repr=False, default=templates.ModelID())
@@ -895,7 +896,7 @@ class _TdlpackRecord:
             self.type = 'grid'
             self._update_sha1_latlon()
         self.duration = datetime.timedelta(hours=0)
-        self.id = TdlpackID(self.is1[8:12].tolist(), self)
+        self._id = TdlpackID(self.is1[8:12].tolist(), self)
 
     def __repr__(self):
         """"""

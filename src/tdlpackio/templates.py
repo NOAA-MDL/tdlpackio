@@ -2,6 +2,8 @@ from dataclasses import dataclass, field
 import datetime
 import numpy as np
 
+from . import utils
+
 DATE_FORMAT = '%Y%m%d%H'
 
 _section_attrs = {0:['edition'],
@@ -104,6 +106,19 @@ class RefDate:
             msg = "Reference date must be a datetime.datetime or np.datetime64 object."
             raise TypeError(msg)
 
+class Id:
+    """Tdlpack Record variable ID."""
+    def __get__(self, obj, objtype=None):
+        return obj._id
+    def __set__(self, obj, value):
+        if isinstance(value, list):
+            obj._id.word1 = value[0]
+            obj._id.word2 = value[1]
+            obj._id.word3 = value[2]
+            obj._id.word4 = value[3]
+            # Update lead time item in is1 array.
+            obj.is1[12] = obj._id.tau
+
 class LeadTime:
     """Forecast Lead Time. NOTE: This is a `datetime.timedelta` object."""
     def __get__(self, obj, objtype=None):
@@ -113,6 +128,7 @@ class LeadTime:
             # Allows setting from xarray
             value = datetime.timedelta(
                 seconds=int(value/np.timedelta64(1, 's')))
+        value = utils.validate_whole_nonnegative_hours(value)
         obj.is1[12] = int(value.total_seconds()/3600)
         obj.id.tau = obj.is1[12]
 
