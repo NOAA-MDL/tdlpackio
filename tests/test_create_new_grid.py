@@ -1,50 +1,30 @@
-#!/usr/bin/env python3
-
-# ---------------------------------------------------------------------------------------- 
-# Import Modules
-# ---------------------------------------------------------------------------------------- 
+import pytest
+import datetime
+import hashlib
 import numpy as np
-import setuptools
-import sys
 
-platform = setuptools.distutils.util.get_platform()
-build_path = './build/lib.'+platform+'-'+str(sys.version_info.major)+'.'+str(sys.version_info.minor)
-sys.path.insert(0,build_path)
-import pytdlpack
+import tdlpackio
 
-# ---------------------------------------------------------------------------------------- 
-# Create some data
-# ---------------------------------------------------------------------------------------- 
-nx = 2345
-ny = 1597
-date = 2019052900
-id = [4210008,10,24,0]
-grid_data = np.random.rand(nx,ny)*75.0
-grid_data.fill(np.nan)
+def test_create_new_gridded_record():
+    rec = tdlpackio.TdlpackRecord(type="grid")
+    rec.refDate = datetime.datetime(2026, 2, 1, 12)
+    rec.id = [4210008,10,24,0]
+    rec.mapProjection = 3
+    rec.nx = 2345
+    rec.ny = 1597
+    rec.latitudeLowerLeft = 19.2290
+    rec.longitudeLowerLeft = 233.7234
+    rec.orientationLongitude = 265.
+    rec.standardLatitude = 25.
+    rec.gridLength = 2.539703
+    rec.data = np.random.rand(rec.nx*rec.ny).reshape(rec.shape)*75.0
 
-# ---------------------------------------------------------------------------------------- 
-# Grid Specs: CONUS Lambert-Conformal 2.5km 2345x1597 
-# ---------------------------------------------------------------------------------------- 
-griddef = pytdlpack.create_grid_definition(proj=3,nx=nx,ny=ny,latll=19.2290,
-          lonll=233.7234,orientlon=265.,stdlat=25.,meshlength=2.539703)
+    is0_hash_expected = "5b9e36ec3fb5698a93d45103ee2f541249c68be4"
+    is1_hash_expected = "4a6e0e7ff594d3b2e28d9ea986cf28057db24255"
+    is2_hash_expected = "57e02f2ffdb8d98ae12238766946edcf8e42c903"
+    is4_hash_expected = "5b9e36ec3fb5698a93d45103ee2f541249c68be4"
 
-# ---------------------------------------------------------------------------------------- 
-# Create TDLPACK data record and pack
-# ---------------------------------------------------------------------------------------- 
-rec = pytdlpack.TdlpackRecord(date=date,id=id,lead=24,plain="GFS WIND SPEED",
-                              data=grid_data,missing_value=9999.0,grid=griddef)
-rec.pack(dec_scale=3)
-
-# ---------------------------------------------------------------------------------------- 
-# Open new sequential file and write the records
-# ---------------------------------------------------------------------------------------- 
-f = pytdlpack.open('new_grid.sq',mode='w',format='sequential')
-f.write(rec)
-f.close()
-
-# ---------------------------------------------------------------------------------------- 
-# Open new random-access file and write the records
-# ---------------------------------------------------------------------------------------- 
-fra = pytdlpack.open('new_grid.ra',mode='w',format='random-access',ra_template='large')
-fra.write(rec)
-fra.close()
+    assert hashlib.sha1(rec.is0).hexdigest() == is0_hash_expected
+    assert hashlib.sha1(rec.is1).hexdigest() == is1_hash_expected
+    assert hashlib.sha1(rec.is2).hexdigest() == is2_hash_expected
+    assert hashlib.sha1(rec.is4).hexdigest() == is4_hash_expected

@@ -363,7 +363,8 @@ For example if a users wants to read the 500th record in the file, the first 499
 their entirety do not need to be read.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
+from typing import ClassVar, Iterable, Optional
 import builtins
 import collections
 import datetime
@@ -818,11 +819,15 @@ class TdlpackRecord:
     ):
 
         bases = list()
-        if not np.any(is2):
-            rectype = 'vector'
-        else:
+
+        rectype = "vector"
+        if "type" in kwargs.keys():
+            rectype = kwargs["type"]
+
+        # If type == "vector" but there is non-zero content in is2, then
+        # the record is created with grid attributes.
+        if rectype == "grid" or np.any(is2):
             bases.append(templates.GridDefinitionSection)
-            rectype = 'grid'
             is1[1] = 1 # Flag in is1 to state that a grid definition section exists
 
         try:
@@ -890,11 +895,7 @@ class _TdlpackRecord:
         self._source = None
         self._type = 'data'
         self._sha1_latlon = None
-        if not np.any(self.is2):
-            self.type = 'vector'
-        else:
-            self.type = 'grid'
-            self._update_sha1_latlon()
+        self._update_sha1_latlon()
         self.duration = datetime.timedelta(hours=0)
         self._id = TdlpackID(self.is1[8:12].tolist(), self)
 
@@ -1130,6 +1131,11 @@ class _TdlpackRecord:
         elif self.type == 'vector':
             return tuple([int(self.numberOfPackedValues)])
 
+    @property
+    def type(self):
+        """Return TDLPACK type."""
+        return "grid" if np.any(self.is2) else "vector"
+
 @dataclass
 class TdlpackRecordOnDiskArray:
     shape: str
@@ -1169,48 +1175,58 @@ def _data(filehandle: open, filetype: str, rec: TdlpackRecord, offset: int, size
 
 @dataclass
 class TdlpackStationRecord:
-    stations: list = field(init=False, repr=False, default=templates.Stations())
-    type: str = field(init=False, repr=False, default='station')
+    """
+    TDLPACK Station Record class
+    """
+    stations_in: InitVar[Optional[Iterable[str]]] = None
 
-    _stations = None
+    type: str = field(init=False, repr=False, default="station")
+    stations: ClassVar[templates.Stations] = templates.Stations()
 
-    def __post_init__(self):
-        """"""
+    # Private class variable holding the list
+    _stations: Optional[list[str]] = field(init=False, repr=False, default=None)
+
+    def __post_init__(self, stations_in):
         self._nsta_expected = 0
+        self._recnum = -1
         self._source = None
+        self._stations = None
+        self._type = 'station'
         self.id = TdlpackID([400001000, 0, 0, 0], self)
 
+        if stations_in is not None:
+            self.stations = stations_in
+
     def __str__(self):
-        """"""
-        return (f'{self._recnum}:d=0000000000:'
-                f'STATION CALL LETTER RECORD:{self.numberOfStations}')
+        return (f"{self._recnum}:d=0000000000:"
+                f"STATION CALL LETTER RECORD:{self.numberOfStations}")
 
     @property
     def numberOfStations(self):
-        """"""
-        if hasattr(self, '_source') and \
-            (isinstance(self._stations, templates.Stations) or
-            self._stations is None
-            ):
+        if self._source is not None and (
+            isinstance(self._stations, list) or self._stations is None
+        ):
             return self._nsta_expected
-        return len(self.stations)
+        return 0 if self.stations is None else len(self.stations)
 
     @property
     def data(self):
-        """"""
         pass
 
     def pack(self):
-        """"""
         pass
 
 
 @dataclass
 class TdlpackTrailerRecord:
+    """
+    TDLPACK Trailer Record class
+    """
     type: str = field(init=False, repr=False, default='trailer')
 
     def __post_init__(self):
         """"""
+        self._recnum = -1
         self._type = 'trailer'
         self.id = TdlpackID([0, 0, 0, 0], self)
 
@@ -1230,7 +1246,7 @@ class TdlpackTrailerRecord:
 
 class TdlpackID:
     """
-    TDLPACK variable ID class.
+    TDLPACK variable ID class
     """
     __slots__ = ('_id', '_rec')
     def __init__(self, id, linked_rec=None):

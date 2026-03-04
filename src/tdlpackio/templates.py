@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 import datetime
 import numpy as np
@@ -28,7 +29,14 @@ class Stations:
                     raise ValueError(f"Error reading stations, expected {obj._nsta_expected}, but got {len(obj._stations)}")
         return obj._stations
     def __set__(self, obj, value):
-        obj._stations = value
+        if isinstance(value, str) or isinstance(value, bytes) or not isinstance(value, Iterable):
+            raise TypeError("stations must be an iterable of station IDs")
+        # Restrict modification if record came from a source
+        if obj._source is not None:
+            raise AttributeError(
+                "stations cannot be modified on records read from file"
+            )
+        obj._stations = list(value)
 
 # --------------------------------------------------------------------------------------
 # Section 0
@@ -187,19 +195,19 @@ class MapProjection:
     def __get__(self, obj, objtype=None):
         return obj.is2[1]
     def __set__(self, obj, value):
-        pass
+        obj.is2[1] = int(value)
 
 class Nx:
     def __get__(self, obj, objtype=None):
         return obj.is2[2]
     def __set__(self, obj, value):
-        pass
+        obj.is2[2] = int(value)
 
 class Ny:
     def __get__(self, obj, objtype=None):
         return obj.is2[3]
     def __set__(self, obj, value):
-        pass
+        obj.is2[3] = int(value)
 
 class LatitudeLowerLeft:
     def __get__(self, obj, objtype=None):
