@@ -1271,6 +1271,11 @@ class TdlpackID:
         else:
             return False
 
+    def __format__(self, spec: str) -> str:
+        if not spec:
+            spec = "basic"
+        return self.format(spec)
+
     def __repr__(self):
         return repr(utils.unparse_id(self._id))
 
@@ -1293,6 +1298,77 @@ class TdlpackID:
         if {idstr[19],idstr[29]} != {delim,delim}:
             raise ValueError(f'Invalid TDLPACK ID string format')
         return cls([int(i.lstrip('0')) if len(i.lstrip('0')) > 0 else 0 for i in idstr.split(delim)])
+
+    def format(self, style: str = "basic") -> str:
+        """
+        Format the TDLPACK ID identifier as a string.
+
+        This method returns a string representation of the identifier in one
+        of several supported formats commonly used in MOS-2000 workflows.
+
+        Parameters
+        ----------
+        style : str, optional
+            Output format style. The following values are supported
+            (case-insensitive):
+
+            ``"basic"`` or ``"b"``
+                Four-word identifer. Each word is printed as a zero-padded
+                integer field.
+
+            ``"mos"`` or ``"m"``
+                MOS-style identifier consisting of the first three words
+                followed by the ISG components and the threshold value
+                formatted in scientific notation (``.0000e±00``).
+
+            ``"parsed"`` or ``"p"``
+                Identifier parsed into its individual components as defined
+                by the internal ID mapping. All components are printed as
+                zero-padded integers except the threshold value, which is
+                printed as a floating-point value with ``F13.6`` formatting.
+
+        Returns
+        -------
+        str
+            String representation of the identifier in the requested format.
+
+        Notes
+        -----
+        The MOS-style threshold representation removes the leading zero
+        from scientific notation (e.g., ``0.0000e+00`` → ``.0000e+00``)
+        to match legacy MOS-2000 formatting conventions.
+        """
+        style = style.lower()
+
+        if style in {"basic", "b"}:
+            return (
+                f"{str(self.word1).zfill(9)} "
+                f"{str(self.word2).zfill(9)} "
+                f"{str(self.word3).zfill(9)} "
+                f"{str(self.word4).zfill(10)}"
+            )
+        elif style in {"mos", "m"}:
+            thresh = f"{self.thresh:.4e}"
+            if thresh.startswith("0"):
+                thresh = thresh[1:]
+            elif thresh.startswith("-0"):
+                thresh = "-" + thresh[2:]
+            return (
+                f"{str(self.word1).zfill(9)} "
+                f"{str(self.word2).zfill(9)} "
+                f"{str(self.word3).zfill(9)} "
+                f"{self.i}{self.s}{self.g} {thresh}"
+            )
+        elif style in {"parsed", "p"}:
+            parsed = ""
+            for k, v in self._id.items():
+                if "thresh" not in k:
+                    parsed += f"{str(v).zfill(len(k))} "
+                else:
+                    parsed += f"{v:13.6f}"
+            return parsed
+
+        raise ValueError(f"Unknown TdlpackID format style: {style!r}")
 
     def to_dict(self):
         """
