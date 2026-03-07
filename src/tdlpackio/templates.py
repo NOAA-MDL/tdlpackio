@@ -7,14 +7,40 @@ from . import utils
 
 DATE_FORMAT = '%Y%m%d%H'
 
-_section_attrs = {0:['edition'],
-                  1:['sectionFlags', 'year', 'month', 'day', 'hour', 'minute', 'refDate',
-                     'id', 'leadTime', 'leadTimeMinutes',
-                     'modelID', 'modelSequenceID', 'decScaleFactor', 'binScaleFactor',
-                     'name', 'validDate', 'duration'],
-                  2:[],
-                  4:['packingFlags','numberOfPackedValues','primaryMissingValue',
-                     'secondaryMissingValue','overallMinValue','numberOfGroups']}
+_section_attrs = {
+    0: [
+        "edition",
+    ],
+    1: [
+        "sectionFlags",
+        "year",
+        "month",
+        "day",
+        "hour",
+        "minute",
+        "refDate",
+        "id",
+        "leadTime",
+        "leadTimeHours",
+        "leadTimeMinutes",
+        "modelID",
+        "modelSequenceID",
+        "decScaleFactor",
+        "binScaleFactor",
+        "name",
+        "validDate",
+        "duration",
+    ],
+    2: [],
+    4: [
+        "packingFlags",
+        "numberOfPackedValues",
+        "primaryMissingValue",
+        "secondaryMissingValue",
+        "overallMinValue",
+        "numberOfGroups",
+    ],
+}
 
 # --------------------------------------------------------------------------------------
 # Descriptor classes for dealing with stations
@@ -47,7 +73,9 @@ class Edition:
     def __get__(self, obj, objtype=None):
         return obj.is0[2]
     def __set__(self, obj, value):
-        pass
+        if int(value) != 0:
+            raise ValueError(f"TDLPACK Edition (version) number must be zero")
+        obj.is0[2] = int(value)
 
 # --------------------------------------------------------------------------------------
 # Section 1
@@ -130,21 +158,36 @@ class Id:
 class LeadTime:
     """Forecast Lead Time. NOTE: This is a `datetime.timedelta` object."""
     def __get__(self, obj, objtype=None):
-        return datetime.timedelta(hours=int(obj.is1[12]))
+        return datetime.timedelta(
+            hours=int(obj.is1[12]),
+            minutes=int(obj.is1[13]),
+        )
     def __set__(self, obj, value):
         if isinstance(value, np.timedelta64):
             # Allows setting from xarray
             value = datetime.timedelta(
                 seconds=int(value/np.timedelta64(1, 's')))
-        value = utils.validate_whole_nonnegative_hours(value)
-        obj.is1[12] = int(value.total_seconds()/3600)
+        h, m = utils.validate_hours_minutes(value)
+        obj.leadTimeHours = h
+        obj.id.tau = obj.is1[12]
+        obj.leadTimeMinutes = m
+
+class LeadTimeHours:
+    def __get__(self, obj, objtype=None):
+        return obj.is1[12]
+    def __set__(self, obj, value):
+        if value < 0 or value > 999:
+            raise ValueError("leadTimeHours must be in the range 0–999 hours")
+        obj.is1[12] = int(value)
         obj.id.tau = obj.is1[12]
 
 class LeadTimeMinutes:
     def __get__(self, obj, objtype=None):
         return obj.is1[13]
     def __set__(self, obj, value):
-        obj.is1[13] = value
+        if value < 0 or value >= 60:
+            raise ValueError("leadTimeMinutes must be in the range 0–59 minutes")
+        obj.is1[13] = int(value)
 
 class ModelID:
     def __get__(self, obj, objtype=None):
@@ -176,9 +219,11 @@ class VariableName:
     This is the TDLPACK "Plain Language" description of the variable
     """
     def __get__(self, obj, objtype=None):
-        return ''.join([chr(i) for i in obj.is1[22:]])
+        return "".join([chr(i) for i in obj.is1[22:]])
     def __set__(self, obj, value):
         obj.is1[21] = 32
+        if len(value) == 0:
+            value = 32*" "
         for n,s in enumerate(value[:obj.is1[21]]):
             obj.is1[22+n] = np.int32(ord(s))
 
@@ -186,7 +231,7 @@ class ValidDate:
     def __get__(self, obj, objtype=None):
         return obj.refDate + obj.leadTime
     def __set__(self, obj, value):
-        pass
+        raise AttributeError(f"validDate is read-only")
 
 # --------------------------------------------------------------------------------------
 # Section 2
@@ -195,18 +240,25 @@ class MapProjection:
     def __get__(self, obj, objtype=None):
         return obj.is2[1]
     def __set__(self, obj, value):
+        valid_mapproj = {3, 5, 7}
+        if int(value) not in valid_mapproj:
+            raise ValueError(f"mapProjection can only be {valid_mapproj}")
         obj.is2[1] = int(value)
 
 class Nx:
     def __get__(self, obj, objtype=None):
         return obj.is2[2]
     def __set__(self, obj, value):
+        if int(value) <= 0:
+            raise ValueError(f"nx cannot be negative")
         obj.is2[2] = int(value)
 
 class Ny:
     def __get__(self, obj, objtype=None):
         return obj.is2[3]
     def __set__(self, obj, value):
+        if int(value) <= 0:
+            raise ValueError(f"ny cannot be negative")
         obj.is2[3] = int(value)
 
 class LatitudeLowerLeft:
@@ -292,10 +344,10 @@ class OverallMinValue:
     def __get__(self, obj, objtype=None):
         return obj.is4[5]
     def __set__(self, obj, value):
-        pass
+        raise AttributeError(f"overallMinValue is read-only")
 
 class NumberOfGroups:
     def __get__(self, obj, objtype=None):
         return obj.is4[6]
     def __set__(self, obj, value):
-        pass
+        raise AttributeError(f"numberOfGroups is read-only")

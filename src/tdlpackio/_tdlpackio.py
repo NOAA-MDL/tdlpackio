@@ -824,19 +824,20 @@ class TdlpackRecord:
         if "type" in kwargs.keys():
             rectype = kwargs["type"]
 
-        # If type == "vector" but there is non-zero content in is2, then
-        # the record is created with grid attributes.
-        if rectype == "grid" or np.any(is2):
+        if bool(np.any(is2)):
+            rectype = "grid"
+
+        if rectype == "grid":
             bases.append(templates.GridDefinitionSection)
             is1[1] = 1 # Flag in is1 to state that a grid definition section exists
 
         try:
-            Record = _record_class_store['rectype']
+            Record = _record_class_store[rectype]
         except(KeyError):
             @dataclass(init=False, repr=False)
             class Record(_TdlpackRecord, *bases):
                 pass
-            _record_class_store['rectype'] = Record
+            _record_class_store[rectype] = Record
 
         # For new record, make sure the reference date is present
         if np.all(is1[2:8]==0):
@@ -869,6 +870,7 @@ class _TdlpackRecord:
     refDate: int = field(init=False, repr=False, default=templates.RefDate())
     id: int = field(init=False, repr=False, default=templates.Id())
     leadTime: int = field(init=False, repr=False, default=templates.LeadTime())
+    leadTimeHours: int = field(init=False, repr=False, default=templates.LeadTimeHours())
     leadTimeMinutes: int = field(init=False, repr=False, default=templates.LeadTimeMinutes())
     modelID: int = field(init=False, repr=False, default=templates.ModelID())
     modelSequenceID: int = field(init=False, repr=False, default=templates.ModelSequenceID())
@@ -893,7 +895,7 @@ class _TdlpackRecord:
         self._linked_station_lon_record = -1
         self._recnum = -1
         self._source = None
-        self._type = 'data'
+        self._type = "data"
         self._sha1_latlon = None
         self._update_sha1_latlon()
         self.duration = datetime.timedelta(hours=0)
@@ -901,10 +903,10 @@ class _TdlpackRecord:
 
     def __repr__(self):
         """"""
-        info = ''
+        info = ""
         for sect in [0,1,2,4]:
             for k,v in self.attrs_by_section(sect,values=True).items():
-                info += f'Section {sect}: {k} = {v}\n'
+                info += f"Section {sect}: {k} = {v}\n"
         return info
 
     def __str__(self):
@@ -1134,7 +1136,7 @@ class _TdlpackRecord:
     @property
     def type(self):
         """Return TDLPACK type."""
-        return "grid" if np.any(self.is2) else "vector"
+        return "grid" if hasattr(self, "nx") else "vector"
 
 @dataclass
 class TdlpackRecordOnDiskArray:

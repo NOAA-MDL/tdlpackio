@@ -121,16 +121,16 @@ def encode_threshold_for_id(thresh: float):
     yy = str(50+abs(exp)) if exp < 0 else str(abs(exp)).zfill(2)
     return w+ithresh+yy
 
-def validate_whole_nonnegative_hours(td: timedelta) -> timedelta:
+def validate_hours_minutes(td: timedelta) -> tuple[int, int]:
     """
-    Validate that a timedelta represents a non-negative whole-hour interval.
+    Validate that a timedelta represents a non-negative interval
+    consisting only of whole hours and whole minutes.
 
     The interval must:
       * Be an instance of ``datetime.timedelta``.
       * Be greater than or equal to zero.
       * Contain no microseconds.
-      * Represent an exact integer number of hours
-        (i.e., no leftover minutes or seconds).
+      * Contain no leftover seconds.
 
     Parameters
     ----------
@@ -139,8 +139,8 @@ def validate_whole_nonnegative_hours(td: timedelta) -> timedelta:
 
     Returns
     -------
-    datetime.timedelta
-        The validated timedelta object.
+    tuple[int, int]
+        Tuple of ``(hours, minutes)``.
 
     Raises
     ------
@@ -151,7 +151,7 @@ def validate_whole_nonnegative_hours(td: timedelta) -> timedelta:
     ValueError
         If ``td`` contains microseconds.
     ValueError
-        If ``td`` is not an exact whole-hour value.
+        If ``td`` contains seconds.
     """
     if not isinstance(td, timedelta):
         raise TypeError("interval must be a datetime.timedelta object")
@@ -162,10 +162,10 @@ def validate_whole_nonnegative_hours(td: timedelta) -> timedelta:
     if td.microseconds != 0:
         raise ValueError("interval must not contain microseconds")
 
-    if td.seconds % 3600 != 0:
-        raise ValueError(
-            "interval must be an exact whole-hour value "
-            "(no minutes or seconds)"
-        )
+    if td.seconds % 60 != 0:
+        raise ValueError("interval must not contain seconds")
 
-    return td
+    total_minutes = int(td.total_seconds() // 60)
+    hours, minutes = divmod(total_minutes, 60)
+
+    return hours, minutes
