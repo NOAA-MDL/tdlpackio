@@ -12,10 +12,18 @@ description = "Python interface for reading and writing TDLPACK data"
 authors = [
   {name = "Eric Engle", email = "eric.engle@noaa.gov"},
 ]
-requires-python = ">=3.8,<3.14"
+requires-python = ">=3.8,<3.15"
+]
 keywords = [
-  "weather", "data-science", "numpy", "meteorology", "weather-data", "atmospheric-science",
-  "statistics", "mos", "statpp"
+  "atmospheric-science",
+  "data-science",
+  "meteorology",
+  "mos",
+  "numpy",
+  "statistics",
+  "statpp",
+  "weather",
+  "weather-data"
 ]
 readme = "README.md"
 license = {text = "MIT"}
@@ -31,6 +39,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: MIT License",
   "Topic :: Scientific/Engineering :: Atmospheric Science",
