@@ -1032,7 +1032,7 @@ class _TdlpackRecord:
                         self.is1,
                         self.is2,
                         self.is4,
-                        self.data.T
+                        np.asfortranarray(self.data.T, dtype=np.float32)
                     )
                 elif self.type == 'vector':
                     iret, ioctet, self._ipack = tdlpacklib.pack_1d(
@@ -1040,7 +1040,7 @@ class _TdlpackRecord:
                         self.is1,
                         self.is2,
                         self.is4,
-                        self.data.T
+                        np.asfortranarray(self.data, dtype=np.float32)
                     )
             else:
                 self._ipack = _open_file_store[self._source].read(self._recnum)
