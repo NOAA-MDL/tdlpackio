@@ -192,14 +192,13 @@ def pack_1d(cnp.ndarray[cnp.int32_t, ndim=1] is0,
             cnp.ndarray[cnp.int32_t, ndim=1] is1,
             cnp.ndarray[cnp.int32_t, ndim=1] is2,
             cnp.ndarray[cnp.int32_t, ndim=1] is4,
-            cnp.ndarray[cnp.float, ndim=1] data):
+            cnp.float32_t[:] data):
     """
     """
     cdef int32_t[:] is0_view = is0
     cdef int32_t[:] is1_view = is1
     cdef int32_t[:] is2_view = is2
     cdef int32_t[:] is4_view = is4
-    cdef float[:] data_view = data
 
     cdef int32_t nd
     cdef int32_t ioctet
@@ -217,28 +216,27 @@ def pack_1d(cnp.ndarray[cnp.int32_t, ndim=1] is0,
         <int32_t *>&is2_view[0],
         <int32_t *>&is4_view[0],
         &nd,
-        <float *>&data_view[0],
+        &data[0],
         &ND5,
         &ipack[0],
         &ioctet,
         &iret
     )
 
-    return iret, ioctet, np.asarray(ipack[:ioctet/TDLP_NBYPWD])
+    return iret, ioctet, np.asarray(ipack[:ioctet//TDLP_NBYPWD])
 
 
 def pack_2d(cnp.ndarray[cnp.int32_t, ndim=1] is0,
             cnp.ndarray[cnp.int32_t, ndim=1] is1,
             cnp.ndarray[cnp.int32_t, ndim=1] is2,
             cnp.ndarray[cnp.int32_t, ndim=1] is4,
-            cnp.ndarray[cnp.float, ndim=2] data):
+            cnp.float32_t[::1, :] data):
     """
     """
     cdef int32_t[:] is0_view = is0
     cdef int32_t[:] is1_view = is1
     cdef int32_t[:] is2_view = is2
     cdef int32_t[:] is4_view = is4
-    cdef float[:, ::1] data_view = data
 
     cdef int32_t nx
     cdef int32_t ny
@@ -246,7 +244,7 @@ def pack_2d(cnp.ndarray[cnp.int32_t, ndim=1] is0,
     cdef int32_t iret
 
     nx = data.shape[0]
-    ny = data.shape[0]
+    ny = data.shape[1]
     ioctet = 0
     iret = 0
 
@@ -259,14 +257,14 @@ def pack_2d(cnp.ndarray[cnp.int32_t, ndim=1] is0,
         <int32_t *>&is4_view[0],
         &nx,
         &ny,
-        &data_view[0, 0],
+        &data[0, 0],
         &ND5,
         &ipack[0],
         &ioctet,
         &iret
     )
 
-    return iret, ioctet, np.asarray(ipack[:ioctet/TDLP_NBYPWD])
+    return iret, ioctet, np.asarray(ipack[:ioctet//TDLP_NBYPWD])
 
 
 def write_station_record(path,
