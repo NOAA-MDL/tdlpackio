@@ -118,8 +118,6 @@ def open_tdlpack_file(path,
     cdef int32_t lun
     cdef int32_t iret
 
-    print(path, mode, ftype)
-
     c_path = <char *>PyUnicode_AsUTF8(path)
     c_mode = <char *>PyUnicode_AsUTF8(mode)
 

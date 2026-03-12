@@ -224,6 +224,8 @@ class VariableName:
         obj.is1[21] = 32
         if len(value) == 0:
             value = 32*" "
+        elif len(value) > 32:
+            value = value[:32]
         for n,s in enumerate(value[:obj.is1[21]]):
             obj.is1[22+n] = np.int32(ord(s))
 
@@ -309,7 +311,6 @@ class GridDefinitionSection():
     gridLength: float = field(init=False, repr=False, default=GridLength())
     standardLatitude: float = field(init=False, repr=False, default=StandardLatitude())
     @classmethod
-    @property
     def _attrs(cls):
         return list(cls.__dataclass_fields__.keys())
 
