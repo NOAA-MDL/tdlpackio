@@ -570,7 +570,7 @@ class open:
                     last_station_id_rec = self.records
                     rec._recnum = self.records
                     rec._source = self.name
-                    rec.numberOfStations = int(n/2)
+                    rec._nsta_expected = int(n/2)
                     self._index['record'].append(rec)
                     self._index['type'].append('station')
                 else:
@@ -614,6 +614,9 @@ class open:
                 break
             offset = (prec_next_key-1)*nbytes
             self._filehandle.seek(offset)
+
+        # Make key_records immutable
+        self.key_records = tuple(self.key_records)
 
 
     def _sequential_file_indexer(self):
