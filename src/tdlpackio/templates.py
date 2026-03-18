@@ -5,7 +5,7 @@ import numpy as np
 
 from . import utils
 
-DATE_FORMAT = '%Y%m%d%H'
+DATE_FORMAT = "%Y%m%d%H"
 
 _section_attrs = {
     0: [
@@ -46,11 +46,12 @@ _section_attrs = {
 # Descriptor classes for dealing with stations
 # --------------------------------------------------------------------------------------
 class Stations:
+    """Descriptor class for handling station lists"""
     def __get__(self, obj, objtype=None):
         if obj._stations is None:
             if obj._source is not None:
                 from ._tdlpackio import _open_file_store
-                obj._stations = [s.decode('ascii').strip() for s in _open_file_store[obj._source].read(obj._recnum).tolist()]
+                obj._stations = [s.decode("ascii").strip() for s in _open_file_store[obj._source].read(obj._recnum).tolist()]
                 if len(obj._stations) != obj._nsta_expected:
                     raise ValueError(f"Error reading stations, expected {obj._nsta_expected}, but got {len(obj._stations)}")
         return obj._stations
@@ -68,8 +69,7 @@ class Stations:
 # Section 0
 # --------------------------------------------------------------------------------------
 class Edition:
-    """
-    """
+    """TDLPACK version number.  Should always be 0."""
     def __get__(self, obj, objtype=None):
         return obj.is0[2]
     def __set__(self, obj, value):
@@ -81,12 +81,15 @@ class Edition:
 # Section 1
 # --------------------------------------------------------------------------------------
 class SectionFlags:
+    """Seciton flags."""
     def __get__(self, obj, objtype=None):
-        return f'{obj.is1[1]:08b}'
+        return obj._section_flags
     def __set__(self, obj, value):
-        obj.is1[1] = value
+        # Individual flags values are set by interacting with the TdlpackFlags object
+        pass
 
 class Year:
+    """Year of Reference Date"""
     def __get__(self, obj, objtype=None):
         return obj.is1[2]
     def __set__(self, obj, value):
@@ -94,6 +97,7 @@ class Year:
         obj.refDate = datetime.datetime(*obj.is1[2:7])
 
 class Month:
+    """Month of Reference Date"""
     def __get__(self, obj, objtype=None):
         return obj.is1[3]
     def __set__(self, obj, value):
@@ -101,6 +105,7 @@ class Month:
         obj.refDate = datetime.datetime(*obj.is1[2:7])
 
 class Day:
+    """Day of Reference Date"""
     def __get__(self, obj, objtype=None):
         return obj.is1[4]
     def __set__(self, obj, value):
@@ -108,6 +113,7 @@ class Day:
         obj.refDate = datetime.datetime(*obj.is1[2:7])
 
 class Hour:
+    """Hour of Reference Date"""
     def __get__(self, obj, objtype=None):
         return obj.is1[5]
     def __set__(self, obj, value):
@@ -115,6 +121,7 @@ class Hour:
         obj.refDate = datetime.datetime(*obj.is1[2:7])
 
 class Minute:
+    """Minute of Reference Date"""
     def __get__(self, obj, objtype=None):
         return obj.is1[6]
     def __set__(self, obj, value):
@@ -166,13 +173,14 @@ class LeadTime:
         if isinstance(value, np.timedelta64):
             # Allows setting from xarray
             value = datetime.timedelta(
-                seconds=int(value/np.timedelta64(1, 's')))
+                seconds=int(value/np.timedelta64(1, "s")))
         h, m = utils.validate_hours_minutes(value)
         obj.leadTimeHours = h
         obj.id.tau = obj.is1[12]
         obj.leadTimeMinutes = m
 
 class LeadTimeHours:
+    """Forecast lead time in hours"""
     def __get__(self, obj, objtype=None):
         return obj.is1[12]
     def __set__(self, obj, value):
@@ -182,6 +190,7 @@ class LeadTimeHours:
         obj.id.tau = obj.is1[12]
 
 class LeadTimeMinutes:
+    """Minutes component of lead time."""
     def __get__(self, obj, objtype=None):
         return obj.is1[13]
     def __set__(self, obj, value):
@@ -190,6 +199,7 @@ class LeadTimeMinutes:
         obj.is1[13] = int(value)
 
 class ModelID:
+    """Model ID. This is the same as the "dd" of the TDPACK ID"""
     def __get__(self, obj, objtype=None):
         return obj.is1[14]
     def __set__(self, obj, value):
@@ -197,27 +207,28 @@ class ModelID:
         obj.id.dd = value
 
 class ModelSequenceID:
+    """Model sequence ID."""
     def __get__(self, obj, objtype=None):
         return obj.is1[15]
     def __set__(self, obj, value):
         obj.is1[15] = value
 
 class DecScaleFactor:
+    """Decimal Scale Factor for packing"""
     def __get__(self, obj, objtype=None):
         return obj.is1[16]
     def __set__(self, obj, value):
         obj.is1[16] = value
 
 class BinScaleFactor:
+    """Binary Scale Factor for packing"""
     def __get__(self, obj, objtype=None):
         return obj.is1[17]
     def __set__(self, obj, value):
         obj.is1[17] = value
 
 class VariableName:
-    """
-    This is the TDLPACK "Plain Language" description of the variable
-    """
+    """This is the TDLPACK "Plain Language" description of the variable"""
     def __get__(self, obj, objtype=None):
         return "".join([chr(i) for i in obj.is1[22:]])
     def __set__(self, obj, value):
@@ -229,16 +240,11 @@ class VariableName:
         for n,s in enumerate(value[:obj.is1[21]]):
             obj.is1[22+n] = np.int32(ord(s))
 
-class ValidDate:
-    def __get__(self, obj, objtype=None):
-        return obj.refDate + obj.leadTime
-    def __set__(self, obj, value):
-        raise AttributeError(f"validDate is read-only")
-
 # --------------------------------------------------------------------------------------
 # Section 2
 # --------------------------------------------------------------------------------------
 class MapProjection:
+    """Map Projection"""
     def __get__(self, obj, objtype=None):
         return obj.is2[1]
     def __set__(self, obj, value):
@@ -248,6 +254,7 @@ class MapProjection:
         obj.is2[1] = int(value)
 
 class Nx:
+    """Nx"""
     def __get__(self, obj, objtype=None):
         return obj.is2[2]
     def __set__(self, obj, value):
@@ -256,6 +263,7 @@ class Nx:
         obj.is2[2] = int(value)
 
 class Ny:
+    """Ny"""
     def __get__(self, obj, objtype=None):
         return obj.is2[3]
     def __set__(self, obj, value):
@@ -264,6 +272,7 @@ class Ny:
         obj.is2[3] = int(value)
 
 class LatitudeLowerLeft:
+    """Latitude of the lower left gridpoint"""
     def __get__(self, obj, objtype=None):
         return obj.is2[4]*1e-4
     def __set__(self, obj, value):
@@ -271,6 +280,7 @@ class LatitudeLowerLeft:
         obj._update_sha1_latlon()
 
 class LongitudeLowerLeft:
+    """longitude of the lower left gridpoint"""
     def __get__(self, obj, objtype=None):
         return obj.is2[5]*1e-4
     def __set__(self, obj, value):
@@ -278,6 +288,7 @@ class LongitudeLowerLeft:
         obj._update_sha1_latlon()
 
 class OrientationLongitude:
+    """Orientation Longitude"""
     def __get__(self, obj, objtype=None):
         return obj.is2[6]*1e-4
     def __set__(self, obj, value):
@@ -285,6 +296,7 @@ class OrientationLongitude:
         obj._update_sha1_latlon()
 
 class GridLength:
+    """Grid length (i.e. mesh length)"""
     def __get__(self, obj, objtype=None):
         # Return in units of meters
         return obj.is2[7]*1e-3
@@ -294,6 +306,7 @@ class GridLength:
         obj._update_sha1_latlon()
 
 class StandardLatitude:
+    """Standard Latitude"""
     def __get__(self, obj, objtype=None):
         return obj.is2[8]*1e-4
     def __set__(self, obj, value):
@@ -302,6 +315,12 @@ class StandardLatitude:
 
 @dataclass(init=False)
 class GridDefinitionSection():
+    """
+    TDLPACK Grid Definition Section
+
+    These metadata attributes map to specific items in the TdlpackRecord ojbect,
+    is2 array attribute.
+    """
     mapProjection: int = field(init=False, repr=False, default=MapProjection())
     nx: int = field(init=False, repr=False, default=Nx())
     ny: int = field(init=False, repr=False, default=Ny())
@@ -318,36 +337,52 @@ class GridDefinitionSection():
 # Section 4
 # --------------------------------------------------------------------------------------
 class PackingFlags:
+    """Packing flags"""
     def __get__(self, obj, objtype=None):
-        return f'{obj.is4[1]:08b}'
+        return obj._packing_flags
     def __set__(self, obj, value):
+        # Individual flags values are set by interacting with the TdlpackFlags object
         pass
 
 class NumberOfPackedValues:
+    """
+    Number of packed values. This value is the number of stations when the
+    record is vector or nx*ny when gridded.
+    """
     def __get__(self, obj, objtype=None):
         return obj.is4[2]
     def __set__(self, obj, value):
         pass
 
 class PrimaryMissingValue:
+    """Primary missing value. Generally 9999"""
     def __get__(self, obj, objtype=None):
         return obj.is4[3]
     def __set__(self, obj, value):
-        obj.is4[3] = value
+        if value == obj.secondarMissingValue:
+            raise ValueError(f"primary missing value cannot equal secondary missing value")
+        obj.is4[3] = int(value)
+        obj.packingFlags["hasPrimaryMissingValue"] = 1
 
 class SecondaryMissingValue:
+    """Primary missing value. Generally 9997"""
     def __get__(self, obj, objtype=None):
         return obj.is4[4]
     def __set__(self, obj, value):
-        obj.is4[4] = value
+        if value == obj.primaryMissingValue:
+            raise ValueError(f"secondary missing value cannot equal primary missing value")
+        obj.is4[4] = int(value)
+        obj.packingFlags["hasSecondaryMissingValue"] = 1
 
 class OverallMinValue:
+    """Overall minimum value of data [READ-ONLY]"""
     def __get__(self, obj, objtype=None):
         return obj.is4[5]
     def __set__(self, obj, value):
         raise AttributeError(f"overallMinValue is read-only")
 
 class NumberOfGroups:
+    """Number of packing groups [READ-ONLY]"""
     def __get__(self, obj, objtype=None):
         return obj.is4[6]
     def __set__(self, obj, value):

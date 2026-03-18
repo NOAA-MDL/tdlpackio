@@ -364,7 +364,7 @@ their entirety do not need to be read.
 """
 
 from dataclasses import dataclass, field, InitVar
-from typing import ClassVar, Iterable, Optional
+from typing import ClassVar, Iterable, Literal, Optional
 import builtins
 import collections
 import datetime
@@ -842,12 +842,6 @@ class TdlpackRecord:
                 pass
             _record_class_store[rectype] = Record
 
-        # For new record, make sure the reference date is present
-        if np.all(is1[2:8]==0):
-            d = datetime.datetime.fromtimestamp(0, datetime.UTC)
-            is1[2:7] = d.timetuple()[:5]
-            is1[7] = np.int32(d.strftime(templates.DATE_FORMAT))
-
         return Record(is0, is1, is2, is4, *args)
 
 
@@ -880,7 +874,6 @@ class _TdlpackRecord:
     decScaleFactor: int = field(init=False, repr=False, default=templates.DecScaleFactor())
     binScaleFactor: int = field(init=False, repr=False, default=templates.BinScaleFactor())
     name: str = field(init=False, repr=False, default=templates.VariableName())
-    validDate: int = field(init=False, repr=False, default=templates.ValidDate())
 
     # Section 4 looked up attributes
     packingFlags: int = field(init=False, repr=False, default=templates.PackingFlags())
@@ -902,7 +895,23 @@ class _TdlpackRecord:
         self._sha1_latlon = None
         self._update_sha1_latlon()
         self.duration = datetime.timedelta(hours=0)
-        self._id = TdlpackID(self.is1[8:12].tolist(), self)
+        self._id = TdlpackID(
+            self.is1[8:12].tolist(),
+            self,
+        )
+        self._section_flags = TdlpackFlags(
+            "section",
+            self,
+        )
+        self._packing_flags = TdlpackFlags(
+            "packing",
+            self,
+        )
+        # For new record, make sure the reference date is present
+        if np.all(self.is1[2:8]==0):
+            d = datetime.datetime.fromtimestamp(0, datetime.UTC)
+            self.is1[2:7] = d.timetuple()[:5]
+            self.is1[7] = np.int32(d.strftime(templates.DATE_FORMAT))
 
     def __repr__(self):
         """"""
@@ -936,6 +945,11 @@ class _TdlpackRecord:
     def parseid(self):
         """Return parsed ID"""
         return utils.parse_id(self.id)
+
+    @property
+    def validDate(self):
+        """Provide the valid date"""
+        return self.refDate + self.leadTime
 
     def attrs_by_section(self, sect, values=False):
         """
@@ -1594,3 +1608,101 @@ class TdlpackID:
         self._id['g'] = value
         if self._rec is not None:
             self._rec.is1[11] = utils.unparse_id(self._id)[3]
+
+
+class TdlpackFlags:
+    """
+    TDLPACK Flags class
+
+    This class can be used to handle bit flags for the section flags in is1[1] or
+    the packing flags is4[1].
+    """
+    __slots__ = (
+        "_arr_item",
+        "_arr_item_idx",
+        "_flags",
+        "_rec",
+        "_type",
+    )
+
+    _immutable_flags = (
+        "hasBitMapSection",
+        "isVectorData",
+        "packing",
+        "packingOptions",
+    )
+
+    _idx = 1
+
+    _section_flags_mapping = {
+        "hasBitMapSection": 6,
+        "hasGridDefinitionSection": 7,
+    }
+
+    _packing_flags_mapping = {
+        "isVectorData": 3,             # 0 = False (i.e. gridpoint); 1 = True
+        "packing": 4,                  # 0 = Simple Packing; 1 = Complex packing
+        "packingOptions": 5,           # 0 = Original scaled data; 1 = 2nd order spatial differences
+        "hasPrimaryMissingValue": 6,   # 0 = No primary missing value; primary missing value may be present
+        "hasSecondaryMissingValue": 7, # 0 = No primary missing value; primary missing value may be present
+    }
+    def __init__(
+        self,
+        flag_type: Literal["section", "packing"],
+        linked_rec: "TdlpackRecord",
+    ):
+        """
+        Initialize a TdlpackFlags instance.
+
+        Parameters
+        ----------
+        flag_type : {"section", "packing"}
+            Specifies which set of flags this instance manages. Determines
+            both the internal flag mapping and the underlying array in
+            ``linked_rec`` that will be accessed and modified.
+        linked_rec : TdlpackRecord
+            The parent record containing the underlying data arrays. Flag
+            updates performed through this instance are applied directly to
+            the corresponding ``is1`` or ``is4`` array of this object.
+
+        Notes
+        -----
+        - ``flag_type="section"`` maps to ``linked_rec.is1``.
+        - ``flag_type="packing"`` maps to ``linked_rec.is4``.
+        """
+        self._rec = linked_rec
+        self._type = flag_type
+        if flag_type == "section":
+            self._flags = self._section_flags_mapping
+            self._arr_item = self._rec.is1
+        elif flag_type == "packing":
+            self._flags = self._packing_flags_mapping
+            self._arr_item = self._rec.is4
+
+    def __repr__(self):
+        return self.to_dict().__repr__()
+
+    def __getitem__(self, key):
+        arr_item = [int(i) for i in f"{self._arr_item[self._idx]:08b}"]
+        return arr_item[self._flags[key]]
+
+    def __setitem__(self, key, value):
+        if value not in {0, 1}:
+            raise ValueError(f"flag values can only be 0 or 1")
+        if key in self._immutable_flags:
+            raise TypeError(f"flag '{key}' is immutable and cannot be modified")
+        s = self.to_list()
+        s[self._flags[key]] = value
+        self._arr_item[self._idx] = int("".join([str(i) for i in s]), 2)
+
+    def to_dict(self):
+        """Return flags as a dictionary"""
+        return {key: self[key] for key in self._flags.keys()}
+
+    def to_list(self):
+        """Return flags as a list"""
+        return [int(i) for i in self.to_string()]
+
+    def to_string(self):
+        """Return flags as a string"""
+        return f"{self._arr_item[self._idx]:08b}"
