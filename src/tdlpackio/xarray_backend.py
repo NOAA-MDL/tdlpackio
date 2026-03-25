@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 
 LOCK = SerializableLock()
 
+
 class TdlpackBackendEntrypoint(BackendEntrypoint):
     """xarray backend engine entrypoint for opening and  decoding sequential tdlpack files.
 
@@ -44,12 +45,13 @@ class TdlpackBackendEntrypoint(BackendEntrypoint):
         down to a non-sparse selection
         The tdlpack is considered not sparse when variables built have the same shape.
     """
+
     def open_dataset(
         self,
         filename,
         *,
-        drop_variables = None,
-        name_scheme: list = ['ccc','fff'],
+        drop_variables=None,
+        name_scheme: list = ["ccc", "fff"],
         filters: typing.Mapping[str, any] = None,
     ):
         """"""
@@ -61,7 +63,9 @@ class TdlpackBackendEntrypoint(BackendEntrypoint):
 
         # Divide up records by variable based on name scheme and filters
         filters = copy(filters)
-        frames, cube, extra_geo, one_sta_list, is2 = make_variables(file_index, name_scheme, filters, f)
+        frames, cube, extra_geo, one_sta_list, is2 = make_variables(
+            file_index, name_scheme, filters, f
+        )
         # return empty dataset if no data
         if frames is None:
             return xr.Dataset()
@@ -70,8 +74,8 @@ class TdlpackBackendEntrypoint(BackendEntrypoint):
         ds = xr.Dataset()
         for var_df in frames:
             da = build_da_without_coords(var_df, cube, f, one_sta_list)
-            da.encoding['tdlp_is2'] = is2
-#            da.encoding['tdlp_datset_name_scheme'] = name_scheme
+            da.encoding["tdlp_is2"] = is2
+            #            da.encoding['tdlp_datset_name_scheme'] = name_scheme
             ds[da.name] = da
 
         # assign coords from the cube; the cube prevents datarrays with different shapes
@@ -83,13 +87,11 @@ class TdlpackBackendEntrypoint(BackendEntrypoint):
 
 
 class TdlpackBackendArray(BackendArray):
-
     def __init__(self, array, lock):
         self.array = array
         self.shape = array.shape
         self.dtype = np.dtype(array.dtype)
         self.lock = lock
-
 
     def __getitem__(self, key: xr.core.indexing.ExplicitIndexer) -> np.typing.ArrayLike:
         return xr.core.indexing.explicit_indexing_adapter(
@@ -110,11 +112,11 @@ def exclusive_slice_to_inclusive(item):
     if item.start is None and item.stop is None and item.step is None:
         return item
     if not isinstance(item, slice):
-        raise ValueError(f'item must be a slice; it was of type {type(item)}')
+        raise ValueError(f"item must be a slice; it was of type {type(item)}")
     # if step is None, it's one
     step = 1 if item.step is None else item.step
     if item.stop < item.start or step < 1:
-        raise ValueError(f'slice {item} not accounted for')
+        raise ValueError(f"slice {item} not accounted for")
     # handle case where slice has one item
     if abs(item.stop - item.start) == step:
         return [item.start]
@@ -122,9 +124,10 @@ def exclusive_slice_to_inclusive(item):
     s = slice(item.start, item.stop - step, step)
     return s
 
+
 class Validator:
     def __set_name__(self, owner, name):
-        self.private_name = f'_{name}'
+        self.private_name = f"_{name}"
         self.name = name
 
     def __get__(self, obj, objtype=None):
@@ -134,8 +137,8 @@ class Validator:
             value = None
         return value
 
-class PdIndex(Validator):
 
+class PdIndex(Validator):
     def __set__(self, obj, value):
         try:
             value = pd.Index(value)
@@ -143,20 +146,22 @@ class PdIndex(Validator):
             value = pd.Index([value])
         setattr(obj, self.private_name, value)
 
+
 def array_safe_eq(a, b) -> bool:
     """Check if a and b are equal, even if they are numpy arrays"""
     if a is b:
         return True
-    if hasattr(a, 'equals'):
+    if hasattr(a, "equals"):
         return a.equals(b)
-    if hasattr(a, 'all') and hasattr(b, 'all'):
+    if hasattr(a, "all") and hasattr(b, "all"):
         return a.shape == b.shape and (a == b).all()
-    if hasattr(a, 'all') or hasattr(b, 'all'):
+    if hasattr(a, "all") or hasattr(b, "all"):
         return False
     try:
         return a == b
     except TypeError:
         return NotImplementedError
+
 
 def dc_eq(dc1, dc2) -> bool:
     """checks if two dataclasses which hold numpy arrays are equal"""
@@ -191,7 +196,7 @@ class TdlpackCube:
     station: pd.Index = PdIndex()
 
     def __setitem__(self, key, value):
-        #super().__setitem__(key, value)
+        # super().__setitem__(key, value)
         setattr(self, key, value)
 
     def __getitem__(self, key):
@@ -202,10 +207,15 @@ class TdlpackCube:
 
     def coords(self) -> typing.Dict[str, xr.Variable]:
         keys = list(TdlpackCube.__dataclass_fields__.keys())
-        keys.remove('x')
-        keys.remove('y')
-        coords = {k: xr.Variable(dims=k, data=self[k], attrs=dict(tdlp_name=k)) for k in keys if self[k] is not None}
+        keys.remove("x")
+        keys.remove("y")
+        coords = {
+            k: xr.Variable(dims=k, data=self[k], attrs=dict(tdlp_name=k))
+            for k in keys
+            if self[k] is not None
+        }
         return coords
+
 
 @dataclass
 class OnDiskArray:
@@ -216,13 +226,17 @@ class OnDiskArray:
     shape: typing.Tuple[int, ...] = field(init=False)
     ndim: int = field(init=False)
     geo_ndim: int = field(init=False)
-    dtype = 'float32'
+    dtype = "float32"
 
     def __post_init__(self):
         if not self.cube.station is None:
-            geo_shape = (len(self.cube.station),) # for stations, the record may not actually be this shape, but is converted to this shape
+            geo_shape = (
+                len(self.cube.station),
+            )  # for stations, the record may not actually be this shape, but is converted to this shape
         else:
-            geo_shape = self.index.iloc[0].record_shape  # multiple grids not allowed so can just use first
+            geo_shape = self.index.iloc[
+                0
+            ].record_shape  # multiple grids not allowed so can just use first
 
         self.geo_shape = geo_shape
         self.geo_ndim = len(geo_shape)
@@ -233,43 +247,63 @@ class OnDiskArray:
             self.shape = tuple([len(i) for i in self.index.index.levels]) + geo_shape
         self.ndim = len(self.shape)
 
-
     def __getitem__(self, item) -> np.array:
         # dimensions not in index are internal to tdlpack records; 2 dims for grids; 1 dim for stations
         f = tdlpackio.open(self.file_name)
 
-        index_slicer = item[:-self.geo_ndim]
-        index_slicer = tuple([[i] if isinstance(i, int) else i for i in index_slicer]) # maintain all multindex levels
+        index_slicer = item[: -self.geo_ndim]
+        index_slicer = tuple(
+            [[i] if isinstance(i, int) else i for i in index_slicer]
+        )  # maintain all multindex levels
         # pandas loc slicing is inclusive, therefore convert slices into explicit lists
-        index_slicer_inclusive = tuple([ exclusive_slice_to_inclusive(i) if isinstance(i, slice) else i for i in index_slicer])
+        index_slicer_inclusive = tuple(
+            [
+                exclusive_slice_to_inclusive(i) if isinstance(i, slice) else i
+                for i in index_slicer
+            ]
+        )
 
         # get records selected by item in new index dataframe
         index = self.index.loc[index_slicer_inclusive, :]
         index = index.set_index(index.index)
 
         # reset miloc to new relative locations in sub array
-        index['miloc'] = list(zip(*[index.index.unique(level=dim).get_indexer(index.index.get_level_values(dim)) for dim in index.index.names]))
+        index["miloc"] = list(
+            zip(
+                *[
+                    index.index.unique(level=dim).get_indexer(
+                        index.index.get_level_values(dim)
+                    )
+                    for dim in index.index.names
+                ]
+            )
+        )
         array_field_shape = index.index.levshape + self.geo_shape
 
         array_field = np.full(array_field_shape, fill_value=np.nan, dtype="float32")
 
         for key, row in index.iterrows():
-            record = f[row['record']]
-            logger.debug(f'unpacking and loading data, {record.reference_date}, {record.id}')
+            record = f[row["record"]]
+            logger.debug(
+                f"unpacking and loading data, {record.reference_date}, {record.id}"
+            )
             record.unpack(data=True)
-            if not self.cube.x is None: # grid
+            if not self.cube.x is None:  # grid
                 values = record.data.transpose()
-            else: # stations
+            else:  # stations
                 if self.one_station_list_and_ordered:
-                    logger.debug(f'taking fast path for retrieving station record')
+                    logger.debug(f"taking fast path for retrieving station record")
                     values = record.data
                 else:
-                    rec_stations = f[row['linked_station_id_record']].stations
-                    rec_series = pd.Series(record.data, name='data', index=pd.Series(rec_stations, name='station'))
-                    arr_series = pd.Series(np.nan, name='data', index=self.cube.station)
+                    rec_stations = f[row["linked_station_id_record"]].stations
+                    rec_series = pd.Series(
+                        record.data,
+                        name="data",
+                        index=pd.Series(rec_stations, name="station"),
+                    )
+                    arr_series = pd.Series(np.nan, name="data", index=self.cube.station)
                     arr_series.update(rec_series)
                     values = arr_series.values
-
 
             array_field[row.miloc] = values
 
@@ -281,86 +315,91 @@ class OnDiskArray:
             if isinstance(it, int):
                 array_field = array_field[(slice(None, None, None),) * i + (0,)]
         f.close()
-        array_field[array_field==9999.0] = np.nan
+        array_field[array_field == 9999.0] = np.nan
         return array_field
 
 
 def dims_to_shape(d) -> tuple:
-    if 'nx' in d:
-        t = (d['ny'],d['nx'])
+    if "nx" in d:
+        t = (d["ny"], d["nx"])
     else:
-        t = (d['nsta'],)
+        t = (d["nsta"],)
     return t
 
-def parse_tdlpackio_index_to_components(df, decode_time=True, decode_thresh=True, decode_lead=True, ttt='hours'):
-    df = df[df.type != 'trailer']
+
+def parse_tdlpackio_index_to_components(
+    df, decode_time=True, decode_thresh=True, decode_lead=True, ttt="hours"
+):
+    df = df[df.type != "trailer"]
     recnum = df.index + 1
     df = df.assign(recnum=recnum)
 
     # Parse dims to shape tuple, order as (y, x).
-    df = df[df.type == 'data']
+    df = df[df.type == "data"]
 
     df = df.assign(
-        ccc=df['record'].apply(lambda obj: obj.id.ccc),
-        fff=df['record'].apply(lambda obj: obj.id.fff),
-        cccfff=df['record'].apply(lambda obj: obj.id.cccfff),
-        b=df['record'].apply(lambda obj: obj.id.b),
-        dd=df['record'].apply(lambda obj: obj.id.dd),
-        v=df['record'].apply(lambda obj: obj.id.v),
-        llll=df['record'].apply(lambda obj: obj.id.llll),
-        uuuu=df['record'].apply(lambda obj: obj.id.uuuu),
-        t=df['record'].apply(lambda obj: obj.id.t),
-        o=df['record'].apply(lambda obj: obj.id.o),
-        thresh=df['record'].apply(lambda obj: obj.id.thresh),
-        i=df['record'].apply(lambda obj: obj.id.i),
-        s=df['record'].apply(lambda obj: obj.id.s),
-        g=df['record'].apply(lambda obj: obj.id.g),
-        refDate=df['record'].apply(lambda obj: obj.refDate),
-        leadTime=df['record'].apply(lambda obj: obj.leadTime),
-        record_shape=df['record'].apply(lambda obj: obj.shape),
-        linked_station_id_record=df['record'].apply(lambda obj: obj._linked_station_id_record),
+        ccc=df["record"].apply(lambda obj: obj.id.ccc),
+        fff=df["record"].apply(lambda obj: obj.id.fff),
+        cccfff=df["record"].apply(lambda obj: obj.id.cccfff),
+        b=df["record"].apply(lambda obj: obj.id.b),
+        dd=df["record"].apply(lambda obj: obj.id.dd),
+        v=df["record"].apply(lambda obj: obj.id.v),
+        llll=df["record"].apply(lambda obj: obj.id.llll),
+        uuuu=df["record"].apply(lambda obj: obj.id.uuuu),
+        t=df["record"].apply(lambda obj: obj.id.t),
+        o=df["record"].apply(lambda obj: obj.id.o),
+        thresh=df["record"].apply(lambda obj: obj.id.thresh),
+        i=df["record"].apply(lambda obj: obj.id.i),
+        s=df["record"].apply(lambda obj: obj.id.s),
+        g=df["record"].apply(lambda obj: obj.id.g),
+        refDate=df["record"].apply(lambda obj: obj.refDate),
+        leadTime=df["record"].apply(lambda obj: obj.leadTime),
+        record_shape=df["record"].apply(lambda obj: obj.shape),
+        linked_station_id_record=df["record"].apply(
+            lambda obj: obj._linked_station_id_record
+        ),
     )
 
-    df = df.drop(['record'], axis = 1)
+    df = df.drop(["record"], axis=1)
 
-#    # remove any records with 1-9 stations as they are causing problems at the moment
-#    df = df[df.record_shape != (1,)]
-#    df = df[df.record_shape != (2,)]
-#    df = df[df.record_shape != (3,)]
-#    df = df[df.record_shape != (4,)]
-#    df = df[df.record_shape != (5,)]
-#    df = df[df.record_shape != (6,)]
-#    df = df[df.record_shape != (7,)]
-#    df = df[df.record_shape != (8,)]
-#    df = df[df.record_shape != (9,)]
+    #    # remove any records with 1-9 stations as they are causing problems at the moment
+    #    df = df[df.record_shape != (1,)]
+    #    df = df[df.record_shape != (2,)]
+    #    df = df[df.record_shape != (3,)]
+    #    df = df[df.record_shape != (4,)]
+    #    df = df[df.record_shape != (5,)]
+    #    df = df[df.record_shape != (6,)]
+    #    df = df[df.record_shape != (7,)]
+    #    df = df[df.record_shape != (8,)]
+    #    df = df[df.record_shape != (9,)]
 
     return df
 
 
 meta_formats = {
-        'cccfff' : '{:06d}',
-        'cccfffbdd' : '{:09d}',
-        'ccc' : '{:03d}',
-        'fff' : '{:03d}',
-        'b' : '{:01d}',
-        'dd' : '{:02d}',
-        'v' : '{:01d}',
-        'llll' : '{:04d}',
-        'uuuu' : '{:04d}',
-        't' : '{:01d}',
-        'o' : '{:01d}',
-        'thresh' : '{d}',
-        }
+    "cccfff": "{:06d}",
+    "cccfffbdd": "{:09d}",
+    "ccc": "{:03d}",
+    "fff": "{:03d}",
+    "b": "{:01d}",
+    "dd": "{:02d}",
+    "v": "{:01d}",
+    "llll": "{:04d}",
+    "uuuu": "{:04d}",
+    "t": "{:01d}",
+    "o": "{:01d}",
+    "thresh": "{d}",
+}
+
 
 def build_da_without_coords(
-    index,
-    cube,
-    file,
-    one_sorted_station_list:bool
+    index, cube, file, one_sorted_station_list: bool
 ) -> xr.DataArray:
     """"""
     dim_names = [k for k in cube.__dataclass_fields__.keys() if cube[k] is not None]
-    constant_meta_names = [k for k in cube.__dataclass_fields__.keys() if cube[k] is None]
+    constant_meta_names = [
+        k for k in cube.__dataclass_fields__.keys() if cube[k] is None
+    ]
     dims = {k: len(cube[k]) for k in dim_names}
 
     data = OnDiskArray(file.name, index, cube, one_sorted_station_list)
@@ -369,32 +408,35 @@ def build_da_without_coords(
     data = indexing.LazilyIndexedArray(data)
     da = xr.DataArray(data, dims=dim_names)
 
-    if 'station' in da.dims:
-        da.encoding['preffered_chunks'] = {'station':-1}
+    if "station" in da.dims:
+        da.encoding["preffered_chunks"] = {"station": -1}
     else:
-        da.encoding['preffered_chunks'] = {'y':-1, 'x':-1}
+        da.encoding["preffered_chunks"] = {"y": -1, "x": -1}
 
     da.name = index.name.iloc[0]
     for meta_name in constant_meta_names:
         if meta_name in index.columns:
             da.attrs[meta_name] = index[meta_name].iloc[0]
-            da.encoding[f'tdlp_{meta_name}'] = da.attrs[meta_name]
+            da.encoding[f"tdlp_{meta_name}"] = da.attrs[meta_name]
 
     return da
 
+
 zfil = {
-        'cccfff' : 6,
-        'ccc' : 3,
-        'fff' : 3,
-        'b' : 1,
-        'dd' : 2,
-        'v' : 1,
-        'llll' : 4,
-        'uuuu' : 4,
-        't' : 1,
-        'o' : 1,
-        'thresh' : 7,
-        }
+    "cccfff": 6,
+    "ccc": 3,
+    "fff": 3,
+    "b": 1,
+    "dd": 2,
+    "v": 1,
+    "llll": 4,
+    "uuuu": 4,
+    "t": 1,
+    "o": 1,
+    "thresh": 7,
+}
+
+
 def _asarray_tuplesafe(values):
     """
     Convert values into a numpy array of at most 1-dimension, while preserving
@@ -413,13 +455,19 @@ def _asarray_tuplesafe(values):
 
     return result
 
+
 def make_variables(index, name_scheme, filters, f):
-    ''' from index as dataframe, separate by variable
-        create an individual dataframe index and cube for each variable'''
+    """from index as dataframe, separate by variable
+    create an individual dataframe index and cube for each variable"""
 
     # let nam determine the variables
-    #index['name'] = index[name_scheme].apply(lambda row: '_'.join(row.values.astype(str), axis=1)
-    index.loc[:,'name'] = index[name_scheme].astype(str).apply(lambda col: col.str.zfill(zfil[col.name])).apply(lambda row: '_'.join(row), axis=1)
+    # index['name'] = index[name_scheme].apply(lambda row: '_'.join(row.values.astype(str), axis=1)
+    index.loc[:, "name"] = (
+        index[name_scheme]
+        .astype(str)
+        .apply(lambda col: col.str.zfill(zfil[col.name]))
+        .apply(lambda row: "_".join(row), axis=1)
+    )
 
     # adopt parts of xarray's sel logic  so that filters behave similarly
     # allowed to filter to nothing to make empty dataset
@@ -434,9 +482,11 @@ def make_variables(index, name_scheme, filters, f):
                     v
                     if getattr(v, "ndim", 1) > 1  # vectorized-indexing
                     else _asarray_tuplesafe(v)
-                    )
+                )
                 if label.ndim == 0:
-                    label_value = label[()] if label.dtype.kind in "mM" else label.item() # see https://github.com/pydata/xarray/pull/4292 for details
+                    label_value = (
+                        label[()] if label.dtype.kind in "mM" else label.item()
+                    )  # see https://github.com/pydata/xarray/pull/4292 for details
                     try:
                         indexer = pd.Index(index[k]).get_loc(label_value)
                         if isinstance(indexer, int):
@@ -461,8 +511,7 @@ def make_variables(index, name_scheme, filters, f):
     index = index.set_index(name_scheme).sort_index()
     # return nothing if no data
     if index.empty:
-        return None,None,None,None,None
-
+        return None, None, None, None, None
 
     ordered_meta = TdlpackCube.__dataclass_fields__.keys()
     cube = None
@@ -478,33 +527,45 @@ def make_variables(index, name_scheme, filters, f):
 
         if c.date is None:
             # case where only one date; use date as unit dimesnion
-            c['refDate'] = [frame.refDate.iloc[0]]
-            #setattr(cube, 'date', [frame.date.iloc[0]])
+            c["refDate"] = [frame.refDate.iloc[0]]
+            # setattr(cube, 'date', [frame.date.iloc[0]])
 
         if c.lead is None:
             # case where only one lead; use lead as unit dimesnion
-            c['leadTime'] = [frame.leadTime.iloc[0]]
-
+            c["leadTime"] = [frame.leadTime.iloc[0]]
 
         dims = [k for k in ordered_meta if c[k] is not None]
 
         for dim in dims:
             if frame[dim].value_counts().nunique() > 1:
-                raise ValueError(f'un-even numer of records associated with dimension: {dim}\n unique values for {dim}: {frame[dim].unique()} ')
+                raise ValueError(
+                    f"un-even numer of records associated with dimension: {dim}\n unique values for {dim}: {frame[dim].unique()} "
+                )
 
         frame = frame.sort_values(dims)
         frame = frame.set_index(dims)
 
         if cube:
             if cube != c:
-                raise ValueError(f'{cube},\n {c};\n cubes are not the same; filter to a single cube')
+                raise ValueError(
+                    f"{cube},\n {c};\n cubes are not the same; filter to a single cube"
+                )
         else:
             cube = c
 
         # miloc is multi-index integer location
-        miloc = list(zip(*[frame.index.unique(level=dim).get_indexer(frame.index.get_level_values(dim)) for dim in dims]))
+        miloc = list(
+            zip(
+                *[
+                    frame.index.unique(level=dim).get_indexer(
+                        frame.index.get_level_values(dim)
+                    )
+                    for dim in dims
+                ]
+            )
+        )
         frame = frame.assign(miloc=miloc)
-        dim_ix = tuple([n+'_ix' for n in dims])
+        dim_ix = tuple([n + "_ix" for n in dims])
         frame = frame.set_index(pd.MultiIndex.from_tuples(frame.miloc, names=dim_ix))
 
         ordered_frames.append(frame)
@@ -522,16 +583,22 @@ def make_variables(index, name_scheme, filters, f):
             # station records; check if the multiple station id records are identical
             station_id_records = index.linked_station_id_record.unique()
             if 0 in station_id_records:
-                raise ValueError('TDLPACK file has a mix of station and gridded records; cannot read.')
+                raise ValueError(
+                    "TDLPACK file has a mix of station and gridded records; cannot read."
+                )
             if len(station_id_records) > 1:
-                station = pd.Series(f[int(station_id_records[0])].stations, name='station')
+                station = pd.Series(
+                    f[int(station_id_records[0])].stations, name="station"
+                )
                 for station_record in station_id_records[1:]:
-                    sta = pd.Series(f[int(station_record)].stations, name='station')
+                    sta = pd.Series(f[int(station_record)].stations, name="station")
                     if not station.equals(sta):
                         # station lists on file are not all the same
-                        logger.warning(f'Station lists on file are not identical; loading of data will be less efficient')
+                        logger.warning(
+                            f"Station lists on file are not identical; loading of data will be less efficient"
+                        )
                         one_station_list = False
-                        station = pd.merge(station, sta, how='outer').station
+                        station = pd.merge(station, sta, how="outer").station
             if station.is_monotonic_increasing:
                 cube.station = station
                 if one_station_list:
@@ -539,20 +606,24 @@ def make_variables(index, name_scheme, filters, f):
                 else:
                     one_station_list_and_ordered = False
             else:
-                logger.warning(f'station list(s) are not ordered; loading of data will be less efficient')
+                logger.warning(
+                    f"station list(s) are not ordered; loading of data will be less efficient"
+                )
                 one_station_list_and_ordered = False
                 cube.station = station.sort_values()
         else:
-            raise ValueError('multiple grids not accommodated')
+            raise ValueError("multiple grids not accommodated")
     elif len(record_shapes) == 1:  # data records exist and have same shape
         if len(record_shapes[0]) == 1:
             rec = f[int(index.linked_station_id_record.iloc[0])]
-            station_series = pd.Series(rec.stations, name='station')
+            station_series = pd.Series(rec.stations, name="station")
             if station_series.is_monotonic_increasing:
                 cube.station = station_series
                 one_station_list_and_ordered = True
             else:
-                logger.warning(f'station list(s) are not ordered; loading of data will be less efficient')
+                logger.warning(
+                    f"station list(s) are not ordered; loading of data will be less efficient"
+                )
                 cube.station = station_series.sort_values()
                 one_station_list_and_ordered = False
         else:
@@ -566,10 +637,10 @@ def make_variables(index, name_scheme, filters, f):
         # we want the lat lons; make them via accessing a record; we are asuming all records are the same grid because they have the same shape;
         # may want a unique grid identifier from tdlpackio to avoid assuming this
         latitude, longitude = rec.latlons()
-        latitude = xr.DataArray(latitude, dims=['y','x'])
-        latitude.attrs['standard_name'] = 'latitude'
-        longitude = xr.DataArray(longitude, dims=['y','x'])
-        longitude.attrs['standard_name'] = 'longitude'
+        latitude = xr.DataArray(latitude, dims=["y", "x"])
+        latitude.attrs["standard_name"] = "latitude"
+        longitude = xr.DataArray(longitude, dims=["y", "x"])
+        longitude.attrs["standard_name"] = "longitude"
         extra_geo = dict(latitude=latitude, longitude=longitude)
         one_station_list_and_ordered = None
     return ordered_frames, cube, extra_geo, one_station_list_and_ordered, is2
@@ -577,31 +648,32 @@ def make_variables(index, name_scheme, filters, f):
 
 class Validator(ABC):
     def __set_name__(self, owner, name):
-        self.private_name = f'_{name}'
+        self.private_name = f"_{name}"
 
     def __get__(self, obj, objtype=None):
         return getattr(obj, self.private_name)
 
     def get_name(self):
-        ''' can be used by subclass with super().get_name() to discover
-            the private name without _ ; helpfull for raising informative errors'''
-        return self.private_name.strip('_')
+        """can be used by subclass with super().get_name() to discover
+        the private name without _ ; helpfull for raising informative errors"""
+        return self.private_name.strip("_")
 
     def __set__(self, obj, value):
         v = self.validate(value)
         if v is not None:
             value = v
         setattr(obj, self.private_name, value)
-        if not hasattr(obj, '_validated'):
+        if not hasattr(obj, "_validated"):
             obj._validated = []
         if self.private_name not in obj._validated:
             obj._validated.append(self.private_name)
 
     @abstractmethod
     def validate(self, value):
-        ''' validate method can accept (null return), augment (return augmented)
-        or raise an error'''
+        """validate method can accept (null return), augment (return augmented)
+        or raise an error"""
         pass
+
 
 class Int(Validator):
     def __init__(self, min=None, max=None):
@@ -612,20 +684,29 @@ class Int(Validator):
         if isinstance(value, (int, np.integer)):
             if self.min is not None:
                 if self.min > value:
-                    raise ValueError(f'Expected "{name}" value {value!r} to be >= {self.min}')
+                    raise ValueError(
+                        f'Expected "{name}" value {value!r} to be >= {self.min}'
+                    )
             if self.max is not None:
                 if self.max < value:
-                    raise ValueError(f'Expected "{name}" value {value!r} to be <= {self.max}')
+                    raise ValueError(
+                        f'Expected "{name}" value {value!r} to be <= {self.max}'
+                    )
 
             return value
         else:
             if self.min is not None:
                 if self.min > value.min():
-                    raise ValueError(f'Expected "{name}" min value {value!r} to be >= {self.min}')
+                    raise ValueError(
+                        f'Expected "{name}" min value {value!r} to be >= {self.min}'
+                    )
             if self.max is not None:
                 if self.max < value.max():
-                    raise ValueError(f'Expected "{name}" max value {value!r} to be <= {self.max}')
+                    raise ValueError(
+                        f'Expected "{name}" max value {value!r} to be <= {self.max}'
+                    )
             return pd.Index(value)
+
 
 class Numeric(Validator):
     def __init__(self):
@@ -636,6 +717,7 @@ class Numeric(Validator):
             return value
         return pd.Index(value)  # no validation atm
 
+
 class TimeDelta(Validator):
     def __init__(self):
         pass
@@ -644,6 +726,7 @@ class TimeDelta(Validator):
         if isinstance(value, (datetime.timedelta, np.timedelta64)):
             return value
         return pd.TimedeltaIndex(value)
+
 
 class DateTime(Validator):
     def __init__(self):
@@ -656,8 +739,8 @@ class DateTime(Validator):
 
 
 @dataclass(init=False)
-class RequiredTdlpackMeta():
-    #Tdlpack metadata required as coord or in encoding
+class RequiredTdlpackMeta:
+    # Tdlpack metadata required as coord or in encoding
     date: datetime.datetime = DateTime()
 
     ccc: int = Int(min=0, max=999)
@@ -670,9 +753,9 @@ class RequiredTdlpackMeta():
     uuuu: int = Int(min=0, max=9999)
 
     t: int = Int(min=0, max=9)
-#    rr: int = Int(min=0, max=99)
+    #    rr: int = Int(min=0, max=99)
     o: int = Int(min=0, max=9)
-#    hh: int = Int(min=0, max=99)
+    #    hh: int = Int(min=0, max=99)
     lead: datetime.timedelta = TimeDelta()
 
     thresh: int = Numeric()
@@ -681,7 +764,7 @@ class RequiredTdlpackMeta():
     g: int = Int(min=0, max=9)
 
     def __setitem__(self, key, value):
-        #super().__setitem__(key, value)
+        # super().__setitem__(key, value)
         setattr(self, key, value)
 
     def __getitem__(self, key):
@@ -690,7 +773,9 @@ class RequiredTdlpackMeta():
     def to_id(self):
         for meta in self.__dataclass_fields__.keys():
             if isinstance(self[meta], pd.Index):
-                raise ValueError(f'{meta} is an index, but must be singular to convert to an id')
+                raise ValueError(
+                    f"{meta} is an index, but must be singular to convert to an id"
+                )
         id1 = self.ccc * 1_000_000
         id1 += self.fff * 1000
         id1 += self.b * 100
@@ -704,119 +789,142 @@ class RequiredTdlpackMeta():
         id3 += self.o * 100_000
         id3 += int(pd.Timedelta(self.lead).total_seconds() / 3600)
 
-        return[id1, id2, id3, 0]
+        return [id1, id2, id3, 0]
 
 
 @xr.register_dataset_accessor("tdlpackio")
 class TdlpackDataset:
-
     def __init__(self, xarray_obj):
         self._obj = xarray_obj
-
 
     def _iscoord(self, tdlp_meta):
         for coord_name in self._obj.coords:
             coord = self._obj[coord_name]
-            if 'tdlp_name' in coord.attrs:
-                if coord.attrs['tdlp_name'] == tdlp_meta:
+            if "tdlp_name" in coord.attrs:
+                if coord.attrs["tdlp_name"] == tdlp_meta:
                     return True
         return False
 
-    def to_tdlpack(self, file, mode='w-', compute: bool = True, var_constants=None, min_unique=1000):
-        '''
+    def to_tdlpack(
+        self, file, mode="w-", compute: bool = True, var_constants=None, min_unique=1000
+    ):
+        """
         mode : {"w", "w-"}, optional, default: "w-"
         Persistence mode: "w" means create (overwrite if exists);
         "w-" means create (fail if exists);
-        '''
+        """
 
         have_chunks = any(v.chunks for v in self._obj.variables.values())
         # ensuring has x/y or station dims and that any chunks do not span those dims
-        if 'station' in self._obj.dims:
+        if "station" in self._obj.dims:
             station = True
             if have_chunks:
-                self._obj = self._obj.chunk({'station':-1})
-        elif 'x' in self._obj.dims and 'y' in self._obj.dims:
+                self._obj = self._obj.chunk({"station": -1})
+        elif "x" in self._obj.dims and "y" in self._obj.dims:
             station = False
             if have_chunks:
-                self._obj = self._obj.chunk({'x':-1, 'y':-1})
+                self._obj = self._obj.chunk({"x": -1, "y": -1})
         else:
-            raise ValueError("data does not have 'x' and 'y' or 'station' dims for writing to tdlp grid or station formats")
+            raise ValueError(
+                "data does not have 'x' and 'y' or 'station' dims for writing to tdlp grid or station formats"
+            )
 
-
-        possible_multi_var_keys=['ccc','fff','b','dd','v','llll','uuuu','t','o','i','s','g']
+        possible_multi_var_keys = [
+            "ccc",
+            "fff",
+            "b",
+            "dd",
+            "v",
+            "llll",
+            "uuuu",
+            "t",
+            "o",
+            "i",
+            "s",
+            "g",
+        ]
         multi_var_keys = [k for k in possible_multi_var_keys if not self._iscoord(k)]
-        meta_dicts= list()
+        meta_dicts = list()
         for var in self._obj.data_vars:
             da = self._obj[var]
-            meta_dicts.append({key: da.encoding[f'tdlp_{key}'] for key in multi_var_keys })
+            meta_dicts.append(
+                {key: da.encoding[f"tdlp_{key}"] for key in multi_var_keys}
+            )
         df = pd.DataFrame(meta_dicts).nunique()
-        meta_varying_by_var = df.index[df>1]
-
-
+        meta_varying_by_var = df.index[df > 1]
 
         meta = RequiredTdlpackMeta()
         keys = list(meta.__dataclass_fields__.keys())
         coord_meta = list()
         const_meta = list()
-#        tdlpid = TdlpId()
+        #        tdlpid = TdlpId()
         tdlpid = tdlpackio.TdlpackID()
         for key in keys:
-            if f'tdlp_{key}' in da.encoding:
-                meta[key] = da.encoding[f'tdlp_{key}']
+            if f"tdlp_{key}" in da.encoding:
+                meta[key] = da.encoding[f"tdlp_{key}"]
                 tdlpid[key] = meta[key]
                 const_meta.append(key)
                 continue
-            found=False
+            found = False
             for coord_name in self._obj.coords:
                 coord = self._obj[coord_name]
-                if 'tdlp_name' in coord.attrs:
-                    if coord.attrs['tdlp_name'] == key:
-                        found=True
+                if "tdlp_name" in coord.attrs:
+                    if coord.attrs["tdlp_name"] == key:
+                        found = True
                         coord_meta.append(key)
                         meta[key] = coord
                         break
             if not found:
-                raise ValueError(f'to_tdlpack requres metadata for {key} be in encoding or coordinate')
-
+                raise ValueError(
+                    f"to_tdlpack requres metadata for {key} be in encoding or coordinate"
+                )
 
         filepath = Path(file)
-        if mode == 'w-':
+        if mode == "w-":
             if filepath.exists():
-                raise ValueError(f"{file} already exists and will not be overwritten; mode: 'w' can overwrite existing files")
-        elif mode == 'w':
+                raise ValueError(
+                    f"{file} already exists and will not be overwritten; mode: 'w' can overwrite existing files"
+                )
+        elif mode == "w":
             if filepath.is_dir():
                 raise ValueError(f"cannot clobber directory {file}")
 
-        open(filepath, 'w').close()
-        store = filepath.parent / f'.{filepath.name}'
+        open(filepath, "w").close()
+        store = filepath.parent / f".{filepath.name}"
         if store.is_dir():
-            logger.warning(f'removing existing hidden directory {store}')
+            logger.warning(f"removing existing hidden directory {store}")
             shutil.rmtree(store)
         store.mkdir(parents=True)
 
         prodicized = product(*[meta[k] for k in coord_meta])
-        f = tdlpackio.open(store / filepath.name, mode='w', format='sequential')
+        f = tdlpackio.open(store / filepath.name, mode="w", format="sequential")
         if station:
-            template_rec = tdlpackio.TdlpackRecord(date=0, id=[0,0,0,0], data=np.array([0]))
+            template_rec = tdlpackio.TdlpackRecord(
+                date=0, id=[0, 0, 0, 0], data=np.array([0])
+            )
             stations = tdlpackio.TdlpackStationRecord(list(self._obj.station.data))
             stations.pack()
             f.write(stations)
         else:
             # the grid doesn't matter ( can tweak/clean later)
-            template_rec = tdlpackio.TdlpackRecord(date=0, id=[0,0,0,0], grid=pytdlpack.grids['nbmak'], data=np.array([0]))
-            template_rec.is2 = da.encoding['tdlp_is2'] # this loads the grid metadata
+            template_rec = tdlpackio.TdlpackRecord(
+                date=0,
+                id=[0, 0, 0, 0],
+                grid=pytdlpack.grids["nbmak"],
+                data=np.array([0]),
+            )
+            template_rec.is2 = da.encoding["tdlp_is2"]  # this loads the grid metadata
         template_rec.primary_missing_value = 9999.0
-
 
         for t in prodicized:
             for var in self._obj.data_vars:
                 # select slice of array for tdlpack record
-                loc = {k:v for (k,v) in zip(coord_meta,t)}
+                loc = {k: v for (k, v) in zip(coord_meta, t)}
                 da = self._obj[var].loc[loc].squeeze()
 
                 # put extra metadata that varies by variable in loc for updating tdlpid
                 for m in meta_varying_by_var:
-                    loc[m] = da.encoding[f'tdlp_{m}']
+                    loc[m] = da.encoding[f"tdlp_{m}"]
                 tdlpid.update(**loc)
 
                 # shape data array appropriately for station or grid formatted tdlpack record
@@ -828,43 +936,49 @@ class TdlpackDataset:
                 # build out a tdlpack DataRecord with appropriate metadata
                 idlist = [tdlpid.word1, tdlpid.word2, tdlpid.word3, tdlpid.word4]
                 if var_constants is None:
-                    plain = 'NO VAR MATCH'
+                    plain = "NO VAR MATCH"
                     # let dec_scale allow for min_unique values in the space between the max and min
                     datamax = np.nanmax(data)
                     datamin = np.nanmin(data)
                     if datamax == datamin or np.isnan(datamax):
                         dec_scale = 9  # data is a constant or all missing and will compress well
                     else:
-                        log10range = np.log10(np.nanmax(data)-np.nanmin(data))
+                        log10range = np.log10(np.nanmax(data) - np.nanmin(data))
                         range_place = np.floor(log10range)
                         dec_scale = int(np.ceil(np.log10(min_unique)) - range_place)
                 else:
-                    plain = var_constants.loc[tdlpid.cccfff]['plain']
-                    dec_scale = var_constants.loc[tdlpid.cccfff]['iscale']
+                    plain = var_constants.loc[tdlpid.cccfff]["plain"]
+                    dec_scale = var_constants.loc[tdlpid.cccfff]["iscale"]
                 date = da.date.data.squeeze()[()]
-                rec = make_record(template_rec, idlist, data, 'PLAIN TEXT', date)
+                rec = make_record(template_rec, idlist, data, "PLAIN TEXT", date)
                 rec.pack(dec_scale=dec_scale)
-                logger.debug(f'writing {date}, {idlist} with dec_scale: {dec_scale}')
+                logger.debug(f"writing {date}, {idlist} with dec_scale: {dec_scale}")
                 f.write(rec)
 
         f.close()
         shutil.move(store / filepath.name, file)
         shutil.rmtree(store)
 
+
 @xr.register_dataarray_accessor("tdlpackio")
 class TdlpDataarray:
-
     def __init__(self, xarray_obj):
         self._obj = xarray_obj
 
-    def to_tdlpack(self, file, mode='w-', compute: bool = True,):
-        '''
+    def to_tdlpack(
+        self,
+        file,
+        mode="w-",
+        compute: bool = True,
+    ):
+        """
         mode : {"w", "w-"}, optional, default: "w-"
         Persistence mode: "w" means create (overwrite if exists);
         "w-" means create (fail if exists);
-        '''
+        """
         ds = self._obj.to_dataset()
         ds.tdlp.to_tdlpack(file, mode=mode, compute=compute)
+
 
 def make_record(template, rec_id, data, plain, date):
     rec = copy(template)
@@ -874,19 +988,20 @@ def make_record(template, rec_id, data, plain, date):
     rec.is1[8:12] = rec.id
     rec.is1[12] = rec.is1[10] % 1000
     rec.reference_date = pd.to_datetime(date)
-    rec.is1[2] = int(rec.reference_date.strftime('%Y'))
-    rec.is1[3] = int(rec.reference_date.strftime('%m'))
-    rec.is1[4] = int(rec.reference_date.strftime('%d'))
-    rec.is1[5] = int(rec.reference_date.strftime('%H'))
-    rec.is1[7] = int(rec.reference_date.strftime('%Y%m%d%H'))
+    rec.is1[2] = int(rec.reference_date.strftime("%Y"))
+    rec.is1[3] = int(rec.reference_date.strftime("%m"))
+    rec.is1[4] = int(rec.reference_date.strftime("%d"))
+    rec.is1[5] = int(rec.reference_date.strftime("%H"))
+    rec.is1[7] = int(rec.reference_date.strftime("%Y%m%d%H"))
 
     rec.is4[2] = len(data)
     rec.number_of_values = rec.is4[2]
 
     rec.plain = plain
-#    rec.lead_time = 24
+    #    rec.lead_time = 24
 
     return rec
+
 
 @dataclass
 class TdlpId:
@@ -898,28 +1013,32 @@ class TdlpId:
     # word1
     @property
     def ccc(self):
-        return  self.word1 // 1_000_000
+        return self.word1 // 1_000_000
+
     @ccc.setter
     def ccc(self, value):
         self.word1 = self.word1 - self.ccc * 1_000_000 + value * 1_000_000
 
     @property
     def fff(self):
-        return  self.word1 % 1_000_000 // 1000
+        return self.word1 % 1_000_000 // 1000
+
     @fff.setter
     def fff(self, value):
         self.word1 = self.word1 - self.fff * 1000 + value * 1000
 
     @property
     def b(self):
-        return  self.word1 % 1000 // 100
+        return self.word1 % 1000 // 100
+
     @b.setter
     def b(self, value):
         self.word1 = self.word1 - self.b * 100 + value * 100
 
     @property
     def dd(self):
-        return  self.word1 % 100
+        return self.word1 % 100
+
     @dd.setter
     def dd(self, value):
         self.word1 = self.word1 - self.dd + value
@@ -927,21 +1046,24 @@ class TdlpId:
     # word2
     @property
     def v(self):
-        return  self.word2 // 100_000_000
+        return self.word2 // 100_000_000
+
     @v.setter
     def v(self, value):
         self.word2 = self.word2 - self.v * 100_000_000 + value * 100_000_000
 
     @property
     def llll(self):
-        return  self.word2 % 100_000_000 // 10_000
+        return self.word2 % 100_000_000 // 10_000
+
     @llll.setter
     def llll(self, value):
         self.word2 = self.word2 - self.llll * 10_000 + value * 10_000
 
     @property
     def uuuu(self):
-        return  self.word2 % 10_000
+        return self.word2 % 10_000
+
     @uuuu.setter
     def uuuu(self, value):
         self.word2 = self.word2 - self.uuuu + value
@@ -950,6 +1072,7 @@ class TdlpId:
     @property
     def rr(self):
         return self.word3 % 100_000_000 // 1_000_000
+
     @rr.setter
     def rr(self, value):
         self.word3 = self.word3 - self.rr * 1_000_000 + value * 1_000_000
@@ -957,6 +1080,7 @@ class TdlpId:
     @property
     def ttt(self):
         return self.word3 % 1_000
+
     @ttt.setter
     def ttt(self, value):
         self.word3 = self.word3 - self.ttt + value
@@ -964,6 +1088,7 @@ class TdlpId:
     @property
     def lead(self):
         return datetime.timedelta(hours=self.ttt)
+
     @lead.setter
     def lead(self, value):
         self.ttt = int(pd.Timedelta(value).total_seconds() / 3600)
@@ -971,16 +1096,20 @@ class TdlpId:
     # word4
     @property
     def w(self):
-        return  self.word4 // 1_000_000_000
+        return self.word4 // 1_000_000_000
+
     @property
     def xxxx(self):
-        return  self.word4 % 1_000_000_000 // 100_000
+        return self.word4 % 1_000_000_000 // 100_000
+
     @property
     def yy(self):
         return self.word4 % 100_000 // 1_000
+
     @property
     def wxxxxyy(self):
         return self.word4 // 1_000
+
     @wxxxxyy.setter
     def wxxxxyy(self, value):
         self.word4 = self.word4 - self.wxxxxyy * 1_000 + value * 1_000
@@ -988,13 +1117,15 @@ class TdlpId:
     @property
     def isg(self):
         return self.word4 % 1000
+
     @isg.setter
     def isg(self, value):
         self.word4 = self.word4 - self.isg + value
 
     @property
     def i(self):
-         return self.word4 % 1000 // 100
+        return self.word4 % 1000 // 100
+
     @i.setter
     def i(self, value):
         self.word4 = self.word4 - self.i * 100 + value * 100
@@ -1002,6 +1133,7 @@ class TdlpId:
     @property
     def s(self):
         return self.word4 % 100 // 10
+
     @s.setter
     def s(self, value):
         self.word4 = self.word4 - self.s * 10 + value * 10
@@ -1009,25 +1141,26 @@ class TdlpId:
     @property
     def g(self):
         return self.word4 % 10
+
     @g.setter
     def g(self, value):
         self.word4 = self.word4 - self.g + value
 
     @property
     def thresh(self):
-        return f'{self.w}.{self.xxxx:04}E{self.yy:02}'
+        return f"{self.w}.{self.xxxx:04}E{self.yy:02}"
+
     @thresh.setter
     def thresh(self, value):
         if value == 0:
             self.wxxxxyy = 0
             return
-        n = np.log10(np.abs(value)).astype('int')
-        n = n+1 if n > 0 else n
-        xxxx = (np.abs(value) / 10.0**n * 10000).round(decimals=0).astype('int')
-        wxxxx = xxxx+50000 if value < 0 else xxxx
+        n = np.log10(np.abs(value)).astype("int")
+        n = n + 1 if n > 0 else n
+        xxxx = (np.abs(value) / 10.0**n * 10000).round(decimals=0).astype("int")
+        wxxxx = xxxx + 50000 if value < 0 else xxxx
         wxxxxyy = wxxxx * 100 + abs(n) if n >= 0 else wxxxx * 100 + abs(n) + 50
         self.wxxxxyy = wxxxxyy
-
 
     def __setitem__(self, key, value):
         setattr(self, key, value)
@@ -1036,5 +1169,5 @@ class TdlpId:
         return getattr(self, key)
 
     def update(self, **kwargs):
-        for k,v in kwargs.items():
+        for k, v in kwargs.items():
             self[k] = v

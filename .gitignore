@@ -12,3 +12,4 @@ test/*.tdlp
 src/tdlpackio/__config__.py
 *.egg-info
 dist/*
+pytdlpack/

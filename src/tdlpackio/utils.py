@@ -2,6 +2,7 @@
 
 from datetime import timedelta
 
+
 def parse_id(mosid: list) -> dict:
     """
     Parse a 4-Word TDLPACK variable ID into its 15 components and the threshold
@@ -45,12 +46,13 @@ def parse_id(mosid: list) -> dict:
     fraction = int(id4[1:5].lstrip("0") or 0)
 
     exp = int(id4[5:7].lstrip("0") or 0)
-    exp = int(-1*(exp-50)) if exp >= 50 else exp
+    exp = int(-1 * (exp - 50)) if exp >= 50 else exp
     exp = 1 if fraction == 0 else exp
 
-    idprs["thresh"] = sign*(float(fraction)*10**exp)
+    idprs["thresh"] = sign * (float(fraction) * 10**exp)
 
     return idprs
+
 
 def unparse_id(parsedid: dict) -> list:
     """
@@ -67,20 +69,38 @@ def unparse_id(parsedid: dict) -> list:
     list
         The 4-word TDLPACK variable ID.
     """
-    id1 = str(parsedid["ccc"]).zfill(3)+str(parsedid["fff"]).zfill(3)+\
-          str(parsedid["b"])+str(parsedid["dd"]).zfill(2)
-    id2 = str(parsedid["v"])+str(parsedid["llll"]).zfill(4)+\
-          str(parsedid["uuuu"]).zfill(4)
-    id3 = str(parsedid["t"])+str(parsedid["rr"]).zfill(2)+\
-          str(parsedid["o"])+str(parsedid["hh"]).zfill(2)+\
-          str(parsedid["tau"]).zfill(3)
-    id4 = encode_threshold_for_id(parsedid["thresh"])+\
-          str(parsedid["i"])+\
-          str(parsedid["s"])+\
-          str(parsedid["g"])
+    id1 = (
+        str(parsedid["ccc"]).zfill(3)
+        + str(parsedid["fff"]).zfill(3)
+        + str(parsedid["b"])
+        + str(parsedid["dd"]).zfill(2)
+    )
+    id2 = (
+        str(parsedid["v"])
+        + str(parsedid["llll"]).zfill(4)
+        + str(parsedid["uuuu"]).zfill(4)
+    )
+    id3 = (
+        str(parsedid["t"])
+        + str(parsedid["rr"]).zfill(2)
+        + str(parsedid["o"])
+        + str(parsedid["hh"]).zfill(2)
+        + str(parsedid["tau"]).zfill(3)
+    )
+    id4 = (
+        encode_threshold_for_id(parsedid["thresh"])
+        + str(parsedid["i"])
+        + str(parsedid["s"])
+        + str(parsedid["g"])
+    )
 
-    return [int(id1.lstrip("0") or 0), int(id2.lstrip("0") or 0),
-            int(id3.lstrip("0") or 0), int(id4.lstrip("0") or 0)]
+    return [
+        int(id1.lstrip("0") or 0),
+        int(id2.lstrip("0") or 0),
+        int(id3.lstrip("0") or 0),
+        int(id4.lstrip("0") or 0),
+    ]
+
 
 def encode_threshold_for_id(thresh: float):
     """
@@ -104,22 +124,23 @@ def encode_threshold_for_id(thresh: float):
     nval, nfrac = len(ival), len(ifrac)
     if nval == 0 and nfrac > 0:
         exp = 4
-        ithresh = ifrac.ljust(4,"0")[:4]
+        ithresh = ifrac.ljust(4, "0")[:4]
     elif nval > 0 and nfrac == 0:
         exp = 4 - nval if nval <= 4 else 0
-        ithresh = ival.ljust(4,"0")[:4]
+        ithresh = ival.ljust(4, "0")[:4]
     else:
-        ndigits = nval+nfrac
+        ndigits = nval + nfrac
         if ndigits < 4:
             exp = ndigits
         elif ndigits >= 4:
-            exp = 4-nval
+            exp = 4 - nval
             exp = 0 if nval >= 4 else exp
-        ithresh = (ival+ifrac).ljust(4,"0")[:4]
+        ithresh = (ival + ifrac).ljust(4, "0")[:4]
     exp = -exp
     w = "0" if sign == 1 else "1"
-    yy = str(50+abs(exp)) if exp < 0 else str(abs(exp)).zfill(2)
-    return w+ithresh+yy
+    yy = str(50 + abs(exp)) if exp < 0 else str(abs(exp)).zfill(2)
+    return w + ithresh + yy
+
 
 def validate_hours_minutes(td: timedelta) -> tuple[int, int]:
     """
