@@ -34,7 +34,9 @@ tdlpackio v2.0 is a major factor of pytdlpack v1.x. The API, code design, and st
 from [grib2io](https://github.com/NOAA-MDL/grib2io) v2. As stated, TDLPACK data can live in a sequential
 or random-access file, can contain vector or gridded data. tdlpackio v2 aims to provide data to the user
 in a consistent manner. When opening a TDLPACK file, records are lazily-indexed so that data are only read
-and unpacked only when necessary.
+and unpacked only when necessary. tdlpackio performs the TDLPACK file reading natively in Python. The
+open class contains methods for reading and indexing. However, packing and unpacking TDLPACK data as well
+as writing to files are performed by the subroutines in libtdlpack.
 
 Tutorials
 =========
@@ -93,8 +95,8 @@ class open:
     format : {'sequential', 'random-access'}, optional
         File type when creating a new file.
 
-    ra_template : object, optional
-        Template used for random-access files.
+    ra_template : {'small', 'large'}, optional
+        Template used when creating random-access files.
     """
 
     _filetype_map = {
@@ -441,7 +443,29 @@ class open:
                 break
 
     def read(self, n):
-        """Read record from file"""
+        """
+        Read record from file.
+
+        Parameters
+        ----------
+        n : int
+            Record number.
+
+        Returns
+        -------
+        numpy.ndarray
+            Record data as a NumPy array. The returned dtype depends on the
+            record type:
+
+            - ``data`` or ``trailer`` : ``int32`` array.
+            - ``station`` : fixed-width byte string array (``S8``).
+
+        Notes
+        -----
+        The file pointer is positioned using the internal index before reading.
+        Record size is determined from the file header (sequential) or index
+        (random-access).
+        """
         if "w" in self.mode:
             pass  # Remove this at some point....
         # Position file pointer to the beginning of the TDLPACK record.
@@ -453,7 +477,7 @@ class open:
         elif self.filetype == "random-access":
             size = self._index["size"][n]
 
-        if self._index["type"][n] in ["data", "trailer"]:
+        if self._index["type"][n] in {"data", "trailer"}:
             return np.frombuffer(self._filehandle.read(size), dtype=">i4").astype(
                 np.int32
             )
@@ -461,7 +485,29 @@ class open:
             return np.frombuffer(self._filehandle.read(size), dtype="S8")
 
     def write(self, record):
-        """Write packed data to file"""
+        """
+        Write record(s) to file.
+
+        Parameters
+        ----------
+        record : TdlpackStationRecord, _TdlpackRecord, TdlpackTrailerRecord, or list
+            Record or list of records to write.
+
+            - ``TdlpackStationRecord`` : Station record. Station identifiers
+              are padded to ``NCHAR``.
+            - ``_TdlpackRecord`` : Packed data record.
+            - ``TdlpackTrailerRecord`` : Trailer record.
+            - ``list`` : List of supported record types.
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        Updates ``bytes_written``, ``records_written``, ``records``, and
+        ``_type_lastrecord_written``.
+        """
         if isinstance(record, list):
             for rec in record:
                 self.write(rec)
@@ -510,7 +556,19 @@ class open:
         self.records += 1
 
     def close(self):
-        """Close the file"""
+        """
+        Close the file.
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        For write mode, a trailer record may be written for sequential files
+        if the last record type requires it. The underlying TDLpack file handle
+        is then closed. The file is removed from the internal open file store.
+        """
         if "r" in self.mode:
             self._filehandle.close()
         if "w" in self.mode:
@@ -526,7 +584,25 @@ class open:
         del _open_file_store[self.name]
 
     def select(self, **kwargs):
-        """Select TDLPACK records by `TdlpackRecord` attributes"""
+        """
+        Select records by attribute.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Keyword arguments specifying ``TdlpackRecord`` attributes and
+            values to match.
+
+        Returns
+        -------
+        list
+            List of records matching all provided attribute/value pairs.
+
+        Notes
+        -----
+        Selection is performed against records in the internal index. Records
+        must match all specified attributes to be included in the result.
+        """
         # TODO: Added ability to process multiple values for each keyword (attribute)
         idxs = []
         nkeys = len(kwargs.keys())
@@ -546,7 +622,46 @@ class open:
 
 
 class TdlpackRecord:
-    """Creation class for TDLPACK Record"""
+    """
+    Creation class for TDLPACK record objects.
+
+    This class dynamically constructs and returns an instance of a
+    ``_TdlpackRecord`` subclass based on the provided section arrays and
+    optional keyword arguments. Record classes are cached by type to avoid
+    repeated class construction.
+
+    Parameters
+    ----------
+    is0 : numpy.ndarray, optional
+        Section 0 array. Default is zero-initialized ``int32`` array of size ``ND7``.
+    is1 : numpy.ndarray, optional
+        Section 1 array. Default is zero-initialized ``int32`` array of size ``ND7``.
+    is2 : numpy.ndarray, optional
+        Section 2 array. Default is zero-initialized ``int32`` array of size ``ND7``.
+    is4 : numpy.ndarray, optional
+        Section 4 array. Default is zero-initialized ``int32`` array of size ``ND7``.
+    *args : tuple
+        Additional positional arguments passed to the constructed record class.
+    **kwargs : dict
+        Optional keyword arguments. The following key is recognized:
+
+        - ``type`` : str, optional
+          Record type. Default is ``"vector"``. If ``is2`` contains any
+          non-zero values, the type is automatically set to ``"grid"``.
+
+    Returns
+    -------
+    _TdlpackRecord
+        Instance of a dynamically generated subclass of ``_TdlpackRecord``.
+
+    Notes
+    -----
+    - Record subclasses are created dynamically and cached in
+      ``_record_class_store`` using the record type as the key.
+    - For ``"grid"`` records, ``templates.GridDefinitionSection`` is added
+      as a base class and ``is1[1]`` is set to indicate the presence of a
+      grid definition section.
+    """
 
     def __new__(
         self,
@@ -1225,10 +1340,30 @@ class TdlpackID:
 
     @property
     def word1(self):
+        """
+        First ID word.
+
+        Returns
+        -------
+        int
+            First parsed ID word.
+        """
         return utils.unparse_id(self._id)[0]
 
     @word1.setter
     def word1(self, value):
+        """
+        Set first ID word.
+
+        Parameters
+        ----------
+        value : int
+            New value.
+
+        Notes
+        -----
+        Updates internal ID and ``is1[8]`` if record is attached.
+        """
         newid = utils.unparse_id(self._id)
         newid[0] = value
         self._id = utils.parse_id(newid)
@@ -1237,10 +1372,30 @@ class TdlpackID:
 
     @property
     def word2(self):
+        """
+        Second ID word.
+
+        Returns
+        -------
+        int
+            Second parsed ID word.
+        """
         return utils.unparse_id(self._id)[1]
 
     @word2.setter
     def word2(self, value):
+        """
+        Set second ID word.
+
+        Parameters
+        ----------
+        value : int
+            New value.
+
+        Notes
+        -----
+        Updates internal ID and ``is1[9]`` if record is attached.
+        """
         newid = utils.unparse_id(self._id)
         newid[1] = value
         self._id = utils.parse_id(newid)
@@ -1249,10 +1404,30 @@ class TdlpackID:
 
     @property
     def word3(self):
+        """
+        Third ID word.
+
+        Returns
+        -------
+        int
+            Third parsed ID word.
+        """
         return utils.unparse_id(self._id)[2]
 
     @word3.setter
     def word3(self, value):
+        """
+        Set third ID word.
+
+        Parameters
+        ----------
+        value : int
+            New value.
+
+        Notes
+        -----
+        Updates internal ID and ``is1[10]`` if record is attached.
+        """
         newid = utils.unparse_id(self._id)
         newid[2] = value
         self._id = utils.parse_id(newid)
@@ -1261,10 +1436,30 @@ class TdlpackID:
 
     @property
     def word4(self):
+        """
+        Fourth ID word.
+
+        Returns
+        -------
+        int
+            Fourth parsed ID word.
+        """
         return utils.unparse_id(self._id)[3]
 
     @word4.setter
     def word4(self, value):
+        """
+        Set fourth ID word.
+
+        Parameters
+        ----------
+        value : int
+            New value.
+
+        Notes
+        -----
+        Updates internal ID and ``is1[11]`` if record is attached.
+        """
         newid = utils.unparse_id(self._id)
         newid[3] = value
         self._id = utils.parse_id(newid)
@@ -1273,125 +1468,349 @@ class TdlpackID:
 
     @property
     def ccc(self):
+        """
+        CCC identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["ccc"]
 
     @ccc.setter
     def ccc(self, value):
+        """
+        Set CCC identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[8]`` if record is attached.
+        """
         self._id["ccc"] = value
         if self._rec is not None:
             self._rec.is1[8] = utils.unparse_id(self._id)[0]
 
     @property
     def fff(self):
+        """
+        FFF identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["fff"]
 
     @fff.setter
     def fff(self, value):
+        """
+        Set FFF identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[8]`` if record is attached.
+        """
         self._id["fff"] = value
         if self._rec is not None:
             self._rec.is1[8] = utils.unparse_id(self._id)[0]
 
     @property
     def cccfff(self):
+        """
+        Combined CCCFFF identifier.
+
+        Returns
+        -------
+        int
+            Integer representation of ``word1 / 1000``.
+        """
         return int(self.word1 / 1000)
 
     @property
     def b(self):
+        """
+        B identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["b"]
 
     @b.setter
     def b(self, value):
+        """
+        Set B identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[8]`` if record is attached.
+        """
         self._id["b"] = value
         if self._rec is not None:
             self._rec.is1[8] = utils.unparse_id(self._id)[0]
 
     @property
     def dd(self):
+        """
+        DD identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["dd"]
 
     @dd.setter
     def dd(self, value):
+        """
+        Set DD identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[8]`` and ``is1[14]`` if record is attached.
+        """
         self._id["dd"] = value
-        self._rec.is1[8] = utils.unparse_id(self._id)[0]
         if self._rec is not None:
+            self._rec.is1[8] = utils.unparse_id(self._id)[0]
             self._rec.is1[14] = value
 
     @property
     def v(self):
+        """
+        V identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["v"]
 
     @v.setter
     def v(self, value):
+        """
+        Set V identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[9]`` if record is attached.
+        """
         self._id["v"] = value
         if self._rec is not None:
             self._rec.is1[9] = utils.unparse_id(self._id)[1]
 
     @property
     def llll(self):
+        """
+        LLLL identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["llll"]
 
     @llll.setter
     def llll(self, value):
+        """
+        Set LLLL identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[9]`` if record is attached.
+        """
         self._id["llll"] = value
         if self._rec is not None:
             self._rec.is1[9] = utils.unparse_id(self._id)[1]
 
     @property
     def uuuu(self):
+        """
+        UUUU identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["uuuu"]
 
     @uuuu.setter
     def uuuu(self, value):
+        """
+        Set UUUU identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[9]`` if record is attached.
+        """
         self._id["uuuu"] = value
         if self._rec is not None:
             self._rec.is1[9] = utils.unparse_id(self._id)[1]
 
     @property
     def t(self):
+        """
+        T identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["t"]
 
     @t.setter
     def t(self, value):
+        """
+        Set T identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[10]`` if record is attached.
+        """
         self._id["t"] = value
         if self._rec is not None:
             self._rec.is1[10] = utils.unparse_id(self._id)[2]
 
     @property
     def rr(self):
+        """
+        RR identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["rr"]
 
     @rr.setter
     def rr(self, value):
+        """
+        Set RR identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[10]`` if record is attached.
+        """
         self._id["rr"] = value
         if self._rec is not None:
             self._rec.is1[10] = utils.unparse_id(self._id)[2]
 
     @property
     def o(self):
+        """
+        O identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["o"]
 
     @o.setter
     def o(self, value):
+        """
+        Set O identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[10]`` if record is attached.
+        """
         self._id["o"] = value
         if self._rec is not None:
             self._rec.is1[10] = utils.unparse_id(self._id)[2]
 
     @property
     def hh(self):
+        """
+        HH identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["hh"]
 
     @hh.setter
     def hh(self, value):
+        """
+        Set HH identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[10]`` if record is attached.
+        """
         self._id["hh"] = value
         if self._rec is not None:
             self._rec.is1[10] = utils.unparse_id(self._id)[2]
 
     @property
     def tau(self):
+        """
+        Forecast hour (tau).
+
+        Returns
+        -------
+        int
+        """
         return self._id["tau"]
 
     @tau.setter
     def tau(self, value):
+        """
+        Set forecast hour (tau).
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[10]`` and ``is1[12]`` if record is attached.
+        """
         self._id["tau"] = value
         if self._rec is not None:
             self._rec.is1[10] = utils.unparse_id(self._id)[2]
@@ -1399,40 +1818,112 @@ class TdlpackID:
 
     @property
     def thresh(self):
+        """
+        Threshold identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["thresh"]
 
     @thresh.setter
     def thresh(self, value):
+        """
+        Set threshold identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[11]`` if record is attached.
+        """
         self._id["thresh"] = value
         if self._rec is not None:
             self._rec.is1[11] = utils.unparse_id(self._id)[3]
 
     @property
     def i(self):
+        """
+        I identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["i"]
 
     @i.setter
     def i(self, value):
+        """
+        Set I identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[11]`` if record is attached.
+        """
         self._id["i"] = value
         if self._rec is not None:
             self._rec.is1[11] = utils.unparse_id(self._id)[3]
 
     @property
     def s(self):
+        """
+        S identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["s"]
 
     @s.setter
     def s(self, value):
+        """
+        Set S identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[11]`` if record is attached.
+        """
         self._id["s"] = value
         if self._rec is not None:
             self._rec.is1[11] = utils.unparse_id(self._id)[3]
 
     @property
     def g(self):
+        """
+        G identifier component.
+
+        Returns
+        -------
+        int
+        """
         return self._id["g"]
 
     @g.setter
     def g(self, value):
+        """
+        Set G identifier component.
+
+        Parameters
+        ----------
+        value : int
+
+        Notes
+        -----
+        Updates ``is1[11]`` if record is attached.
+        """
         self._id["g"] = value
         if self._rec is not None:
             self._rec.is1[11] = utils.unparse_id(self._id)[3]
