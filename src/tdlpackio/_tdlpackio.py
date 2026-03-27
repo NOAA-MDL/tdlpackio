@@ -603,13 +603,42 @@ class open:
         Selection is performed against records in the internal index. Records
         must match all specified attributes to be included in the result.
         """
-        # TODO: Added ability to process multiple values for each keyword (attribute)
+        _id_keys = [
+            "word1",
+            "word2",
+            "word3",
+            "word4",
+            "ccc",
+            "fff",
+            "b",
+            "dd",
+            "v",
+            "llll",
+            "uuuu",
+            "t",
+            "rr",
+            "o",
+            "hh",
+            "tau",
+            "thresh",
+            "i",
+            "s",
+            "g",
+        ]
+
+        # TODO: Add ability to process multiple values for each keyword (attribute)
         idxs = []
         nkeys = len(kwargs.keys())
         for k, v in kwargs.items():
-            for m in self._index["record"]:
-                if hasattr(m, k) and getattr(m, k) == v:
-                    idxs.append(m._recnum)
+            if k in _id_keys:
+                for rec in self._index["record"]:
+                    #if hasattr(rec, k) and getattr(rec, k) == v:
+                    if getattr(rec.id, k) == v:
+                        idxs.append(rec._recnum)
+            else:
+                for rec in self._index["record"]:
+                    if hasattr(rec, k) and getattr(rec, k) == v:
+                        idxs.append(rec._recnum)
         idxs = np.array(idxs, dtype=">i4")
         return [
             self._index["record"][i]
@@ -1248,20 +1277,19 @@ class TdlpackID:
 
         Parameters
         ----------
-        style : str, optional
-            Output format style. The following values are supported
-            (case-insensitive):
+        style : {'basic', 'b', 'mos', 'm', 'parsed', 'p'}, optional
+            Output format style (case-insensitive):
 
-            ``"basic"`` or ``"b"``
-                Four-word identifer. Each word is printed as a zero-padded
+            - ``"basic"`` or ``"b"``
+                Four-word identifier. Each word is printed as a zero-padded
                 integer field.
 
-            ``"mos"`` or ``"m"``
+            - ``"mos"`` or ``"m"``
                 MOS-style identifier consisting of the first three words
                 followed by the ISG components and the threshold value
                 formatted in scientific notation (``.0000e±00``).
 
-            ``"parsed"`` or ``"p"``
+            - ``"parsed"`` or ``"p"``
                 Identifier parsed into its individual components as defined
                 by the internal ID mapping. All components are printed as
                 zero-padded integers except the threshold value, which is
@@ -1277,6 +1305,30 @@ class TdlpackID:
         The MOS-style threshold representation removes the leading zero
         from scientific notation (e.g., ``0.0000e+00`` → ``.0000e+00``)
         to match legacy MOS-2000 formatting conventions.
+
+        Examples
+        --------
+        Using the ``format`` method:
+
+        >>> rec.format("basic")
+        '001000008 000000500 000000000 0000000000'
+
+        >>> rec.format("mos")
+        '001000008 000000500 000000000 000 .0000e+00'
+
+        >>> rec.format("parsed")
+        '001 000 0 08 0 0000 0500 0 00 0 00 000 0 0 0      0.000000'
+
+        Using Python's format protocol (``__format__``):
+
+        >>> f"{rec.id:basic}"
+        '001000008 000000500 000000000 0000000000'
+
+        >>> f"{rec.id:mos}"
+        '001000008 000000500 000000000 000 .0000e+00'
+
+        >>> f"{rec.id:parsed}"
+        '001 000 0 08 0 0000 0500 0 00 0 00 000 0 0 0      0.000000'
         """
         style = style.lower()
 
