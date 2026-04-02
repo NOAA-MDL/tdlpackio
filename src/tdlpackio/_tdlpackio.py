@@ -581,7 +581,8 @@ class open:
                         self.records_written,
                     )
             iret = tdlpacklib.close_tdlpack_file(self._lun, self._ifiletype)
-        del _open_file_store[self.name]
+        if self.name in _open_file_store.keys():
+            del _open_file_store[self.name]
 
     def select(self, **kwargs):
         """

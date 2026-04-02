@@ -112,7 +112,7 @@ class Year:
     """Year of Reference Date"""
 
     def __get__(self, obj, objtype=None):
-        return obj.is1[2]
+        return int(obj.is1[2])
 
     def __set__(self, obj, value):
         obj.is1[2] = value
@@ -123,7 +123,7 @@ class Month:
     """Month of Reference Date"""
 
     def __get__(self, obj, objtype=None):
-        return obj.is1[3]
+        return int(obj.is1[3])
 
     def __set__(self, obj, value):
         obj.is1[3] = value
@@ -134,7 +134,7 @@ class Day:
     """Day of Reference Date"""
 
     def __get__(self, obj, objtype=None):
-        return obj.is1[4]
+        return int(obj.is1[4])
 
     def __set__(self, obj, value):
         obj.is1[4] = value
@@ -145,7 +145,7 @@ class Hour:
     """Hour of Reference Date"""
 
     def __get__(self, obj, objtype=None):
-        return obj.is1[5]
+        return int(obj.is1[5])
 
     def __set__(self, obj, value):
         obj.is1[5] = value
@@ -156,7 +156,7 @@ class Minute:
     """Minute of Reference Date"""
 
     def __get__(self, obj, objtype=None):
-        return obj.is1[6]
+        return int(obj.is1[6])
 
     def __set__(self, obj, value):
         obj.is1[6] = value
@@ -226,25 +226,27 @@ class LeadTimeHours:
     """Forecast lead time in hours"""
 
     def __get__(self, obj, objtype=None):
-        return obj.is1[12]
+        return int(obj.is1[12])
 
     def __set__(self, obj, value):
+        value = int(value)
         if value < 0 or value > 999:
             raise ValueError("leadTimeHours must be in the range 0–999 hours")
-        obj.is1[12] = int(value)
-        obj.id.tau = obj.is1[12]
+        obj.is1[12] = value
+        obj.id.tau = value
 
 
 class LeadTimeMinutes:
     """Minutes component of lead time."""
 
     def __get__(self, obj, objtype=None):
-        return obj.is1[13]
+        return int(obj.is1[13])
 
     def __set__(self, obj, value):
+        value = int(value)
         if value < 0 or value >= 60:
             raise ValueError("leadTimeMinutes must be in the range 0–59 minutes")
-        obj.is1[13] = int(value)
+        obj.is1[13] = value
 
 
 class ModelID:
@@ -296,10 +298,7 @@ class VariableName:
 
     def __set__(self, obj, value):
         obj.is1[21] = 32
-        if len(value) == 0:
-            value = 32 * " "
-        elif len(value) > 32:
-            value = value[:32]
+        value = value[:32].ljust(32)
         for n, s in enumerate(value[: obj.is1[21]]):
             obj.is1[22 + n] = np.int32(ord(s))
 
