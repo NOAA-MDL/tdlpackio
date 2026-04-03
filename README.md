@@ -6,6 +6,9 @@
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
+[![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/release/python-3130/)
+[![Python 3.14](https://img.shields.io/badge/python-3.14-blue.svg)](https://www.python.org/downloads/release/python-3140/)
 
 ![Build Linux](https://github.com/NOAA-MDL/tdlpackio/actions/workflows/build_linux.yml/badge.svg)
 ![Build macOS](https://github.com/NOAA-MDL/tdlpackio/actions/workflows/build_macos.yml/badge.svg)
@@ -19,25 +22,40 @@
 
 ## Introduction
 
-tdlpackio provides a Python interface for reading and writing TDLPACK files. NOAA/NWS Meteorological Development Lab ([MDL](https://www.weather.gov/mdl/)) produces [Model Output Statistics (MOS)](https://vlab.noaa.gov/web/mdl/mos) and the [National Blend of Models (NBM)](https://vlab.noaa.gov/web/mdl/nbm). These products are generated from the MDL's in-house MOS-2000 Software System (MOS2K). The MOS2K system defines a GRIB-like data format called TDLPACK.  A brief introduction to TDLPACK files and data format can be found [here](TDLPACK.md). tdlpackio contains a NumPy/F2PY extension module, tdlpacklib, which is contains Fortran subroutines for TDLPACK I/O and unpacking/packing subroutines.  These are a subset of of the MOS2K system.
+tdlpackio provides a Python interface for reading and writing TDLPACK files. The NOAA/NWS Meteorological Development Lab ([MDL](https://www.weather.gov/mdl/)) produces [Model Output Statistics (MOS)](https://vlab.noaa.gov/web/mdl/mos) and the [National Blend of Models (NBM)](https://vlab.noaa.gov/web/mdl/nbm). These products are generated from the MDL's in-house MOS-2000 Software System (MOS2K). The MOS2K system defines a GRIB-like data format called TDLPACK.  A brief introduction to TDLPACK files and data format can be found [here](TDLPACK.md). tdlpackio provides a Cython extension module, tdlpacklib, which provides an interface to [libtdlpack](https://github.com/NOAA-MDL/libtdlpack), a Fortran-based library containing a subset of MOS2K subroutines.
 
 ## Requirements
-* Python 3.8, 3.9, 3.10, and 3.11
+* Python 3.8, 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
+* [libtdlpack](https://github.com/NOAA-MDL/libtdlpack) 1.0.0+
 * setuptools
-* NumPy
-* Fortran compiler: GNU (gfortran) and Intel (ifort) have been tested.
+* cython 3.0+
+* numpy 1.26+
+* pyproj 1.9.6+
+* C compiler: GNU, Intel, and Apple Clang have been tested.
 
-## Installation
+## Required External Libraries
 
-```shell
+### libtdlpack
+The [libtdlpack](https://github.com/NOAA-MDL/libtdlpack) library is required for tdlpackio.  You will have to build and install this yourself, but this is not difficult.  For macOS users, libtdlpack can be installed via [this Homebrew Tap](https://github.com/NOAA-MDL/homebrew-mdllibs).  If you use the *conda ecosystems, then you can install via `conda install -c conda-forge libtdlpack`.
+
+## Install
+
+Once again, this assumes that libtdlpack has been installed.  If libtdlpack has been installed into a "common" installation path, then it will be found, otherwise define environment variable `TDLPACK_DIR` with the installation path.
+
+* From [PyPI](https://pypi.python.org/pypi/tdlpackio) via pip:
+
+```
 pip install tdlpackio
 ```
+* From [conda-forge](https://anaconda.org/conda-forge/tdlpackio) via conda:
 
-### Build and Install from Source
+```
+conda install -c conda-forge tdlpackio
+```
 
+* From source:
 ```shell
-python setup.py build --fcompiler=[gnu95|intelem]
-python setup.py install [--user |--prefix=PREFIX]
+pip install .
 ```
 
 ## Development
