@@ -145,11 +145,6 @@ class open:
                     self.name, self.mode, self._ifiletype, ra_template=ra_template
                 )
 
-        # Get file size
-        try:
-            self.size = os.path.getsize(self.name)
-        except FileNotFoundError:
-            self.size = 0
         # Add self to file data store
         _open_file_store[self.name] = self
 
@@ -157,6 +152,11 @@ class open:
     def _ifiletype(self):
         """Return numeric filetype"""
         return self._filetype_map[self.filetype]
+
+    @property
+    def size(self):
+        """Return the file size."""
+        return os.path.getsize(self.name)
 
     def __enter__(self):
         """"""
@@ -173,10 +173,12 @@ class open:
     def __repr__(self):
         """"""
         strings = []
-        keys = self.__dict__.keys()
+        keys = list(self.__dict__.keys())
         for k in keys:
             if not k.startswith("_"):
-                strings.append("%s = %s\n" % (k, self.__dict__[k]))
+                strings.append(f"{k} = {self.__dict__[k]}\n")
+        # Attach size property.
+        strings.append(f"size = {self.size}\n")
         return "".join(strings)
 
     def __getitem__(self, key):
