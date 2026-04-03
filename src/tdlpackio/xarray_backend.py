@@ -977,7 +977,7 @@ class TdlpDataarray:
         "w-" means create (fail if exists);
         """
         ds = self._obj.to_dataset()
-        ds.tdlp.to_tdlpack(file, mode=mode, compute=compute)
+        ds.tdlp.to_tdlpack(file, mode=mode, compute=compute, **kwargs)
 
 
 def make_record(template, rec_id, data, plain, date):
