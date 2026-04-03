@@ -40,7 +40,9 @@ as writing to files are performed by the subroutines in libtdlpack.
 
 Tutorials
 =========
-...COMING SOON...
+The following Jupyter Notebooks are available as tutorials:
+
+* [General Usage](https://github.com/NOAA-MDL/tdlpackio/blob/master/demos/tdlpackio-v2.ipynb)
 """
 
 from dataclasses import dataclass, field, InitVar
