@@ -1,5 +1,5 @@
 build/
-tdlpack/*.o
+src/ext/tdlpacklib.c
 *.o
 *.so
 *.pyc
@@ -9,7 +9,7 @@ test/*.ra
 test/*.sq
 test/*.tdlp
 *.code-workspace
-pytdlpack/version.py
+src/tdlpackio/__config__.py
 *.egg-info
 dist/*
-MANIFEST
+pytdlpack/

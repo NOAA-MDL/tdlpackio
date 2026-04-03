@@ -1,0 +1,74 @@
+[build-system]
+requires = [
+  "cython>3",
+  "numpy",
+  "setuptools>=61.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tdlpackio"
+description = "Python interface for reading and writing TDLPACK data"
+authors = [
+  {name = "Eric Engle", email = "eric.engle@noaa.gov"},
+]
+requires-python = ">=3.8,<3.15"
+keywords = [
+  "atmospheric-science",
+  "data-science",
+  "meteorology",
+  "mos",
+  "numpy",
+  "statistics",
+  "statpp",
+  "weather",
+  "weather-data"
+]
+readme = "README.md"
+license = {text = "MIT"}
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Programming Language :: Cython",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Scientific/Engineering :: Atmospheric Science",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Operating System :: POSIX",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+]
+dependencies = [
+  "numpy",
+] 
+dynamic = ["version"]
+
+[project.optional-dependencies]
+xarray = ["xarray"]
+
+[project.entry-points."xarray.backends"]
+tdlpackio = "tdlpackio.xarray_backend:TdlpackBackendEntrypoint"
+
+[project.scripts]
+lstdlp = "tdlpackio:lstdlp._lstdlp_main"
+
+[project.urls]
+Documentation = "https://noaa-mdl.github.io/tdlpackio"
+Respository = "https://github.com/NOAA-MDL/tdlpackio"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["tdlpackio"]
+zip-safe = false
+
+[tool.setuptools.dynamic]
+version = {attr = "tdlpackio.__config__.tdlpackio_version"}

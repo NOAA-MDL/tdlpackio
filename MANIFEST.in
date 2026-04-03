@@ -2,6 +2,7 @@ include MANIFEST.in
 include LICENSE
 include TDLPACK.md
 include README.md
+include VERSION
 include setup.py
 include TdlpackIO.py
 include create_docs.sh
