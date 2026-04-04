@@ -25,7 +25,7 @@
 tdlpackio provides a Python interface for reading and writing TDLPACK files. The NOAA/NWS Meteorological Development Lab ([MDL](https://www.weather.gov/mdl/)) produces [Model Output Statistics (MOS)](https://vlab.noaa.gov/web/mdl/mos) and the [National Blend of Models (NBM)](https://vlab.noaa.gov/web/mdl/nbm). These products are generated from the MDL's in-house MOS-2000 Software System (MOS2K). The MOS2K system defines a GRIB-like data format called TDLPACK.  A brief introduction to TDLPACK files and data format can be found [here](TDLPACK.md). tdlpackio provides a Cython extension module, tdlpacklib, which provides an interface to [libtdlpack](https://github.com/NOAA-MDL/libtdlpack), a Fortran-based library containing a subset of MOS2K subroutines.
 
 ## Requirements
-* Python 3.8, 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
+* Python 3.10, 3.11, 3.12, 3.13, 3.14
 * [libtdlpack](https://github.com/NOAA-MDL/libtdlpack) 1.0.0+
 * setuptools
 * cython 3.0+
