@@ -45,9 +45,10 @@ jobs:
         id: cache-libtdlpack
         uses: actions/cache@v4
         with:
-          path: |
-            ${{ env.LIBTDLPACK_PREFIX }}
-          key: ${{ runner.os }}-libtdlpack-${{ env.LIBTDLPACK_VERSION }}-${{ matrix.ccompiler }}
+          path: ${{ env.LIBTDLPACK_PREFIX }}
+          key: ${{ runner.os }}-libtdlpack-${{ env.LIBTDLPACK_VERSION }}-${{ matrix.ccompiler }}-py${{ matrix.python-version }}
+          restore-keys: |
+            ${{ runner.os }}-libtdlpack-${{ env.LIBTDLPACK_VERSION }}-${{ matrix.ccompiler }}-
 
       - name: Build and install libtdlpack
         if: steps.cache-libtdlpack.outputs.cache-hit != 'true'
