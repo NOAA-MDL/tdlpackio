@@ -1,0 +1,52 @@
+name: Build and Test on Linux
+
+on: [push, pull_request]
+
+jobs:
+  build-linux:
+    
+    name: py${{ matrix.python-version }}_cc=${{ matrix.ccompiler }}_static=${{ matrix.staticlib }}
+    runs-on: ubuntu-latest
+    env:
+      CC: ${{ matrix.ccompiler }}
+    strategy:
+      matrix:
+        python-version: ["3.8","3.9","3.10","3.11","3.12","3.13","3.14"]
+        ccompiler: ["gcc-14"]
+        staticlib: ["False"]
+   
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Ubuntu Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install cmake gfortran
+
+    - name: Install python dependencies via pip
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install --upgrade setuptools
+        python -m pip install --upgrade wheel
+        python -m pip install -r requirements.txt
+
+    - name: Install libtdlpack
+      run: |
+        wget https://github.com/NOAA-MDL/libtdlpack/archive/refs/tags/v1.0.0.tar.gz
+        tar -xzvf v1.0.0.tar.gz
+        cd libtdlpack-1.0.0
+        mkdir build && cd build
+        cmake -DUSE_OPENMP=ON -DBUILD_SHARED_LIBS=ON ..
+        make -j2
+        sudo make install
+
+    - name: Install tdlpackio and test
+      run: |
+        python --version
+        USE_STATIC_LIBS=${{ matrix.staticlib }} pip install .
+        python -c "import tdlpackio; tdlpackio.show_config()"
+        pytest ./tests/
