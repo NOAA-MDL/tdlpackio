@@ -98,6 +98,7 @@ jobs:
           LIBRARY_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib
           DYLD_LIBRARY_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib
           PKG_CONFIG_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib/pkgconfig
+          TDLPACK_DIR: ${{ github.workspace }}/local/lib/libtdlpack.dylib
         run: |
           python -m pip install .
 
