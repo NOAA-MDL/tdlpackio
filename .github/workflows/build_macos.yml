@@ -79,6 +79,10 @@ jobs:
 
       - name: Show cached libtdlpack contents
         run: |
+          cd "${LIBTDLPACK_PREFIX}/lib"
+          if [ -f libtdlpack.0.dylib ] && [ ! -e libtdlpack.dylib ]; then
+            ln -v -s libtdlpack.0.dylib libtdlpack.dylib
+          fi
           echo "Using libtdlpack from ${LIBTDLPACK_PREFIX}"
           find "${LIBTDLPACK_PREFIX}" -maxdepth 3 -type f | sort
 
