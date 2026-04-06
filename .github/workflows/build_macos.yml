@@ -80,7 +80,8 @@ jobs:
       - name: Show cached libtdlpack contents
         run: |
           cd "${LIBTDLPACK_PREFIX}/lib"
-          if [ -f libtdlpack.0.dylib ] && [ ! -e libtdlpack.dylib ]; then
+          if [ -f libtdlpack.0.dylib ] && [ ! -f libtdlpack.dylib ]; then
+            echo "Creating libtdlpack.dylib symlink"
             ln -v -s libtdlpack.0.dylib libtdlpack.dylib
           fi
           echo "Using libtdlpack from ${LIBTDLPACK_PREFIX}"
