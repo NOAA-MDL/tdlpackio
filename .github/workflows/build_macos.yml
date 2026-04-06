@@ -79,24 +79,9 @@ jobs:
 
       - name: Show cached libtdlpack contents
         run: |
-          cd "${LIBTDLPACK_PREFIX}/lib"
-          ls -l
-          if [ -f libtdlpack.0.dylib ]; then
-            echo "YES"
-          else
-            echo "NO"
-          fi
-          if [ ! -f libtdlpack.dylib ]; then
-            echo "YES"
-          else
-            echo "NO"
-          fi
-          if [ -f libtdlpack.0.dylib ] && [ ! -f libtdlpack.dylib ]; then
-            echo "Creating libtdlpack.dylib symlink"
-            ln -v -s libtdlpack.0.dylib libtdlpack.dylib
-          fi
+          cd "${LIBTDLPACK_PREFIX}"
           echo "Using libtdlpack from ${LIBTDLPACK_PREFIX}"
-          find "${LIBTDLPACK_PREFIX}" -maxdepth 3 -type f | sort
+          find "${LIBTDLPACK_PREFIX}" | sort
 
       - name: Install Python dependencies
         run: |
