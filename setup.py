@@ -223,7 +223,6 @@ def check_ip_for_openmp(ip_lib, static=False):
 # ----------------------------------------------------------------------------------------
 VERSION = get_tdlpackio_version()
 
-#build_with_ip = True
 build_with_openmp = False
 
 extmod_config = {}

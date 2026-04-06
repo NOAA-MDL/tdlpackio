@@ -6,20 +6,16 @@ on:
 
 jobs:
   build-macos:
-    name: py${{ matrix.python-version }}_cc=${{ matrix.ccompiler }}_static=${{ matrix.staticlib }}
-    runs-on: macos-latest
+    name: py${{ matrix.python-version }}_static=${{ matrix.staticlib }}
+    runs-on: macos-14
 
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.10"]
-        ccompiler: ["gcc-14"]
-        fortran-compiler: ["gfortran-14"]
         staticlib: ["False"]
 
     env:
-      CC: ${{ matrix.ccompiler }}
-      FC: ${{ matrix.fortran-compiler }}
       LIBTDLPACK_VERSION: "1.0.0"
       LIBTDLPACK_PREFIX: ${{ github.workspace }}/local
       LIBTDLPACK_SRC_DIR: ${{ github.workspace }}/libtdlpack-src
@@ -34,37 +30,53 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
 
-      - name: Show tool versions
+      - name: Install macOS dependencies
         run: |
-          uname -a
-          python --version
-          ${CC} --version
-          ${FC} --version
-          cmake --version
-          wget --version
+          brew update
+          brew install cmake gcc wget
+
+      - name: Configure Homebrew GCC environment
+        shell: bash
+        run: |
+          GCC_PREFIX="$(brew --prefix gcc)"
+          GCC_BIN_DIR="${GCC_PREFIX}/bin"
+
+          # Prefer the highest-versioned gcc/gfortran provided by Homebrew.
+          GCC_PATH="$(find "${GCC_BIN_DIR}" -maxdepth 1 -type f -name 'gcc-*' | sort -V | tail -n 1)"
+          GFORTRAN_PATH="$(find "${GCC_BIN_DIR}" -maxdepth 1 -type f -name 'gfortran-*' | sort -V | tail -n 1)"
+
+          if [ -z "${GCC_PATH}" ] || [ -z "${GFORTRAN_PATH}" ]; then
+            echo "Could not locate Homebrew gcc/gfortran"
+            exit 1
+          fi
+
+          echo "CC=${GCC_PATH}" >> "${GITHUB_ENV}"
+          echo "FC=${GFORTRAN_PATH}" >> "${GITHUB_ENV}"
+
+          echo "Using CC=${GCC_PATH}"
+          echo "Using FC=${GFORTRAN_PATH}"
 
       - name: Cache libtdlpack
         id: cache-libtdlpack
         uses: actions/cache@v4
         with:
           path: ${{ env.LIBTDLPACK_PREFIX }}
-          key: ${{ runner.os }}-libtdlpack-${{ env.LIBTDLPACK_VERSION }}-${{ matrix.ccompiler }}-${{ matrix.fortran-compiler }}-py${{ matrix.python-version }}
+          key: ${{ runner.os }}-${{ runner.arch }}-libtdlpack-${{ env.LIBTDLPACK_VERSION }}-shared-openmp-py${{ matrix.python-version }}
           restore-keys: |
-            ${{ runner.os }}-libtdlpack-${{ env.LIBTDLPACK_VERSION }}-${{ matrix.ccompiler }}-${{ matrix.fortran-compiler }}-
+            ${{ runner.os }}-${{ runner.arch }}-libtdlpack-${{ env.LIBTDLPACK_VERSION }}-shared-openmp-
 
       - name: Build and install libtdlpack
         if: steps.cache-libtdlpack.outputs.cache-hit != 'true'
+        env:
+          CC: ${{ env.CC }}
+          FC: ${{ env.FC }}
         run: |
           echo "Building libtdlpack ${LIBTDLPACK_VERSION}"
           rm -rf "${LIBTDLPACK_SRC_DIR}"
           mkdir -p "${LIBTDLPACK_SRC_DIR}"
-
           wget -O "${LIBTDLPACK_SRC_DIR}/libtdlpack.tar.gz" \
             "https://github.com/NOAA-MDL/libtdlpack/archive/refs/tags/v${LIBTDLPACK_VERSION}.tar.gz"
-
-          tar -xzf "${LIBTDLPACK_SRC_DIR}/libtdlpack.tar.gz" \
-            -C "${LIBTDLPACK_SRC_DIR}" \
-            --strip-components=1
+          tar -xzf "${LIBTDLPACK_SRC_DIR}/libtdlpack.tar.gz" -C "${LIBTDLPACK_SRC_DIR}" --strip-components=1
 
           cmake -S "${LIBTDLPACK_SRC_DIR}" -B "${LIBTDLPACK_SRC_DIR}/build" \
             -DCMAKE_INSTALL_PREFIX="${LIBTDLPACK_PREFIX}" \
@@ -79,15 +91,8 @@ jobs:
 
       - name: Show cached libtdlpack contents
         run: |
-          cd "${LIBTDLPACK_PREFIX}"
           echo "Using libtdlpack from ${LIBTDLPACK_PREFIX}"
-          echo "BEFORE..."
-          find "${LIBTDLPACK_PREFIX}" | sort
-          cd "${LIBTDLPACK_PREFIX}/lib"
-          ln -s libtdlpack.0.dylib libtdlpack.dylib
-          cd "${LIBTDLPACK_PREFIX}"
-          echo "AFTER..."
-          find "${LIBTDLPACK_PREFIX}" | sort
+          find "${LIBTDLPACK_PREFIX}" -maxdepth 3 -type f | sort
 
       - name: Install Python dependencies
         run: |
@@ -99,24 +104,28 @@ jobs:
 
       - name: Install tdlpackio
         env:
+          CC: ${{ env.CC }}
+          FC: ${{ env.FC }}
           USE_STATIC_LIBS: ${{ matrix.staticlib }}
           CMAKE_PREFIX_PATH: ${{ env.LIBTDLPACK_PREFIX }}
           CPATH: ${{ env.LIBTDLPACK_PREFIX }}/include
-          LIBRARY_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib
-          DYLD_LIBRARY_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib
-          PKG_CONFIG_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib/pkgconfig
-          TDLPACK_DIR: ${{ github.workspace }}/local/lib/libtdlpack.dylib
+          LIBRARY_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib:${{ env.LIBTDLPACK_PREFIX }}/lib64
+          DYLD_LIBRARY_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib:${{ env.LIBTDLPACK_PREFIX }}/lib64:${{ env.DYLD_LIBRARY_PATH }}
+          PKG_CONFIG_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib/pkgconfig:${{ env.LIBTDLPACK_PREFIX }}/lib64/pkgconfig
         run: |
+          python --version
+          echo "CC=${CC}"
+          echo "FC=${FC}"
           python -m pip install .
 
       - name: Show tdlpackio configuration
         env:
-          DYLD_LIBRARY_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib
+          DYLD_LIBRARY_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib:${{ env.LIBTDLPACK_PREFIX }}/lib64:${{ env.DYLD_LIBRARY_PATH }}
         run: |
           python -c "import tdlpackio; tdlpackio.show_config()"
 
       - name: Run tests
         env:
-          DYLD_LIBRARY_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib
+          DYLD_LIBRARY_PATH: ${{ env.LIBTDLPACK_PREFIX }}/lib:${{ env.LIBTDLPACK_PREFIX }}/lib64:${{ env.DYLD_LIBRARY_PATH }}
         run: |
           pytest -v tests/
