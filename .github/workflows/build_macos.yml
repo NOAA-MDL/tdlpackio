@@ -81,6 +81,12 @@ jobs:
         run: |
           cd "${LIBTDLPACK_PREFIX}"
           echo "Using libtdlpack from ${LIBTDLPACK_PREFIX}"
+          echo "BEFORE..."
+          find "${LIBTDLPACK_PREFIX}" | sort
+          cd "${LIBTDLPACK_PREFIX}/lib"
+          ln -s libtdlpack.0.dylib libtdlpack.dylib
+          cd "${LIBTDLPACK_PREFIX}"
+          echo "AFTER..."
           find "${LIBTDLPACK_PREFIX}" | sort
 
       - name: Install Python dependencies
