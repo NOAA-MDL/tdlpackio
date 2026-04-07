@@ -1,13 +1,15 @@
 include MANIFEST.in
-include LICENSE
-include TDLPACK.md
-include README.md
-include VERSION
 include setup.py
-include TdlpackIO.py
+include pyproject.toml
+include README.md
+include TDLPACK.md
+include LICENSE
+include VERSION
 include create_docs.sh
-recursive-include docs *
-recursive-include tdlpack *
-recursive-include test *
-recursive-include sampledata *
-recursive-include pytdlpack *
+include requirements.txt
+include TdlpackIO.py
+graft docs
+graft src/ext
+graft src/tdlpackio
+prune tests
+global-exclude *.py[cod] *.c *.so *.DS_Store
