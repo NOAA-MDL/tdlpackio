@@ -69,30 +69,10 @@ def unparse_id(parsedid: dict) -> list:
     list
         The 4-word TDLPACK variable ID.
     """
-    id1 = (
-        str(parsedid["ccc"]).zfill(3)
-        + str(parsedid["fff"]).zfill(3)
-        + str(parsedid["b"])
-        + str(parsedid["dd"]).zfill(2)
-    )
-    id2 = (
-        str(parsedid["v"])
-        + str(parsedid["llll"]).zfill(4)
-        + str(parsedid["uuuu"]).zfill(4)
-    )
-    id3 = (
-        str(parsedid["t"])
-        + str(parsedid["rr"]).zfill(2)
-        + str(parsedid["o"])
-        + str(parsedid["hh"]).zfill(2)
-        + str(parsedid["tau"]).zfill(3)
-    )
-    id4 = (
-        encode_threshold_for_id(parsedid["thresh"])
-        + str(parsedid["i"])
-        + str(parsedid["s"])
-        + str(parsedid["g"])
-    )
+    id1 = str(parsedid["ccc"]).zfill(3) + str(parsedid["fff"]).zfill(3) + str(parsedid["b"]) + str(parsedid["dd"]).zfill(2)
+    id2 = str(parsedid["v"]) + str(parsedid["llll"]).zfill(4) + str(parsedid["uuuu"]).zfill(4)
+    id3 = str(parsedid["t"]) + str(parsedid["rr"]).zfill(2) + str(parsedid["o"]) + str(parsedid["hh"]).zfill(2) + str(parsedid["tau"]).zfill(3)
+    id4 = encode_threshold_for_id(parsedid["thresh"]) + str(parsedid["i"]) + str(parsedid["s"]) + str(parsedid["g"])
 
     return [
         int(id1.lstrip("0") or 0),

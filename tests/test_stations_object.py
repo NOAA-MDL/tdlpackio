@@ -16,8 +16,8 @@ def test_new_station_object():
     assert rec.numberOfStations == len(test_stations)
 
     # FUTURE...
-    #rec = tdlpackio.TdlpackStationRecord(["kacy", " kbwi "])
-    #assert rec.stations == ["KACY", "KBWI"]
+    # rec = tdlpackio.TdlpackStationRecord(["kacy", " kbwi "])
+    # assert rec.stations == ["KACY", "KBWI"]
 
 
 def test_stations_from_file(request):

@@ -54,28 +54,17 @@ class Stations:
             if obj._source is not None:
                 from ._tdlpackio import _open_file_store
 
-                obj._stations = [
-                    s.decode("ascii").strip()
-                    for s in _open_file_store[obj._source].read(obj._recnum).tolist()
-                ]
+                obj._stations = [s.decode("ascii").strip() for s in _open_file_store[obj._source].read(obj._recnum).tolist()]
                 if len(obj._stations) != obj._nsta_expected:
-                    raise ValueError(
-                        f"Error reading stations, expected {obj._nsta_expected}, but got {len(obj._stations)}"
-                    )
+                    raise ValueError(f"Error reading stations, expected {obj._nsta_expected}, but got {len(obj._stations)}")
         return obj._stations
 
     def __set__(self, obj, value):
-        if (
-            isinstance(value, str)
-            or isinstance(value, bytes)
-            or not isinstance(value, Iterable)
-        ):
+        if isinstance(value, str) or isinstance(value, bytes) or not isinstance(value, Iterable):
             raise TypeError("stations must be an iterable of station IDs")
         # Restrict modification if record came from a source
         if obj._source is not None:
-            raise AttributeError(
-                "stations cannot be modified on records read from file"
-            )
+            raise AttributeError("stations cannot be modified on records read from file")
         obj._stations = list(value)
 
 
@@ -171,9 +160,7 @@ class RefDate:
 
     def __set__(self, obj, value):
         if isinstance(value, np.datetime64):
-            timestamp = (value - np.datetime64("1970-01-01T00:00:00")) / np.timedelta64(
-                1, "s"
-            )
+            timestamp = (value - np.datetime64("1970-01-01T00:00:00")) / np.timedelta64(1, "s")
             value = datetime.datetime.utcfromtimestamp(timestamp)
         if isinstance(value, datetime.datetime):
             obj.is1[2] = value.year
@@ -444,15 +431,9 @@ class GridDefinitionSection:
     mapProjection: int = field(init=False, repr=False, default=MapProjection())
     nx: int = field(init=False, repr=False, default=Nx())
     ny: int = field(init=False, repr=False, default=Ny())
-    latitudeLowerLeft: float = field(
-        init=False, repr=False, default=LatitudeLowerLeft()
-    )
-    longitudeLowerLeft: float = field(
-        init=False, repr=False, default=LongitudeLowerLeft()
-    )
-    orientationLongitude: float = field(
-        init=False, repr=False, default=OrientationLongitude()
-    )
+    latitudeLowerLeft: float = field(init=False, repr=False, default=LatitudeLowerLeft())
+    longitudeLowerLeft: float = field(init=False, repr=False, default=LongitudeLowerLeft())
+    orientationLongitude: float = field(init=False, repr=False, default=OrientationLongitude())
     gridLength: float = field(init=False, repr=False, default=GridLength())
     standardLatitude: float = field(init=False, repr=False, default=StandardLatitude())
     projParams: float = field(init=False, repr=False, default=ProjParameters())
@@ -497,9 +478,7 @@ class PrimaryMissingValue:
 
     def __set__(self, obj, value):
         if value == obj.secondarMissingValue:
-            raise ValueError(
-                f"primary missing value cannot equal secondary missing value"
-            )
+            raise ValueError(f"primary missing value cannot equal secondary missing value")
         obj.is4[3] = int(value)
         obj.packingFlags["hasPrimaryMissingValue"] = 1
 
@@ -512,9 +491,7 @@ class SecondaryMissingValue:
 
     def __set__(self, obj, value):
         if value == obj.primaryMissingValue:
-            raise ValueError(
-                f"secondary missing value cannot equal primary missing value"
-            )
+            raise ValueError(f"secondary missing value cannot equal primary missing value")
         obj.is4[4] = int(value)
         obj.packingFlags["hasSecondaryMissingValue"] = 1
 

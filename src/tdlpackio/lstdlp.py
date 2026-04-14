@@ -63,19 +63,8 @@ def verbose(rec):
 
     output = []
     output.append((f"    MAX = {dmax:0.3f}:MIN = {dmin:0.3f}:MEAN = {dmean:0.3f}\n"))
-    output.append(
-        (
-            f"    PMISS = {rec.primaryMissingValue:0.0f}"
-            f":SMISS = {rec.secondaryMissingValue:0.0f}\n"
-        )
-    )
-    output.append(
-        (
-            f"    NDATA = {rec.numberOfPackedValues:0.0f}"
-            f":NPMISS = {npmiss:01d}"
-            f":NSMISS = {nsmiss:01d}"
-        )
-    )
+    output.append((f"    PMISS = {rec.primaryMissingValue:0.0f}:SMISS = {rec.secondaryMissingValue:0.0f}\n"))
+    output.append((f"    NDATA = {rec.numberOfPackedValues:0.0f}:NPMISS = {npmiss:01d}:NSMISS = {nsmiss:01d}"))
     return "".join([s for s in output])
 
 
