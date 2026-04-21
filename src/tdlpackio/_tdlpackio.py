@@ -665,15 +665,16 @@ class TdlpackRecord:
         **kwargs,
     ):
 
-        bases = list()
-
         rectype = "vector"
         if "type" in kwargs.keys():
             rectype = kwargs["type"]
+            if rectype not in {"grid", "vector"}:
+                raise ValueError('Invalid "type" argument. Expected "grid" or "vector".')
 
         if bool(np.any(is2)):
             rectype = "grid"
 
+        bases = list()
         if rectype == "grid":
             bases.append(templates.GridDefinitionSection)
             is1[1] = 1  # Flag in is1 to state that a grid definition section exists
