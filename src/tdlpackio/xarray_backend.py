@@ -58,13 +58,13 @@ class TdlpackBackendEntrypoint(BackendEntrypoint):
         # Read and parse metadata from tdlpack file
         f = tdlpackio.open(filename)
         file_index = pd.DataFrame(f._index)
-
         file_index = parse_tdlpackio_index_to_components(file_index)
 
         # Divide up records by variable based on name scheme and filters
         filters = copy(filters)
         frames, cube, extra_geo, one_sta_list, is2 = make_variables(file_index, name_scheme, filters, f)
-        # return empty dataset if no data
+
+        # Return empty dataset if no data
         if frames is None:
             return xr.Dataset()
 
@@ -72,13 +72,13 @@ class TdlpackBackendEntrypoint(BackendEntrypoint):
         ds = xr.Dataset()
         for var_df in frames:
             da = build_da_without_coords(var_df, cube, f, one_sta_list)
-            da.encoding["tdlp_is2"] = is2
-            #            da.encoding['tdlp_datset_name_scheme'] = name_scheme
+            da.encoding["tdlpackio_is2"] = is2
+            da.encoding['tdlpackio_datset_name_scheme'] = name_scheme
             ds[da.name] = da
 
-        # assign coords from the cube; the cube prevents datarrays with different shapes
+        # Assign coords from the cube; the cube prevents datarrays with different shapes
         ds = ds.assign_coords(cube.coords())
-        # assign extra geo coords
+        # Assign extra geo coords
         ds = ds.assign_coords(extra_geo)
 
         return ds
@@ -174,8 +174,8 @@ def dc_eq(dc1, dc2) -> bool:
 
 @dataclass(init=False)
 class TdlpackCube:
-    date: pd.DatetimeIndex = PdIndex()
-    lead: pd.TimedeltaIndex = PdIndex()
+    refDate: pd.DatetimeIndex = PdIndex()
+    leadTime: pd.TimedeltaIndex = PdIndex()
     ccc: pd.Index = PdIndex()
     fff: pd.Index = PdIndex()
     b: pd.Index = PdIndex()
@@ -207,7 +207,7 @@ class TdlpackCube:
         keys = list(TdlpackCube.__dataclass_fields__.keys())
         keys.remove("x")
         keys.remove("y")
-        coords = {k: xr.Variable(dims=k, data=self[k], attrs=dict(tdlp_name=k)) for k in keys if self[k] is not None}
+        coords = {k: xr.Variable(dims=k, data=self[k], attrs=dict(tdlpackio_name=k)) for k in keys if self[k] is not None}
         return coords
 
 
@@ -224,9 +224,11 @@ class OnDiskArray:
 
     def __post_init__(self):
         if self.cube.station is not None:
-            geo_shape = (len(self.cube.station),)  # for stations, the record may not actually be this shape, but is converted to this shape
+            # For stations, the record may not actually be this shape, but is converted to this shape
+            geo_shape = (len(self.cube.station),)
         else:
-            geo_shape = self.index.iloc[0].record_shape  # multiple grids not allowed so can just use first
+            # Multiple grids not allowed so can just use first
+            geo_shape = self.index.iloc[0].record_shape
 
         self.geo_shape = geo_shape
         self.geo_ndim = len(geo_shape)
@@ -238,30 +240,28 @@ class OnDiskArray:
         self.ndim = len(self.shape)
 
     def __getitem__(self, item) -> np.array:
-        # dimensions not in index are internal to tdlpack records; 2 dims for grids; 1 dim for stations
+        # Dimensions not in index are internal to tdlpack records; 2 dims for grids; 1 dim for stations
         f = tdlpackio.open(self.file_name)
 
         index_slicer = item[: -self.geo_ndim]
         index_slicer = tuple([[i] if isinstance(i, int) else i for i in index_slicer])  # maintain all multindex levels
-        # pandas loc slicing is inclusive, therefore convert slices into explicit lists
+        # Pandas loc slicing is inclusive, therefore convert slices into explicit lists
         index_slicer_inclusive = tuple([exclusive_slice_to_inclusive(i) if isinstance(i, slice) else i for i in index_slicer])
 
-        # get records selected by item in new index dataframe
+        # Get records selected by item in new index dataframe
         index = self.index.loc[index_slicer_inclusive, :]
         index = index.set_index(index.index)
 
-        # reset miloc to new relative locations in sub array
+        # Reset miloc to new relative locations in sub array
         index["miloc"] = list(zip(*[index.index.unique(level=dim).get_indexer(index.index.get_level_values(dim)) for dim in index.index.names]))
         array_field_shape = index.index.levshape + self.geo_shape
 
         array_field = np.full(array_field_shape, fill_value=np.nan, dtype="float32")
 
         for key, row in index.iterrows():
-            record = f[row["record"]]
-            logger.debug(f"unpacking and loading data, {record.reference_date}, {record.id}")
-            record.unpack(data=True)
+            record = f[row["recnum"]]
             if self.cube.x is not None:  # grid
-                values = record.data.transpose()
+                values = record.data
             else:  # stations
                 if self.one_station_list_and_ordered:
                     logger.debug(f"taking fast path for retrieving station record")
@@ -279,10 +279,10 @@ class OnDiskArray:
 
             array_field[row.miloc] = values
 
-        # handle geo dim slicing
+        # Handle geo dim slicing
         array_field = array_field[(Ellipsis,) + item[-self.geo_ndim :]]
 
-        # squeeze array dimensions expressed as integer
+        # Squeeze array dimensions expressed as integer
         for i, it in reversed(list(enumerate(item[: -self.geo_ndim]))):
             if isinstance(it, int):
                 array_field = array_field[(slice(None, None, None),) * i + (0,)]
@@ -301,7 +301,7 @@ def dims_to_shape(d) -> tuple:
 
 def parse_tdlpackio_index_to_components(df, decode_time=True, decode_thresh=True, decode_lead=True, ttt="hours"):
     df = df[df.type != "trailer"]
-    recnum = df.index + 1
+    recnum = df.index
     df = df.assign(recnum=recnum)
 
     # Parse dims to shape tuple, order as (y, x).
@@ -381,7 +381,7 @@ def build_da_without_coords(index, cube, file, one_sorted_station_list: bool) ->
     for meta_name in constant_meta_names:
         if meta_name in index.columns:
             da.attrs[meta_name] = index[meta_name].iloc[0]
-            da.encoding[f"tdlp_{meta_name}"] = da.attrs[meta_name]
+            da.encoding[f"tdlpackio_{meta_name}"] = da.attrs[meta_name]
 
     return da
 
@@ -424,12 +424,11 @@ def make_variables(index, name_scheme, filters, f):
     """from index as dataframe, separate by variable
     create an individual dataframe index and cube for each variable"""
 
-    # let nam determine the variables
-    # index['name'] = index[name_scheme].apply(lambda row: '_'.join(row.values.astype(str), axis=1)
+    # Let nam determine the variables
     index.loc[:, "name"] = index[name_scheme].astype(str).apply(lambda col: col.str.zfill(zfil[col.name])).apply(lambda row: "_".join(row), axis=1)
 
-    # adopt parts of xarray's sel logic  so that filters behave similarly
-    # allowed to filter to nothing to make empty dataset
+    # Adopt parts of xarray's sel() logic so that filters behave similarly
+    # Allowed to filter to nothing to make empty dataset
     if filters:
         for k, v in filters.items():
             if isinstance(v, slice):
@@ -457,18 +456,10 @@ def make_variables(index, name_scheme, filters, f):
                 else:
                     indexer = pd.Index(index[k]).get_indexer_for(np.ravel(v))
                     index = index.iloc[indexer[indexer >= 0]]
-    #      if isinstance(v, list):
-    #          v = [int(k) if isinstance(v, str) else k for k in v]
-    #      elif isinstance(v, str):
-    #          v = [int(v)]
-    #      elif isinstance(v, int):
-    #          v = [v]
-    #      filters[k] = index[k].isin(v)
-    #   index = index[pd.DataFrame(filters).all(axis=1)]
 
-    # set the index to the names components
+    # Set the index to the names components
     index = index.set_index(name_scheme).sort_index()
-    # return nothing if no data
+    # Return nothing if no data
     if index.empty:
         return None, None, None, None, None
 
@@ -484,17 +475,16 @@ def make_variables(index, name_scheme, filters, f):
             if len(frame[colname].unique()) > 1:
                 c[colname] = frame[colname].sort_values().unique()
 
-        if c.date is None:
+        if c.refDate is None:
             # case where only one date; use date as unit dimesnion
             c["refDate"] = [frame.refDate.iloc[0]]
             # setattr(cube, 'date', [frame.date.iloc[0]])
 
-        if c.lead is None:
+        if c.leadTime is None:
             # case where only one lead; use lead as unit dimesnion
             c["leadTime"] = [frame.leadTime.iloc[0]]
 
         dims = [k for k in ordered_meta if c[k] is not None]
-
         for dim in dims:
             if frame[dim].value_counts().nunique() > 1:
                 raise ValueError(f"un-even numer of records associated with dimension: {dim}\n unique values for {dim}: {frame[dim].unique()} ")
@@ -727,8 +717,8 @@ class TdlpackDataset:
     def _iscoord(self, tdlp_meta):
         for coord_name in self._obj.coords:
             coord = self._obj[coord_name]
-            if "tdlp_name" in coord.attrs:
-                if coord.attrs["tdlp_name"] == tdlp_meta:
+            if "tdlpackio_name" in coord.attrs:
+                if coord.attrs["tdlpackio_name"] == tdlp_meta:
                     return True
         return False
 
@@ -770,7 +760,7 @@ class TdlpackDataset:
         meta_dicts = list()
         for var in self._obj.data_vars:
             da = self._obj[var]
-            meta_dicts.append({key: da.encoding[f"tdlp_{key}"] for key in multi_var_keys})
+            meta_dicts.append({key: da.encoding[f"tdlpackio_{key}"] for key in multi_var_keys})
         df = pd.DataFrame(meta_dicts).nunique()
         meta_varying_by_var = df.index[df > 1]
 
@@ -778,19 +768,18 @@ class TdlpackDataset:
         keys = list(meta.__dataclass_fields__.keys())
         coord_meta = list()
         const_meta = list()
-        #        tdlpid = TdlpId()
         tdlpid = tdlpackio.TdlpackID()
         for key in keys:
-            if f"tdlp_{key}" in da.encoding:
-                meta[key] = da.encoding[f"tdlp_{key}"]
+            if f"tdlpackio_{key}" in da.encoding:
+                meta[key] = da.encoding[f"tdlpackio_{key}"]
                 tdlpid[key] = meta[key]
                 const_meta.append(key)
                 continue
             found = False
             for coord_name in self._obj.coords:
                 coord = self._obj[coord_name]
-                if "tdlp_name" in coord.attrs:
-                    if coord.attrs["tdlp_name"] == key:
+                if "tdlpackio_name" in coord.attrs:
+                    if coord.attrs["tdlpackio_name"] == key:
                         found = True
                         coord_meta.append(key)
                         meta[key] = coord
@@ -815,31 +804,33 @@ class TdlpackDataset:
 
         prodicized = product(*[meta[k] for k in coord_meta])
         f = tdlpackio.open(store / filepath.name, mode="w", format="sequential")
+
         if station:
-            template_rec = tdlpackio.TdlpackRecord(date=0, id=[0, 0, 0, 0], data=np.array([0]))
+            #ORIG template_rec = tdlpackio.TdlpackRecord(date=0, id=[0, 0, 0, 0], data=np.array([0]))
+            template_rec = tdlpackio.TdlpackRecord()
             stations = tdlpackio.TdlpackStationRecord(list(self._obj.station.data))
             stations.pack()
             f.write(stations)
         else:
-            # the grid doesn't matter ( can tweak/clean later)
+            # The grid doesn't matter (can tweak/clean later)
             template_rec = tdlpackio.TdlpackRecord(
                 date=0,
                 id=[0, 0, 0, 0],
                 grid=tdlpackio.grids["nbmak"],
                 data=np.array([0]),
             )
-            template_rec.is2 = da.encoding["tdlp_is2"]  # this loads the grid metadata
+            template_rec.is2 = da.encoding["tdlpackio_is2"]  # this loads the grid metadata
         template_rec.primary_missing_value = 9999.0
 
         for t in prodicized:
             for var in self._obj.data_vars:
-                # select slice of array for tdlpack record
+                # Select slice of array for tdlpack record
                 loc = {k: v for (k, v) in zip(coord_meta, t)}
                 da = self._obj[var].loc[loc].squeeze()
 
-                # put extra metadata that varies by variable in loc for updating tdlpid
+                # Put extra metadata that varies by variable in loc for updating tdlpid
                 for m in meta_varying_by_var:
-                    loc[m] = da.encoding[f"tdlp_{m}"]
+                    loc[m] = da.encoding[f"tdlpackio_{m}"]
                 tdlpid.update(**loc)
 
                 # shape data array appropriately for station or grid formatted tdlpack record
@@ -851,7 +842,7 @@ class TdlpackDataset:
                 # build out a tdlpack DataRecord with appropriate metadata
                 idlist = [tdlpid.word1, tdlpid.word2, tdlpid.word3, tdlpid.word4]
                 if var_constants is None:
-                    plain = "NO VAR MATCH"
+                    plain = "NO VARIABLE MATCH"
                     # let dec_scale allow for min_unique values in the space between the max and min
                     datamax = np.nanmax(data)
                     datamin = np.nanmin(data)
@@ -867,7 +858,7 @@ class TdlpackDataset:
                 date = da.date.data.squeeze()[()]
                 rec = make_record(template_rec, idlist, data, plain, date)
                 rec.pack(dec_scale=dec_scale)
-                logger.debug(f"writing {date}, {idlist} with dec_scale: {dec_scale}")
+                logger.debug(f"Writing {date}, {idlist} with dec_scale: {dec_scale}")
                 f.write(rec)
 
         f.close()
@@ -897,9 +888,10 @@ class TdlpDataarray:
 
 
 def make_record(template, rec_id, data, plain, date):
+    """
+    """
     rec = copy(template)
     rec.data = data
-
     rec.id = rec_id
     rec.is1[8:12] = rec.id
     rec.is1[12] = rec.is1[10] % 1000
@@ -914,176 +906,5 @@ def make_record(template, rec_id, data, plain, date):
     rec.number_of_values = rec.is4[2]
 
     rec.plain = plain
-    #    rec.lead_time = 24
 
     return rec
-
-
-@dataclass
-class TdlpId:
-    word1: int = 0
-    word2: int = 0
-    word3: int = 0
-    word4: int = 0
-
-    # word1
-    @property
-    def ccc(self):
-        return self.word1 // 1_000_000
-
-    @ccc.setter
-    def ccc(self, value):
-        self.word1 = self.word1 - self.ccc * 1_000_000 + value * 1_000_000
-
-    @property
-    def fff(self):
-        return self.word1 % 1_000_000 // 1000
-
-    @fff.setter
-    def fff(self, value):
-        self.word1 = self.word1 - self.fff * 1000 + value * 1000
-
-    @property
-    def b(self):
-        return self.word1 % 1000 // 100
-
-    @b.setter
-    def b(self, value):
-        self.word1 = self.word1 - self.b * 100 + value * 100
-
-    @property
-    def dd(self):
-        return self.word1 % 100
-
-    @dd.setter
-    def dd(self, value):
-        self.word1 = self.word1 - self.dd + value
-
-    # word2
-    @property
-    def v(self):
-        return self.word2 // 100_000_000
-
-    @v.setter
-    def v(self, value):
-        self.word2 = self.word2 - self.v * 100_000_000 + value * 100_000_000
-
-    @property
-    def llll(self):
-        return self.word2 % 100_000_000 // 10_000
-
-    @llll.setter
-    def llll(self, value):
-        self.word2 = self.word2 - self.llll * 10_000 + value * 10_000
-
-    @property
-    def uuuu(self):
-        return self.word2 % 10_000
-
-    @uuuu.setter
-    def uuuu(self, value):
-        self.word2 = self.word2 - self.uuuu + value
-
-    # word3
-    @property
-    def rr(self):
-        return self.word3 % 100_000_000 // 1_000_000
-
-    @rr.setter
-    def rr(self, value):
-        self.word3 = self.word3 - self.rr * 1_000_000 + value * 1_000_000
-
-    @property
-    def ttt(self):
-        return self.word3 % 1_000
-
-    @ttt.setter
-    def ttt(self, value):
-        self.word3 = self.word3 - self.ttt + value
-
-    @property
-    def lead(self):
-        return datetime.timedelta(hours=self.ttt)
-
-    @lead.setter
-    def lead(self, value):
-        self.ttt = int(pd.Timedelta(value).total_seconds() / 3600)
-
-    # word4
-    @property
-    def w(self):
-        return self.word4 // 1_000_000_000
-
-    @property
-    def xxxx(self):
-        return self.word4 % 1_000_000_000 // 100_000
-
-    @property
-    def yy(self):
-        return self.word4 % 100_000 // 1_000
-
-    @property
-    def wxxxxyy(self):
-        return self.word4 // 1_000
-
-    @wxxxxyy.setter
-    def wxxxxyy(self, value):
-        self.word4 = self.word4 - self.wxxxxyy * 1_000 + value * 1_000
-
-    @property
-    def isg(self):
-        return self.word4 % 1000
-
-    @isg.setter
-    def isg(self, value):
-        self.word4 = self.word4 - self.isg + value
-
-    @property
-    def i(self):
-        return self.word4 % 1000 // 100
-
-    @i.setter
-    def i(self, value):
-        self.word4 = self.word4 - self.i * 100 + value * 100
-
-    @property
-    def s(self):
-        return self.word4 % 100 // 10
-
-    @s.setter
-    def s(self, value):
-        self.word4 = self.word4 - self.s * 10 + value * 10
-
-    @property
-    def g(self):
-        return self.word4 % 10
-
-    @g.setter
-    def g(self, value):
-        self.word4 = self.word4 - self.g + value
-
-    @property
-    def thresh(self):
-        return f"{self.w}.{self.xxxx:04}E{self.yy:02}"
-
-    @thresh.setter
-    def thresh(self, value):
-        if value == 0:
-            self.wxxxxyy = 0
-            return
-        n = np.log10(np.abs(value)).astype("int")
-        n = n + 1 if n > 0 else n
-        xxxx = (np.abs(value) / 10.0**n * 10000).round(decimals=0).astype("int")
-        wxxxx = xxxx + 50000 if value < 0 else xxxx
-        wxxxxyy = wxxxx * 100 + abs(n) if n >= 0 else wxxxx * 100 + abs(n) + 50
-        self.wxxxxyy = wxxxxyy
-
-    def __setitem__(self, key, value):
-        setattr(self, key, value)
-
-    def __getitem__(self, key):
-        return getattr(self, key)
-
-    def update(self, **kwargs):
-        for k, v in kwargs.items():
-            self[k] = v
