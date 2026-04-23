@@ -73,7 +73,7 @@ class TdlpackBackendEntrypoint(BackendEntrypoint):
         for var_df in frames:
             da = build_da_without_coords(var_df, cube, f, one_sta_list)
             da.encoding["tdlpackio_is2"] = is2
-            da.encoding['tdlpackio_datset_name_scheme'] = name_scheme
+            da.encoding["tdlpackio_datset_name_scheme"] = name_scheme
             ds[da.name] = da
 
         # Assign coords from the cube; the cube prevents datarrays with different shapes
@@ -806,7 +806,6 @@ class TdlpackDataset:
         f = tdlpackio.open(store / filepath.name, mode="w", format="sequential")
 
         if station:
-            #ORIG template_rec = tdlpackio.TdlpackRecord(date=0, id=[0, 0, 0, 0], data=np.array([0]))
             template_rec = tdlpackio.TdlpackRecord()
             stations = tdlpackio.TdlpackStationRecord(list(self._obj.station.data))
             stations.pack()
@@ -888,8 +887,7 @@ class TdlpDataarray:
 
 
 def make_record(template, rec_id, data, plain, date):
-    """
-    """
+    """ """
     rec = copy(template)
     rec.data = data
     rec.id = rec_id
