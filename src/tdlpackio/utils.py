@@ -1,5 +1,7 @@
 """Utilities for handling TDLPACK-related objects"""
 
+from __future__ import annotations
+
 from datetime import timedelta
 
 

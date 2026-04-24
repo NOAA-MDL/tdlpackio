@@ -45,6 +45,8 @@ The following Jupyter Notebooks are available as tutorials:
 * [General Usage](https://github.com/NOAA-MDL/tdlpackio/blob/master/demos/tdlpackio-v2.ipynb)
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field, InitVar
 from typing import ClassVar, Iterable, Literal, Optional
 import builtins

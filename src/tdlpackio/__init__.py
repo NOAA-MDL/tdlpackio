@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 # init for tdlpackio package
 from ._tdlpackio import *
 from ._tdlpackio import __doc__

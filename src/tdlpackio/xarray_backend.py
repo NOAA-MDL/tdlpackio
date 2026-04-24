@@ -1,13 +1,16 @@
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+from copy import copy
+from dataclasses import dataclass, field, astuple
+from itertools import product
 from pathlib import Path
-import shutil
 import datetime
 import numbers
-from dataclasses import dataclass, field, astuple
-import typing
-from copy import copy
-from abc import ABC, abstractmethod
-from itertools import product
 import logging
+import shutil
+import typing
+
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -19,6 +22,7 @@ from xarray.backends.common import (
 )
 from xarray.core import indexing
 from xarray.backends.locks import SerializableLock
+
 import tdlpackio
 
 logger = logging.getLogger(__name__)
