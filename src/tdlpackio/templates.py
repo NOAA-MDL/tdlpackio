@@ -479,7 +479,7 @@ class PrimaryMissingValue:
         return obj.is4[3]
 
     def __set__(self, obj, value):
-        if value == obj.secondarMissingValue:
+        if value == obj.secondaryMissingValue:
             raise ValueError(f"primary missing value cannot equal secondary missing value")
         obj.is4[3] = int(value)
         obj.packingFlags["hasPrimaryMissingValue"] = 1
