@@ -5,8 +5,9 @@ Grid definitions of common grids in the MOS-2000/TDLPACK system.
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from types import MappingProxyType
+from typing import Literal
 
 __all__ = ["GridDefinition", "GRIDS", "get_grid", "has_grid"]
 
@@ -76,6 +77,16 @@ _GRIDS: dict[str, GridDefinition] = {
         orientationLongitude=65.0,
         gridLength=1250.0,
     ),
+    "nbmswp": GridDefinition(
+        mapProjection=7,
+        nx=3683,
+        ny=1903,
+        latitudeLowerLeft=-26.0,
+        longitudeLowerLeft=230.0,
+        standardLatitude=-5.0,
+        orientationLongitude=360.0,
+        gridLength=2500.0,
+    ),
     "gfs23": GridDefinition(
         mapProjection=5,
         nx=593,
@@ -131,12 +142,80 @@ _GRIDS: dict[str, GridDefinition] = {
 GRIDS: Mapping[str, GridDefinition] = MappingProxyType(_GRIDS)
 
 
-def get_grid(name: str) -> GridDefinition:
-    """Return a grid definition by name."""
+def _mos2k_to_standard(lon: float) -> float:
+    """
+    Convert MOS-2000 longitude (west-positive) to standard
+    east-positive longitude in [-180, 180].
+    """
+    # Flip sign: west-positive -> east-positive
+    lon = -lon
+
+    # Normalize robustly to [-180, 180)
+    lon = ((lon + 180.0) % 360.0) - 180.0
+
+    return lon
+
+
+def _mos2k_to_0_360(lon: float) -> float:
+    """
+    Convert MOS-2000 longitude (west-positive) to east-positive [0, 360).
+    """
+    return _mos2k_to_standard(lon) % 360.0
+
+
+def get_grid(
+    name: str,
+    *,
+    lon_format: Literal["mos2k", "standard", "0_360"] = "mos2k",
+) -> GridDefinition:
+    """
+    Return a grid definition by name.
+
+    Notes
+    -----
+    Internally, all grid definitions are stored using the MOS-2000
+    longitude convention (west longitude is positive).
+
+    Parameters
+    ----------
+    name : str
+        Grid name.
+    lon_format : {"mos2k", "standard", "0_360"}, optional
+        Longitude convention to return:
+
+        - "mos2k": West longitude positive (native storage format)
+        - "standard": East-positive, range [-180, 180]
+        - "0_360": East-positive, range [0, 360)
+
+    Returns
+    -------
+    GridDefinition
+        Grid definition using the requested longitude convention.
+    """
     try:
-        return GRIDS[name.lower()]
+        grid = GRIDS[name.lower()]
     except KeyError as exc:
         raise KeyError(f"Unknown grid: {name!r}") from exc
+
+    # Native format (no copy needed)
+    if lon_format == "mos2k":
+        return grid
+
+    if lon_format == "standard":
+        return replace(
+            grid,
+            longitudeLowerLeft=_mos2k_to_standard(grid.longitudeLowerLeft),
+            orientationLongitude=_mos2k_to_standard(grid.orientationLongitude),
+        )
+
+    if lon_format == "0_360":
+        return replace(
+            grid,
+            longitudeLowerLeft=_mos2k_to_0_360(grid.longitudeLowerLeft),
+            orientationLongitude=_mos2k_to_0_360(grid.orientationLongitude),
+        )
+
+    raise ValueError(f"Invalid lon_format: {lon_format!r}. Expected one of {{'mos2k', 'standard', '0_360'}}.")
 
 
 def has_grid(name: str) -> bool:
