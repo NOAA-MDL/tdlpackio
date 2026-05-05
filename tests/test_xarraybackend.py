@@ -30,6 +30,8 @@ def test_catted_equall_multi(request):
     sampledata = request.config.rootdir / "tests" / "data"
     ds_multi = xr.open_mfdataset([sampledata / "test1.sq", sampledata / "test2.sq"], engine="tdlpackio")
     ds_catted = xr.open_dataset(sampledata / "test1_2.sq", engine="tdlpackio")
+    assert ds_multi is not None
+    assert ds_catted is not None
 
 
 def test_filters(request):
