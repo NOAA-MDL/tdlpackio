@@ -4,6 +4,7 @@ from __future__ import annotations
 from ._tdlpackio import *
 from ._tdlpackio import __doc__
 
+from .grids import GRIDS, GridDefinition, get_grid, has_grid
 from .version import version as __version__
 
 __all__ = [
@@ -13,6 +14,10 @@ __all__ = [
     "TdlpackStationRecord",
     "TdlpackTrailerRecord",
     "TdlpackID",
+    "GridDefinition",
+    "GRIDS",
+    "get_grid",
+    "has_grid",
 ]
 
 try:
@@ -23,7 +28,9 @@ try:
     tdlpack_static = __config__.tdlpack_static
     extra_objects = __config__.extra_objects
 except ImportError:
-    pass
+    has_openmp_support = None
+    tdlpack_static = None
+    extra_objects = []
 
 __tdlpacklib_version__ = "1.0.0"  # For now...
 
@@ -31,11 +38,11 @@ __tdlpacklib_version__ = "1.0.0"  # For now...
 def show_config():
     """Print tdlpackio build configuration information."""
     print(f"tdlpackio version {__version__} Configuration:")
-    print(f"")
+    print("")
     print(f"libtdlpack library version: {__tdlpacklib_version__}")
     print(f"\tStatic library: {tdlpack_static}")
     print(f"\tOpenMP support: {has_openmp_support}")
-    print(f"")
-    print(f"Static libs:")
+    print("")
+    print("Static libs:")
     for lib in extra_objects:
         print(f"\t{lib}")

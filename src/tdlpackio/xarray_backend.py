@@ -815,13 +815,7 @@ class TdlpackDataset:
             stations.pack()
             f.write(stations)
         else:
-            # The grid doesn't matter (can tweak/clean later)
-            template_rec = tdlpackio.TdlpackRecord(
-                date=0,
-                id=[0, 0, 0, 0],
-                grid=tdlpackio.grids["nbmak"],
-                data=np.array([0]),
-            )
+            template_rec = tdlpackio.TdlpackRecord(type="grid")
             template_rec.is2 = da.encoding["tdlpackio_is2"]  # this loads the grid metadata
         template_rec.primary_missing_value = 9999.0
 
@@ -836,11 +830,7 @@ class TdlpackDataset:
                     loc[m] = da.encoding[f"tdlpackio_{m}"]
                 tdlpid.update(**loc)
 
-                # shape data array appropriately for station or grid formatted tdlpack record
-                if station:
-                    data = da.data
-                else:
-                    data = da.data.transpose()
+                data = da.data
 
                 # build out a tdlpack DataRecord with appropriate metadata
                 idlist = [tdlpid.word1, tdlpid.word2, tdlpid.word3, tdlpid.word4]
