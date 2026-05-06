@@ -58,6 +58,7 @@ import os
 import struct
 import sys
 
+from . import grids
 from . import tdlpacklib
 from . import templates
 from . import utils
@@ -642,6 +643,10 @@ class TdlpackRecord:
         - ``type`` : str, optional
           Record type. Default is ``"vector"``. If ``is2`` contains any
           non-zero values, the type is automatically set to ``"grid"``.
+        - ``grid`` : str, optional
+          Predefined grid. Valid values can be found in ``tdlpackio.grids.GRIDS``.
+          This will force the type to be ``"grid"`` and override values in the ``is2``
+          argument.
 
     Returns
     -------
@@ -675,6 +680,12 @@ class TdlpackRecord:
 
         if bool(np.any(is2)):
             rectype = "grid"
+
+        if "grid" in kwargs.keys():
+            rectype = "grid"
+            if kwargs["grid"] not in grids.GRIDS.keys():
+                raise ValueError('Invalid "grid" argument.')
+            is2 = grids.get_grid(kwargs["grid"]).to_is2()
 
         bases = list()
         if rectype == "grid":

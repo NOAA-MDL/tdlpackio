@@ -4,7 +4,7 @@ from __future__ import annotations
 from ._tdlpackio import *
 from ._tdlpackio import __doc__
 
-from .grids import GRIDS, GridDefinition, get_grid, has_grid
+from .grids import GRIDS, TdlpackGridDefinition, get_grid, has_grid
 from .version import version as __version__
 
 __all__ = [
@@ -14,7 +14,7 @@ __all__ = [
     "TdlpackStationRecord",
     "TdlpackTrailerRecord",
     "TdlpackID",
-    "GridDefinition",
+    "TdlpackGridDefinition",
     "GRIDS",
     "get_grid",
     "has_grid",

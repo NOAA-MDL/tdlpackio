@@ -7,14 +7,22 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from types import MappingProxyType
-from typing import Literal
+from typing import ClassVar, Literal
 
-__all__ = ["GridDefinition", "GRIDS", "get_grid", "has_grid"]
+import numpy as np
+
+from . import _tdlpackio
+
+__all__ = ["TdlpackGridDefinition", "GRIDS", "get_grid", "has_grid"]
 
 
 @dataclass(frozen=True, slots=True)
-class GridDefinition:
-    """Definition of a TDLPACK grid."""
+class TdlpackGridDefinition:
+    """Definition of a TDLPACK grid.
+
+    Stored longitude convention is MOS-2000:
+    west longitude is positive.
+    """
 
     mapProjection: int
     nx: int
@@ -25,9 +33,52 @@ class GridDefinition:
     orientationLongitude: float
     gridLength: float
 
+    # Array mapping
+    IS2_INDEX: ClassVar[dict[str, int]] = {
+        "mapProjection": 1,
+        "nx": 2,
+        "ny": 3,
+        "latitudeLowerLeft": 4,
+        "longitudeLowerLeft": 5,
+        "orientationLongitude": 6,
+        "gridLength": 7,
+        "standardLatitude": 8,
+    }
 
-_GRIDS: dict[str, GridDefinition] = {
-    "nbmak": GridDefinition(
+    # Attribute scale factors used to convert to whole integers.
+    SCALE_FACTOR: ClassVar[dict[str, int]] = {
+        "mapProjection": 1,
+        "nx": 1,
+        "ny": 1,
+        "latitudeLowerLeft": 10_000,
+        "longitudeLowerLeft": 10_000,
+        "orientationLongitude": 10_000,
+        "gridLength": 1000,
+        "standardLatitude": 10_000,
+    }
+
+    def scaled_value(self, name: str) -> int:
+        """Return one grid attribute scaled to an integer."""
+        value = getattr(self, name)
+        scale = self.SCALE_FACTOR[name]
+        return int(round(value * scale))
+
+    def to_is2(self) -> list[int]:
+        """Return the grid definition as a scaled integer array."""
+        is2 = np.zeros((_tdlpackio.ND7), dtype=np.int32)
+
+        for name, index in self.IS2_INDEX.items():
+            is2[index] = self.scaled_value(name)
+
+        return is2
+
+    def to_int_dict(self) -> dict[str, int]:
+        """Return scaled integer values keyed by attribute name."""
+        return {name: self.scaled_value(name) for name in self.IS2_INDEX}
+
+
+_GRIDS: dict[str, TdlpackGridDefinition] = {
+    "nbmak": TdlpackGridDefinition(
         mapProjection=5,
         nx=1649,
         ny=1105,
@@ -37,7 +88,7 @@ _GRIDS: dict[str, GridDefinition] = {
         orientationLongitude=150.0,
         gridLength=2976.560059,
     ),
-    "nbmco": GridDefinition(
+    "nbmco": TdlpackGridDefinition(
         mapProjection=3,
         nx=2345,
         ny=1597,
@@ -47,7 +98,7 @@ _GRIDS: dict[str, GridDefinition] = {
         orientationLongitude=95.0,
         gridLength=2539.702881,
     ),
-    "nbmhi": GridDefinition(
+    "nbmhi": TdlpackGridDefinition(
         mapProjection=7,
         nx=625,
         ny=561,
@@ -57,7 +108,7 @@ _GRIDS: dict[str, GridDefinition] = {
         orientationLongitude=160.0,
         gridLength=2500.0,
     ),
-    "nbmoc": GridDefinition(
+    "nbmoc": TdlpackGridDefinition(
         mapProjection=7,
         nx=2517,
         ny=1817,
@@ -67,7 +118,7 @@ _GRIDS: dict[str, GridDefinition] = {
         orientationLongitude=360.0,
         gridLength=10000.0,
     ),
-    "nbmpr": GridDefinition(
+    "nbmpr": TdlpackGridDefinition(
         mapProjection=7,
         nx=353,
         ny=257,
@@ -77,7 +128,7 @@ _GRIDS: dict[str, GridDefinition] = {
         orientationLongitude=65.0,
         gridLength=1250.0,
     ),
-    "nbmswp": GridDefinition(
+    "nbmswp": TdlpackGridDefinition(
         mapProjection=7,
         nx=3683,
         ny=1903,
@@ -87,7 +138,7 @@ _GRIDS: dict[str, GridDefinition] = {
         orientationLongitude=360.0,
         gridLength=2500.0,
     ),
-    "gfs23": GridDefinition(
+    "gfs23": TdlpackGridDefinition(
         mapProjection=5,
         nx=593,
         ny=337,
@@ -97,7 +148,7 @@ _GRIDS: dict[str, GridDefinition] = {
         orientationLongitude=105.0,
         gridLength=23812.5,
     ),
-    "gfs47": GridDefinition(
+    "gfs47": TdlpackGridDefinition(
         mapProjection=5,
         nx=297,
         ny=169,
@@ -107,7 +158,7 @@ _GRIDS: dict[str, GridDefinition] = {
         orientationLongitude=105.0,
         gridLength=47625.0,
     ),
-    "gfs95": GridDefinition(
+    "gfs95": TdlpackGridDefinition(
         mapProjection=5,
         nx=149,
         ny=85,
@@ -117,7 +168,7 @@ _GRIDS: dict[str, GridDefinition] = {
         orientationLongitude=105.0,
         gridLength=95250.0,
     ),
-    "nam151": GridDefinition(
+    "nam151": TdlpackGridDefinition(
         mapProjection=5,
         nx=425,
         ny=281,
@@ -127,7 +178,7 @@ _GRIDS: dict[str, GridDefinition] = {
         orientationLongitude=110.0,
         gridLength=33812.0,
     ),
-    "nam221": GridDefinition(
+    "nam221": TdlpackGridDefinition(
         mapProjection=3,
         nx=349,
         ny=198,
@@ -139,7 +190,7 @@ _GRIDS: dict[str, GridDefinition] = {
     ),
 }
 
-GRIDS: Mapping[str, GridDefinition] = MappingProxyType(_GRIDS)
+GRIDS: Mapping[str, TdlpackGridDefinition] = MappingProxyType(_GRIDS)
 
 
 def _mos2k_to_standard(lon: float) -> float:
@@ -167,7 +218,7 @@ def get_grid(
     name: str,
     *,
     lon_format: Literal["mos2k", "standard", "0_360"] = "mos2k",
-) -> GridDefinition:
+) -> TdlpackGridDefinition:
     """
     Return a grid definition by name.
 
@@ -189,7 +240,7 @@ def get_grid(
 
     Returns
     -------
-    GridDefinition
+    TdlpackGridDefinition
         Grid definition using the requested longitude convention.
     """
     try:
