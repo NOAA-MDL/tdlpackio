@@ -14,3 +14,5 @@ src/tdlpackio/__config__.py
 dist/*
 pytdlpack/
 **.ipynb_checkpoints
+demos/*.sq
+demos/*.ra
