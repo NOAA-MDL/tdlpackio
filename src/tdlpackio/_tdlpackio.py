@@ -861,7 +861,6 @@ class _TdlpackRecord:
         lats, lons : tuple of arrays
             Tuple of numpy.float32 arrays of latitudes and longitudes.
         """
-        pass
         if self._sha1_latlon in _latlon_store.keys():
             return _latlon_store[self._sha1_latlon]
 
