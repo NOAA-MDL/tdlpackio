@@ -522,17 +522,20 @@ def make_variables(index, name_scheme, filters, f):
         if len(record_shapes[0]) == 1:
             # station records; check if the multiple station id records are identical
             station_id_records = index.linked_station_id_record.unique()
-            if 0 in station_id_records:
-                raise ValueError("TDLPACK file has a mix of station and gridded records; cannot read.")
-            if len(station_id_records) > 1:
-                station = pd.Series(f[int(station_id_records[0])].stations, name="station")
-                for station_record in station_id_records[1:]:
-                    sta = pd.Series(f[int(station_record)].stations, name="station")
-                    if not station.equals(sta):
-                        # station lists on file are not all the same
-                        logger.warning(f"Station lists on file are not identical; loading of data will be less efficient")
-                        one_station_list = False
-                        station = pd.merge(station, sta, how="outer").station
+            # HOLD if 0 in station_id_records:
+            # HOLD     raise ValueError("TDLPACK file has a mix of station and gridded records; cannot read.")
+            station_id_records = list(station_id_records)
+            first_stations = tuple(f[int(station_id_records[0])].stations)
+            seen = dict.fromkeys(first_stations)
+            one_station_list = True
+            for station_record in station_id_records[1:]:
+                stations = tuple(f[int(station_record)].stations)
+                if stations != first_stations:
+                    if one_station_list:
+                        logger.warning("Station lists on file are not identical; loading of data will be less efficient")
+                    one_station_list = False
+                seen.update(dict.fromkeys(stations))
+            station = pd.Series(seen.keys(), name="station")
             if station.is_monotonic_increasing:
                 cube.station = station
                 if one_station_list:
