@@ -13,11 +13,11 @@ import numpy as np
 
 from . import _tdlpackio
 
-__all__ = ["TdlpackGridDefinition", "GRIDS", "get_grid", "has_grid"]
+__all__ = ["TdlpackGridDef", "GRIDS", "get_grid", "has_grid"]
 
 
 @dataclass(frozen=True, slots=True)
-class TdlpackGridDefinition:
+class TdlpackGridDef:
     """Definition of a TDLPACK grid.
 
     Stored longitude convention is MOS-2000:
@@ -77,8 +77,8 @@ class TdlpackGridDefinition:
         return {name: self.scaled_value(name) for name in self.IS2_INDEX}
 
 
-_GRIDS: dict[str, TdlpackGridDefinition] = {
-    "nbmak": TdlpackGridDefinition(
+_GRIDS: dict[str, TdlpackGridDef] = {
+    "nbmak": TdlpackGridDef(
         mapProjection=5,
         nx=1649,
         ny=1105,
@@ -88,7 +88,7 @@ _GRIDS: dict[str, TdlpackGridDefinition] = {
         orientationLongitude=150.0,
         gridLength=2976.560059,
     ),
-    "nbmco": TdlpackGridDefinition(
+    "nbmco": TdlpackGridDef(
         mapProjection=3,
         nx=2345,
         ny=1597,
@@ -98,7 +98,7 @@ _GRIDS: dict[str, TdlpackGridDefinition] = {
         orientationLongitude=95.0,
         gridLength=2539.702881,
     ),
-    "nbmhi": TdlpackGridDefinition(
+    "nbmhi": TdlpackGridDef(
         mapProjection=7,
         nx=625,
         ny=561,
@@ -108,7 +108,7 @@ _GRIDS: dict[str, TdlpackGridDefinition] = {
         orientationLongitude=160.0,
         gridLength=2500.0,
     ),
-    "nbmoc": TdlpackGridDefinition(
+    "nbmoc": TdlpackGridDef(
         mapProjection=7,
         nx=2517,
         ny=1817,
@@ -118,7 +118,7 @@ _GRIDS: dict[str, TdlpackGridDefinition] = {
         orientationLongitude=360.0,
         gridLength=10000.0,
     ),
-    "nbmpr": TdlpackGridDefinition(
+    "nbmpr": TdlpackGridDef(
         mapProjection=7,
         nx=353,
         ny=257,
@@ -128,7 +128,7 @@ _GRIDS: dict[str, TdlpackGridDefinition] = {
         orientationLongitude=65.0,
         gridLength=1250.0,
     ),
-    "nbmswp": TdlpackGridDefinition(
+    "nbmswp": TdlpackGridDef(
         mapProjection=7,
         nx=3683,
         ny=1903,
@@ -138,7 +138,7 @@ _GRIDS: dict[str, TdlpackGridDefinition] = {
         orientationLongitude=360.0,
         gridLength=2500.0,
     ),
-    "gfs23": TdlpackGridDefinition(
+    "gfs23": TdlpackGridDef(
         mapProjection=5,
         nx=593,
         ny=337,
@@ -148,7 +148,7 @@ _GRIDS: dict[str, TdlpackGridDefinition] = {
         orientationLongitude=105.0,
         gridLength=23812.5,
     ),
-    "gfs47": TdlpackGridDefinition(
+    "gfs47": TdlpackGridDef(
         mapProjection=5,
         nx=297,
         ny=169,
@@ -158,7 +158,7 @@ _GRIDS: dict[str, TdlpackGridDefinition] = {
         orientationLongitude=105.0,
         gridLength=47625.0,
     ),
-    "gfs95": TdlpackGridDefinition(
+    "gfs95": TdlpackGridDef(
         mapProjection=5,
         nx=149,
         ny=85,
@@ -168,7 +168,7 @@ _GRIDS: dict[str, TdlpackGridDefinition] = {
         orientationLongitude=105.0,
         gridLength=95250.0,
     ),
-    "nam151": TdlpackGridDefinition(
+    "nam151": TdlpackGridDef(
         mapProjection=5,
         nx=425,
         ny=281,
@@ -178,7 +178,7 @@ _GRIDS: dict[str, TdlpackGridDefinition] = {
         orientationLongitude=110.0,
         gridLength=33812.0,
     ),
-    "nam221": TdlpackGridDefinition(
+    "nam221": TdlpackGridDef(
         mapProjection=3,
         nx=349,
         ny=198,
@@ -190,7 +190,7 @@ _GRIDS: dict[str, TdlpackGridDefinition] = {
     ),
 }
 
-GRIDS: Mapping[str, TdlpackGridDefinition] = MappingProxyType(_GRIDS)
+GRIDS: Mapping[str, TdlpackGridDef] = MappingProxyType(_GRIDS)
 
 
 def _mos2k_to_standard(lon: float) -> float:
@@ -218,7 +218,7 @@ def get_grid(
     name: str,
     *,
     lon_format: Literal["mos2k", "standard", "0_360"] = "mos2k",
-) -> TdlpackGridDefinition:
+) -> TdlpackGridDef:
     """
     Return a grid definition by name.
 
@@ -240,7 +240,7 @@ def get_grid(
 
     Returns
     -------
-    TdlpackGridDefinition
+    TdlpackGridDef
         Grid definition using the requested longitude convention.
     """
     try:

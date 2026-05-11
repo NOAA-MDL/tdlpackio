@@ -208,49 +208,49 @@
 
             </li>
             <li>
-                    <a class="class" href="#TdlpackGridDefinition">TdlpackGridDefinition</a>
+                    <a class="class" href="#TdlpackGridDef">TdlpackGridDef</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#TdlpackGridDefinition.__init__">TdlpackGridDefinition</a>
+                                <a class="function" href="#TdlpackGridDef.__init__">TdlpackGridDef</a>
                         </li>
                         <li>
-                                <a class="variable" href="#TdlpackGridDefinition.mapProjection">mapProjection</a>
+                                <a class="variable" href="#TdlpackGridDef.mapProjection">mapProjection</a>
                         </li>
                         <li>
-                                <a class="variable" href="#TdlpackGridDefinition.nx">nx</a>
+                                <a class="variable" href="#TdlpackGridDef.nx">nx</a>
                         </li>
                         <li>
-                                <a class="variable" href="#TdlpackGridDefinition.ny">ny</a>
+                                <a class="variable" href="#TdlpackGridDef.ny">ny</a>
                         </li>
                         <li>
-                                <a class="variable" href="#TdlpackGridDefinition.latitudeLowerLeft">latitudeLowerLeft</a>
+                                <a class="variable" href="#TdlpackGridDef.latitudeLowerLeft">latitudeLowerLeft</a>
                         </li>
                         <li>
-                                <a class="variable" href="#TdlpackGridDefinition.longitudeLowerLeft">longitudeLowerLeft</a>
+                                <a class="variable" href="#TdlpackGridDef.longitudeLowerLeft">longitudeLowerLeft</a>
                         </li>
                         <li>
-                                <a class="variable" href="#TdlpackGridDefinition.standardLatitude">standardLatitude</a>
+                                <a class="variable" href="#TdlpackGridDef.standardLatitude">standardLatitude</a>
                         </li>
                         <li>
-                                <a class="variable" href="#TdlpackGridDefinition.orientationLongitude">orientationLongitude</a>
+                                <a class="variable" href="#TdlpackGridDef.orientationLongitude">orientationLongitude</a>
                         </li>
                         <li>
-                                <a class="variable" href="#TdlpackGridDefinition.gridLength">gridLength</a>
+                                <a class="variable" href="#TdlpackGridDef.gridLength">gridLength</a>
                         </li>
                         <li>
-                                <a class="variable" href="#TdlpackGridDefinition.IS2_INDEX">IS2_INDEX</a>
+                                <a class="variable" href="#TdlpackGridDef.IS2_INDEX">IS2_INDEX</a>
                         </li>
                         <li>
-                                <a class="variable" href="#TdlpackGridDefinition.SCALE_FACTOR">SCALE_FACTOR</a>
+                                <a class="variable" href="#TdlpackGridDef.SCALE_FACTOR">SCALE_FACTOR</a>
                         </li>
                         <li>
-                                <a class="function" href="#TdlpackGridDefinition.scaled_value">scaled_value</a>
+                                <a class="function" href="#TdlpackGridDef.scaled_value">scaled_value</a>
                         </li>
                         <li>
-                                <a class="function" href="#TdlpackGridDefinition.to_is2">to_is2</a>
+                                <a class="function" href="#TdlpackGridDef.to_is2">to_is2</a>
                         </li>
                         <li>
-                                <a class="function" href="#TdlpackGridDefinition.to_int_dict">to_int_dict</a>
+                                <a class="function" href="#TdlpackGridDef.to_int_dict">to_int_dict</a>
                         </li>
                 </ul>
 
@@ -337,7 +337,7 @@ as writing to files are performed by the subroutines in libtdlpack.</p>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">._tdlpackio</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">._tdlpackio</span><span class="w"> </span><span class="kn">import</span> <span class="vm">__doc__</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.grids</span><span class="w"> </span><span class="kn">import</span> <span class="n">GRIDS</span><span class="p">,</span> <span class="n">TdlpackGridDefinition</span><span class="p">,</span> <span class="n">get_grid</span><span class="p">,</span> <span class="n">has_grid</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.grids</span><span class="w"> </span><span class="kn">import</span> <span class="n">GRIDS</span><span class="p">,</span> <span class="n">TdlpackGridDef</span><span class="p">,</span> <span class="n">get_grid</span><span class="p">,</span> <span class="n">has_grid</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">__version__</span>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
@@ -347,7 +347,7 @@ as writing to files are performed by the subroutines in libtdlpack.</p>
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="s2">&quot;TdlpackStationRecord&quot;</span><span class="p">,</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="s2">&quot;TdlpackTrailerRecord&quot;</span><span class="p">,</span>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="s2">&quot;TdlpackID&quot;</span><span class="p">,</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="s2">&quot;TdlpackGridDefinition&quot;</span><span class="p">,</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="s2">&quot;TdlpackGridDef&quot;</span><span class="p">,</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="s2">&quot;GRIDS&quot;</span><span class="p">,</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="s2">&quot;get_grid&quot;</span><span class="p">,</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="s2">&quot;has_grid&quot;</span><span class="p">,</span>
@@ -3689,77 +3689,77 @@ Delimiter character between each TDLPACK variable ID word.</li>
 
                             </div>
                 </section>
-                <section id="TdlpackGridDefinition">
-                            <input id="TdlpackGridDefinition-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                <section id="TdlpackGridDef">
+                            <input id="TdlpackGridDef-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr class">
                     <div class="decorator decorator-dataclass">@dataclass(frozen=True, slots=True)</div>
 
     <span class="def">class</span>
-    <span class="name">TdlpackGridDefinition</span>:
+    <span class="name">TdlpackGridDef</span>:
 
-                <label class="view-source-button" for="TdlpackGridDefinition-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="TdlpackGridDef-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackGridDefinition-20"><a href="#TdlpackGridDefinition-20"><span class="linenos">20</span></a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="TdlpackGridDefinition-21"><a href="#TdlpackGridDefinition-21"><span class="linenos">21</span></a><span class="k">class</span><span class="w"> </span><span class="nc">TdlpackGridDefinition</span><span class="p">:</span>
-</span><span id="TdlpackGridDefinition-22"><a href="#TdlpackGridDefinition-22"><span class="linenos">22</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Definition of a TDLPACK grid.</span>
-</span><span id="TdlpackGridDefinition-23"><a href="#TdlpackGridDefinition-23"><span class="linenos">23</span></a>
-</span><span id="TdlpackGridDefinition-24"><a href="#TdlpackGridDefinition-24"><span class="linenos">24</span></a><span class="sd">    Stored longitude convention is MOS-2000:</span>
-</span><span id="TdlpackGridDefinition-25"><a href="#TdlpackGridDefinition-25"><span class="linenos">25</span></a><span class="sd">    west longitude is positive.</span>
-</span><span id="TdlpackGridDefinition-26"><a href="#TdlpackGridDefinition-26"><span class="linenos">26</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="TdlpackGridDefinition-27"><a href="#TdlpackGridDefinition-27"><span class="linenos">27</span></a>
-</span><span id="TdlpackGridDefinition-28"><a href="#TdlpackGridDefinition-28"><span class="linenos">28</span></a>    <span class="n">mapProjection</span><span class="p">:</span> <span class="nb">int</span>
-</span><span id="TdlpackGridDefinition-29"><a href="#TdlpackGridDefinition-29"><span class="linenos">29</span></a>    <span class="n">nx</span><span class="p">:</span> <span class="nb">int</span>
-</span><span id="TdlpackGridDefinition-30"><a href="#TdlpackGridDefinition-30"><span class="linenos">30</span></a>    <span class="n">ny</span><span class="p">:</span> <span class="nb">int</span>
-</span><span id="TdlpackGridDefinition-31"><a href="#TdlpackGridDefinition-31"><span class="linenos">31</span></a>    <span class="n">latitudeLowerLeft</span><span class="p">:</span> <span class="nb">float</span>
-</span><span id="TdlpackGridDefinition-32"><a href="#TdlpackGridDefinition-32"><span class="linenos">32</span></a>    <span class="n">longitudeLowerLeft</span><span class="p">:</span> <span class="nb">float</span>
-</span><span id="TdlpackGridDefinition-33"><a href="#TdlpackGridDefinition-33"><span class="linenos">33</span></a>    <span class="n">standardLatitude</span><span class="p">:</span> <span class="nb">float</span>
-</span><span id="TdlpackGridDefinition-34"><a href="#TdlpackGridDefinition-34"><span class="linenos">34</span></a>    <span class="n">orientationLongitude</span><span class="p">:</span> <span class="nb">float</span>
-</span><span id="TdlpackGridDefinition-35"><a href="#TdlpackGridDefinition-35"><span class="linenos">35</span></a>    <span class="n">gridLength</span><span class="p">:</span> <span class="nb">float</span>
-</span><span id="TdlpackGridDefinition-36"><a href="#TdlpackGridDefinition-36"><span class="linenos">36</span></a>
-</span><span id="TdlpackGridDefinition-37"><a href="#TdlpackGridDefinition-37"><span class="linenos">37</span></a>    <span class="c1"># Array mapping</span>
-</span><span id="TdlpackGridDefinition-38"><a href="#TdlpackGridDefinition-38"><span class="linenos">38</span></a>    <span class="n">IS2_INDEX</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="TdlpackGridDefinition-39"><a href="#TdlpackGridDefinition-39"><span class="linenos">39</span></a>        <span class="s2">&quot;mapProjection&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-40"><a href="#TdlpackGridDefinition-40"><span class="linenos">40</span></a>        <span class="s2">&quot;nx&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-41"><a href="#TdlpackGridDefinition-41"><span class="linenos">41</span></a>        <span class="s2">&quot;ny&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-42"><a href="#TdlpackGridDefinition-42"><span class="linenos">42</span></a>        <span class="s2">&quot;latitudeLowerLeft&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-43"><a href="#TdlpackGridDefinition-43"><span class="linenos">43</span></a>        <span class="s2">&quot;longitudeLowerLeft&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-44"><a href="#TdlpackGridDefinition-44"><span class="linenos">44</span></a>        <span class="s2">&quot;orientationLongitude&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-45"><a href="#TdlpackGridDefinition-45"><span class="linenos">45</span></a>        <span class="s2">&quot;gridLength&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-46"><a href="#TdlpackGridDefinition-46"><span class="linenos">46</span></a>        <span class="s2">&quot;standardLatitude&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-47"><a href="#TdlpackGridDefinition-47"><span class="linenos">47</span></a>    <span class="p">}</span>
-</span><span id="TdlpackGridDefinition-48"><a href="#TdlpackGridDefinition-48"><span class="linenos">48</span></a>
-</span><span id="TdlpackGridDefinition-49"><a href="#TdlpackGridDefinition-49"><span class="linenos">49</span></a>    <span class="c1"># Attribute scale factors used to convert to whole integers.</span>
-</span><span id="TdlpackGridDefinition-50"><a href="#TdlpackGridDefinition-50"><span class="linenos">50</span></a>    <span class="n">SCALE_FACTOR</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="TdlpackGridDefinition-51"><a href="#TdlpackGridDefinition-51"><span class="linenos">51</span></a>        <span class="s2">&quot;mapProjection&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-52"><a href="#TdlpackGridDefinition-52"><span class="linenos">52</span></a>        <span class="s2">&quot;nx&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-53"><a href="#TdlpackGridDefinition-53"><span class="linenos">53</span></a>        <span class="s2">&quot;ny&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-54"><a href="#TdlpackGridDefinition-54"><span class="linenos">54</span></a>        <span class="s2">&quot;latitudeLowerLeft&quot;</span><span class="p">:</span> <span class="mi">10_000</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-55"><a href="#TdlpackGridDefinition-55"><span class="linenos">55</span></a>        <span class="s2">&quot;longitudeLowerLeft&quot;</span><span class="p">:</span> <span class="mi">10_000</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-56"><a href="#TdlpackGridDefinition-56"><span class="linenos">56</span></a>        <span class="s2">&quot;orientationLongitude&quot;</span><span class="p">:</span> <span class="mi">10_000</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-57"><a href="#TdlpackGridDefinition-57"><span class="linenos">57</span></a>        <span class="s2">&quot;gridLength&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-58"><a href="#TdlpackGridDefinition-58"><span class="linenos">58</span></a>        <span class="s2">&quot;standardLatitude&quot;</span><span class="p">:</span> <span class="mi">10_000</span><span class="p">,</span>
-</span><span id="TdlpackGridDefinition-59"><a href="#TdlpackGridDefinition-59"><span class="linenos">59</span></a>    <span class="p">}</span>
-</span><span id="TdlpackGridDefinition-60"><a href="#TdlpackGridDefinition-60"><span class="linenos">60</span></a>
-</span><span id="TdlpackGridDefinition-61"><a href="#TdlpackGridDefinition-61"><span class="linenos">61</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">scaled_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span><span id="TdlpackGridDefinition-62"><a href="#TdlpackGridDefinition-62"><span class="linenos">62</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one grid attribute scaled to an integer.&quot;&quot;&quot;</span>
-</span><span id="TdlpackGridDefinition-63"><a href="#TdlpackGridDefinition-63"><span class="linenos">63</span></a>        <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-</span><span id="TdlpackGridDefinition-64"><a href="#TdlpackGridDefinition-64"><span class="linenos">64</span></a>        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCALE_FACTOR</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-</span><span id="TdlpackGridDefinition-65"><a href="#TdlpackGridDefinition-65"><span class="linenos">65</span></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="n">scale</span><span class="p">))</span>
-</span><span id="TdlpackGridDefinition-66"><a href="#TdlpackGridDefinition-66"><span class="linenos">66</span></a>
-</span><span id="TdlpackGridDefinition-67"><a href="#TdlpackGridDefinition-67"><span class="linenos">67</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_is2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-</span><span id="TdlpackGridDefinition-68"><a href="#TdlpackGridDefinition-68"><span class="linenos">68</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the grid definition as a scaled integer array.&quot;&quot;&quot;</span>
-</span><span id="TdlpackGridDefinition-69"><a href="#TdlpackGridDefinition-69"><span class="linenos">69</span></a>        <span class="n">is2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_tdlpackio</span><span class="o">.</span><span class="n">ND7</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-</span><span id="TdlpackGridDefinition-70"><a href="#TdlpackGridDefinition-70"><span class="linenos">70</span></a>
-</span><span id="TdlpackGridDefinition-71"><a href="#TdlpackGridDefinition-71"><span class="linenos">71</span></a>        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS2_INDEX</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="TdlpackGridDefinition-72"><a href="#TdlpackGridDefinition-72"><span class="linenos">72</span></a>            <span class="n">is2</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaled_value</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-</span><span id="TdlpackGridDefinition-73"><a href="#TdlpackGridDefinition-73"><span class="linenos">73</span></a>
-</span><span id="TdlpackGridDefinition-74"><a href="#TdlpackGridDefinition-74"><span class="linenos">74</span></a>        <span class="k">return</span> <span class="n">is2</span>
-</span><span id="TdlpackGridDefinition-75"><a href="#TdlpackGridDefinition-75"><span class="linenos">75</span></a>
-</span><span id="TdlpackGridDefinition-76"><a href="#TdlpackGridDefinition-76"><span class="linenos">76</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_int_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-</span><span id="TdlpackGridDefinition-77"><a href="#TdlpackGridDefinition-77"><span class="linenos">77</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return scaled integer values keyed by attribute name.&quot;&quot;&quot;</span>
-</span><span id="TdlpackGridDefinition-78"><a href="#TdlpackGridDefinition-78"><span class="linenos">78</span></a>        <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaled_value</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS2_INDEX</span><span class="p">}</span>
+    <a class="headerlink" href="#TdlpackGridDef"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackGridDef-20"><a href="#TdlpackGridDef-20"><span class="linenos">20</span></a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="TdlpackGridDef-21"><a href="#TdlpackGridDef-21"><span class="linenos">21</span></a><span class="k">class</span><span class="w"> </span><span class="nc">TdlpackGridDef</span><span class="p">:</span>
+</span><span id="TdlpackGridDef-22"><a href="#TdlpackGridDef-22"><span class="linenos">22</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Definition of a TDLPACK grid.</span>
+</span><span id="TdlpackGridDef-23"><a href="#TdlpackGridDef-23"><span class="linenos">23</span></a>
+</span><span id="TdlpackGridDef-24"><a href="#TdlpackGridDef-24"><span class="linenos">24</span></a><span class="sd">    Stored longitude convention is MOS-2000:</span>
+</span><span id="TdlpackGridDef-25"><a href="#TdlpackGridDef-25"><span class="linenos">25</span></a><span class="sd">    west longitude is positive.</span>
+</span><span id="TdlpackGridDef-26"><a href="#TdlpackGridDef-26"><span class="linenos">26</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="TdlpackGridDef-27"><a href="#TdlpackGridDef-27"><span class="linenos">27</span></a>
+</span><span id="TdlpackGridDef-28"><a href="#TdlpackGridDef-28"><span class="linenos">28</span></a>    <span class="n">mapProjection</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="TdlpackGridDef-29"><a href="#TdlpackGridDef-29"><span class="linenos">29</span></a>    <span class="n">nx</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="TdlpackGridDef-30"><a href="#TdlpackGridDef-30"><span class="linenos">30</span></a>    <span class="n">ny</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="TdlpackGridDef-31"><a href="#TdlpackGridDef-31"><span class="linenos">31</span></a>    <span class="n">latitudeLowerLeft</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="TdlpackGridDef-32"><a href="#TdlpackGridDef-32"><span class="linenos">32</span></a>    <span class="n">longitudeLowerLeft</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="TdlpackGridDef-33"><a href="#TdlpackGridDef-33"><span class="linenos">33</span></a>    <span class="n">standardLatitude</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="TdlpackGridDef-34"><a href="#TdlpackGridDef-34"><span class="linenos">34</span></a>    <span class="n">orientationLongitude</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="TdlpackGridDef-35"><a href="#TdlpackGridDef-35"><span class="linenos">35</span></a>    <span class="n">gridLength</span><span class="p">:</span> <span class="nb">float</span>
+</span><span id="TdlpackGridDef-36"><a href="#TdlpackGridDef-36"><span class="linenos">36</span></a>
+</span><span id="TdlpackGridDef-37"><a href="#TdlpackGridDef-37"><span class="linenos">37</span></a>    <span class="c1"># Array mapping</span>
+</span><span id="TdlpackGridDef-38"><a href="#TdlpackGridDef-38"><span class="linenos">38</span></a>    <span class="n">IS2_INDEX</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="TdlpackGridDef-39"><a href="#TdlpackGridDef-39"><span class="linenos">39</span></a>        <span class="s2">&quot;mapProjection&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-40"><a href="#TdlpackGridDef-40"><span class="linenos">40</span></a>        <span class="s2">&quot;nx&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-41"><a href="#TdlpackGridDef-41"><span class="linenos">41</span></a>        <span class="s2">&quot;ny&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-42"><a href="#TdlpackGridDef-42"><span class="linenos">42</span></a>        <span class="s2">&quot;latitudeLowerLeft&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-43"><a href="#TdlpackGridDef-43"><span class="linenos">43</span></a>        <span class="s2">&quot;longitudeLowerLeft&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-44"><a href="#TdlpackGridDef-44"><span class="linenos">44</span></a>        <span class="s2">&quot;orientationLongitude&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-45"><a href="#TdlpackGridDef-45"><span class="linenos">45</span></a>        <span class="s2">&quot;gridLength&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-46"><a href="#TdlpackGridDef-46"><span class="linenos">46</span></a>        <span class="s2">&quot;standardLatitude&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-47"><a href="#TdlpackGridDef-47"><span class="linenos">47</span></a>    <span class="p">}</span>
+</span><span id="TdlpackGridDef-48"><a href="#TdlpackGridDef-48"><span class="linenos">48</span></a>
+</span><span id="TdlpackGridDef-49"><a href="#TdlpackGridDef-49"><span class="linenos">49</span></a>    <span class="c1"># Attribute scale factors used to convert to whole integers.</span>
+</span><span id="TdlpackGridDef-50"><a href="#TdlpackGridDef-50"><span class="linenos">50</span></a>    <span class="n">SCALE_FACTOR</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="TdlpackGridDef-51"><a href="#TdlpackGridDef-51"><span class="linenos">51</span></a>        <span class="s2">&quot;mapProjection&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-52"><a href="#TdlpackGridDef-52"><span class="linenos">52</span></a>        <span class="s2">&quot;nx&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-53"><a href="#TdlpackGridDef-53"><span class="linenos">53</span></a>        <span class="s2">&quot;ny&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-54"><a href="#TdlpackGridDef-54"><span class="linenos">54</span></a>        <span class="s2">&quot;latitudeLowerLeft&quot;</span><span class="p">:</span> <span class="mi">10_000</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-55"><a href="#TdlpackGridDef-55"><span class="linenos">55</span></a>        <span class="s2">&quot;longitudeLowerLeft&quot;</span><span class="p">:</span> <span class="mi">10_000</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-56"><a href="#TdlpackGridDef-56"><span class="linenos">56</span></a>        <span class="s2">&quot;orientationLongitude&quot;</span><span class="p">:</span> <span class="mi">10_000</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-57"><a href="#TdlpackGridDef-57"><span class="linenos">57</span></a>        <span class="s2">&quot;gridLength&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-58"><a href="#TdlpackGridDef-58"><span class="linenos">58</span></a>        <span class="s2">&quot;standardLatitude&quot;</span><span class="p">:</span> <span class="mi">10_000</span><span class="p">,</span>
+</span><span id="TdlpackGridDef-59"><a href="#TdlpackGridDef-59"><span class="linenos">59</span></a>    <span class="p">}</span>
+</span><span id="TdlpackGridDef-60"><a href="#TdlpackGridDef-60"><span class="linenos">60</span></a>
+</span><span id="TdlpackGridDef-61"><a href="#TdlpackGridDef-61"><span class="linenos">61</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">scaled_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="TdlpackGridDef-62"><a href="#TdlpackGridDef-62"><span class="linenos">62</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one grid attribute scaled to an integer.&quot;&quot;&quot;</span>
+</span><span id="TdlpackGridDef-63"><a href="#TdlpackGridDef-63"><span class="linenos">63</span></a>        <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+</span><span id="TdlpackGridDef-64"><a href="#TdlpackGridDef-64"><span class="linenos">64</span></a>        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCALE_FACTOR</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+</span><span id="TdlpackGridDef-65"><a href="#TdlpackGridDef-65"><span class="linenos">65</span></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="n">scale</span><span class="p">))</span>
+</span><span id="TdlpackGridDef-66"><a href="#TdlpackGridDef-66"><span class="linenos">66</span></a>
+</span><span id="TdlpackGridDef-67"><a href="#TdlpackGridDef-67"><span class="linenos">67</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_is2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+</span><span id="TdlpackGridDef-68"><a href="#TdlpackGridDef-68"><span class="linenos">68</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the grid definition as a scaled integer array.&quot;&quot;&quot;</span>
+</span><span id="TdlpackGridDef-69"><a href="#TdlpackGridDef-69"><span class="linenos">69</span></a>        <span class="n">is2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_tdlpackio</span><span class="o">.</span><span class="n">ND7</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="TdlpackGridDef-70"><a href="#TdlpackGridDef-70"><span class="linenos">70</span></a>
+</span><span id="TdlpackGridDef-71"><a href="#TdlpackGridDef-71"><span class="linenos">71</span></a>        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS2_INDEX</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="TdlpackGridDef-72"><a href="#TdlpackGridDef-72"><span class="linenos">72</span></a>            <span class="n">is2</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaled_value</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span><span id="TdlpackGridDef-73"><a href="#TdlpackGridDef-73"><span class="linenos">73</span></a>
+</span><span id="TdlpackGridDef-74"><a href="#TdlpackGridDef-74"><span class="linenos">74</span></a>        <span class="k">return</span> <span class="n">is2</span>
+</span><span id="TdlpackGridDef-75"><a href="#TdlpackGridDef-75"><span class="linenos">75</span></a>
+</span><span id="TdlpackGridDef-76"><a href="#TdlpackGridDef-76"><span class="linenos">76</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_int_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+</span><span id="TdlpackGridDef-77"><a href="#TdlpackGridDef-77"><span class="linenos">77</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return scaled integer values keyed by attribute name.&quot;&quot;&quot;</span>
+</span><span id="TdlpackGridDef-78"><a href="#TdlpackGridDef-78"><span class="linenos">78</span></a>        <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaled_value</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS2_INDEX</span><span class="p">}</span>
 </span></pre></div>
 
 
@@ -3770,148 +3770,148 @@ west longitude is positive.</p>
 </div>
 
 
-                            <div id="TdlpackGridDefinition.__init__" class="classattr">
+                            <div id="TdlpackGridDef.__init__" class="classattr">
                                 <div class="attr function">
             
-        <span class="name">TdlpackGridDefinition</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">mapProjection</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">nx</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">ny</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">latitudeLowerLeft</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">longitudeLowerLeft</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">standardLatitude</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">orientationLongitude</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">gridLength</span><span class="p">:</span> <span class="nb">float</span></span>)</span>
+        <span class="name">TdlpackGridDef</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">mapProjection</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">nx</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">ny</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">latitudeLowerLeft</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">longitudeLowerLeft</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">standardLatitude</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">orientationLongitude</span><span class="p">:</span> <span class="nb">float</span>,</span><span class="param">	<span class="n">gridLength</span><span class="p">:</span> <span class="nb">float</span></span>)</span>
 
         
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.__init__"></a>
+    <a class="headerlink" href="#TdlpackGridDef.__init__"></a>
     
     
 
                             </div>
-                            <div id="TdlpackGridDefinition.mapProjection" class="classattr">
+                            <div id="TdlpackGridDef.mapProjection" class="classattr">
                                 <div class="attr variable">
             <span class="name">mapProjection</span><span class="annotation">: int</span>
 
         
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.mapProjection"></a>
+    <a class="headerlink" href="#TdlpackGridDef.mapProjection"></a>
     
     
 
                             </div>
-                            <div id="TdlpackGridDefinition.nx" class="classattr">
+                            <div id="TdlpackGridDef.nx" class="classattr">
                                 <div class="attr variable">
             <span class="name">nx</span><span class="annotation">: int</span>
 
         
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.nx"></a>
+    <a class="headerlink" href="#TdlpackGridDef.nx"></a>
     
     
 
                             </div>
-                            <div id="TdlpackGridDefinition.ny" class="classattr">
+                            <div id="TdlpackGridDef.ny" class="classattr">
                                 <div class="attr variable">
             <span class="name">ny</span><span class="annotation">: int</span>
 
         
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.ny"></a>
+    <a class="headerlink" href="#TdlpackGridDef.ny"></a>
     
     
 
                             </div>
-                            <div id="TdlpackGridDefinition.latitudeLowerLeft" class="classattr">
+                            <div id="TdlpackGridDef.latitudeLowerLeft" class="classattr">
                                 <div class="attr variable">
             <span class="name">latitudeLowerLeft</span><span class="annotation">: float</span>
 
         
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.latitudeLowerLeft"></a>
+    <a class="headerlink" href="#TdlpackGridDef.latitudeLowerLeft"></a>
     
     
 
                             </div>
-                            <div id="TdlpackGridDefinition.longitudeLowerLeft" class="classattr">
+                            <div id="TdlpackGridDef.longitudeLowerLeft" class="classattr">
                                 <div class="attr variable">
             <span class="name">longitudeLowerLeft</span><span class="annotation">: float</span>
 
         
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.longitudeLowerLeft"></a>
+    <a class="headerlink" href="#TdlpackGridDef.longitudeLowerLeft"></a>
     
     
 
                             </div>
-                            <div id="TdlpackGridDefinition.standardLatitude" class="classattr">
+                            <div id="TdlpackGridDef.standardLatitude" class="classattr">
                                 <div class="attr variable">
             <span class="name">standardLatitude</span><span class="annotation">: float</span>
 
         
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.standardLatitude"></a>
+    <a class="headerlink" href="#TdlpackGridDef.standardLatitude"></a>
     
     
 
                             </div>
-                            <div id="TdlpackGridDefinition.orientationLongitude" class="classattr">
+                            <div id="TdlpackGridDef.orientationLongitude" class="classattr">
                                 <div class="attr variable">
             <span class="name">orientationLongitude</span><span class="annotation">: float</span>
 
         
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.orientationLongitude"></a>
+    <a class="headerlink" href="#TdlpackGridDef.orientationLongitude"></a>
     
     
 
                             </div>
-                            <div id="TdlpackGridDefinition.gridLength" class="classattr">
+                            <div id="TdlpackGridDef.gridLength" class="classattr">
                                 <div class="attr variable">
             <span class="name">gridLength</span><span class="annotation">: float</span>
 
         
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.gridLength"></a>
+    <a class="headerlink" href="#TdlpackGridDef.gridLength"></a>
     
     
 
                             </div>
-                            <div id="TdlpackGridDefinition.IS2_INDEX" class="classattr">
+                            <div id="TdlpackGridDef.IS2_INDEX" class="classattr">
                                 <div class="attr variable">
             <span class="name">IS2_INDEX</span><span class="annotation">: ClassVar[dict[str, int]]</span>        =
-<input id="TdlpackGridDefinition.IS2_INDEX-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="TdlpackGridDefinition.IS2_INDEX-view-value"></label><span class="default_value">{&#39;mapProjection&#39;: 1, &#39;nx&#39;: 2, &#39;ny&#39;: 3, &#39;latitudeLowerLeft&#39;: 4, &#39;longitudeLowerLeft&#39;: 5, &#39;orientationLongitude&#39;: 6, &#39;gridLength&#39;: 7, &#39;standardLatitude&#39;: 8}</span>
+<input id="TdlpackGridDef.IS2_INDEX-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+            <label class="view-value-button pdoc-button" for="TdlpackGridDef.IS2_INDEX-view-value"></label><span class="default_value">{&#39;mapProjection&#39;: 1, &#39;nx&#39;: 2, &#39;ny&#39;: 3, &#39;latitudeLowerLeft&#39;: 4, &#39;longitudeLowerLeft&#39;: 5, &#39;orientationLongitude&#39;: 6, &#39;gridLength&#39;: 7, &#39;standardLatitude&#39;: 8}</span>
 
         
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.IS2_INDEX"></a>
+    <a class="headerlink" href="#TdlpackGridDef.IS2_INDEX"></a>
     
     
 
                             </div>
-                            <div id="TdlpackGridDefinition.SCALE_FACTOR" class="classattr">
+                            <div id="TdlpackGridDef.SCALE_FACTOR" class="classattr">
                                 <div class="attr variable">
             <span class="name">SCALE_FACTOR</span><span class="annotation">: ClassVar[dict[str, int]]</span>        =
-<input id="TdlpackGridDefinition.SCALE_FACTOR-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="TdlpackGridDefinition.SCALE_FACTOR-view-value"></label><span class="default_value">{&#39;mapProjection&#39;: 1, &#39;nx&#39;: 1, &#39;ny&#39;: 1, &#39;latitudeLowerLeft&#39;: 10000, &#39;longitudeLowerLeft&#39;: 10000, &#39;orientationLongitude&#39;: 10000, &#39;gridLength&#39;: 1000, &#39;standardLatitude&#39;: 10000}</span>
+<input id="TdlpackGridDef.SCALE_FACTOR-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+            <label class="view-value-button pdoc-button" for="TdlpackGridDef.SCALE_FACTOR-view-value"></label><span class="default_value">{&#39;mapProjection&#39;: 1, &#39;nx&#39;: 1, &#39;ny&#39;: 1, &#39;latitudeLowerLeft&#39;: 10000, &#39;longitudeLowerLeft&#39;: 10000, &#39;orientationLongitude&#39;: 10000, &#39;gridLength&#39;: 1000, &#39;standardLatitude&#39;: 10000}</span>
 
         
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.SCALE_FACTOR"></a>
+    <a class="headerlink" href="#TdlpackGridDef.SCALE_FACTOR"></a>
     
     
 
                             </div>
-                            <div id="TdlpackGridDefinition.scaled_value" class="classattr">
-                                        <input id="TdlpackGridDefinition.scaled_value-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                            <div id="TdlpackGridDef.scaled_value" class="classattr">
+                                        <input id="TdlpackGridDef.scaled_value-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
         <span class="name">scaled_value</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">name</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="nb">int</span>:</span></span>
 
-                <label class="view-source-button" for="TdlpackGridDefinition.scaled_value-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="TdlpackGridDef.scaled_value-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.scaled_value"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackGridDefinition.scaled_value-61"><a href="#TdlpackGridDefinition.scaled_value-61"><span class="linenos">61</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">scaled_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-</span><span id="TdlpackGridDefinition.scaled_value-62"><a href="#TdlpackGridDefinition.scaled_value-62"><span class="linenos">62</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one grid attribute scaled to an integer.&quot;&quot;&quot;</span>
-</span><span id="TdlpackGridDefinition.scaled_value-63"><a href="#TdlpackGridDefinition.scaled_value-63"><span class="linenos">63</span></a>        <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-</span><span id="TdlpackGridDefinition.scaled_value-64"><a href="#TdlpackGridDefinition.scaled_value-64"><span class="linenos">64</span></a>        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCALE_FACTOR</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
-</span><span id="TdlpackGridDefinition.scaled_value-65"><a href="#TdlpackGridDefinition.scaled_value-65"><span class="linenos">65</span></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="n">scale</span><span class="p">))</span>
+    <a class="headerlink" href="#TdlpackGridDef.scaled_value"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackGridDef.scaled_value-61"><a href="#TdlpackGridDef.scaled_value-61"><span class="linenos">61</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">scaled_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+</span><span id="TdlpackGridDef.scaled_value-62"><a href="#TdlpackGridDef.scaled_value-62"><span class="linenos">62</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one grid attribute scaled to an integer.&quot;&quot;&quot;</span>
+</span><span id="TdlpackGridDef.scaled_value-63"><a href="#TdlpackGridDef.scaled_value-63"><span class="linenos">63</span></a>        <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+</span><span id="TdlpackGridDef.scaled_value-64"><a href="#TdlpackGridDef.scaled_value-64"><span class="linenos">64</span></a>        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCALE_FACTOR</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+</span><span id="TdlpackGridDef.scaled_value-65"><a href="#TdlpackGridDef.scaled_value-65"><span class="linenos">65</span></a>        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="n">scale</span><span class="p">))</span>
 </span></pre></div>
 
 
@@ -3920,25 +3920,25 @@ west longitude is positive.</p>
 
 
                             </div>
-                            <div id="TdlpackGridDefinition.to_is2" class="classattr">
-                                        <input id="TdlpackGridDefinition.to_is2-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                            <div id="TdlpackGridDef.to_is2" class="classattr">
+                                        <input id="TdlpackGridDef.to_is2-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
         <span class="name">to_is2</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>:</span></span>
 
-                <label class="view-source-button" for="TdlpackGridDefinition.to_is2-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="TdlpackGridDef.to_is2-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.to_is2"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackGridDefinition.to_is2-67"><a href="#TdlpackGridDefinition.to_is2-67"><span class="linenos">67</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_is2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-</span><span id="TdlpackGridDefinition.to_is2-68"><a href="#TdlpackGridDefinition.to_is2-68"><span class="linenos">68</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the grid definition as a scaled integer array.&quot;&quot;&quot;</span>
-</span><span id="TdlpackGridDefinition.to_is2-69"><a href="#TdlpackGridDefinition.to_is2-69"><span class="linenos">69</span></a>        <span class="n">is2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_tdlpackio</span><span class="o">.</span><span class="n">ND7</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-</span><span id="TdlpackGridDefinition.to_is2-70"><a href="#TdlpackGridDefinition.to_is2-70"><span class="linenos">70</span></a>
-</span><span id="TdlpackGridDefinition.to_is2-71"><a href="#TdlpackGridDefinition.to_is2-71"><span class="linenos">71</span></a>        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS2_INDEX</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="TdlpackGridDefinition.to_is2-72"><a href="#TdlpackGridDefinition.to_is2-72"><span class="linenos">72</span></a>            <span class="n">is2</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaled_value</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-</span><span id="TdlpackGridDefinition.to_is2-73"><a href="#TdlpackGridDefinition.to_is2-73"><span class="linenos">73</span></a>
-</span><span id="TdlpackGridDefinition.to_is2-74"><a href="#TdlpackGridDefinition.to_is2-74"><span class="linenos">74</span></a>        <span class="k">return</span> <span class="n">is2</span>
+    <a class="headerlink" href="#TdlpackGridDef.to_is2"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackGridDef.to_is2-67"><a href="#TdlpackGridDef.to_is2-67"><span class="linenos">67</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_is2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+</span><span id="TdlpackGridDef.to_is2-68"><a href="#TdlpackGridDef.to_is2-68"><span class="linenos">68</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the grid definition as a scaled integer array.&quot;&quot;&quot;</span>
+</span><span id="TdlpackGridDef.to_is2-69"><a href="#TdlpackGridDef.to_is2-69"><span class="linenos">69</span></a>        <span class="n">is2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">_tdlpackio</span><span class="o">.</span><span class="n">ND7</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+</span><span id="TdlpackGridDef.to_is2-70"><a href="#TdlpackGridDef.to_is2-70"><span class="linenos">70</span></a>
+</span><span id="TdlpackGridDef.to_is2-71"><a href="#TdlpackGridDef.to_is2-71"><span class="linenos">71</span></a>        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS2_INDEX</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="TdlpackGridDef.to_is2-72"><a href="#TdlpackGridDef.to_is2-72"><span class="linenos">72</span></a>            <span class="n">is2</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaled_value</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</span><span id="TdlpackGridDef.to_is2-73"><a href="#TdlpackGridDef.to_is2-73"><span class="linenos">73</span></a>
+</span><span id="TdlpackGridDef.to_is2-74"><a href="#TdlpackGridDef.to_is2-74"><span class="linenos">74</span></a>        <span class="k">return</span> <span class="n">is2</span>
 </span></pre></div>
 
 
@@ -3947,20 +3947,20 @@ west longitude is positive.</p>
 
 
                             </div>
-                            <div id="TdlpackGridDefinition.to_int_dict" class="classattr">
-                                        <input id="TdlpackGridDefinition.to_int_dict-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+                            <div id="TdlpackGridDef.to_int_dict" class="classattr">
+                                        <input id="TdlpackGridDef.to_int_dict-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
         <span class="def">def</span>
         <span class="name">to_int_dict</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>:</span></span>
 
-                <label class="view-source-button" for="TdlpackGridDefinition.to_int_dict-view-source"><span>View Source</span></label>
+                <label class="view-source-button" for="TdlpackGridDef.to_int_dict-view-source"><span>View Source</span></label>
 
     </div>
-    <a class="headerlink" href="#TdlpackGridDefinition.to_int_dict"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackGridDefinition.to_int_dict-76"><a href="#TdlpackGridDefinition.to_int_dict-76"><span class="linenos">76</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_int_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
-</span><span id="TdlpackGridDefinition.to_int_dict-77"><a href="#TdlpackGridDefinition.to_int_dict-77"><span class="linenos">77</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return scaled integer values keyed by attribute name.&quot;&quot;&quot;</span>
-</span><span id="TdlpackGridDefinition.to_int_dict-78"><a href="#TdlpackGridDefinition.to_int_dict-78"><span class="linenos">78</span></a>        <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaled_value</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS2_INDEX</span><span class="p">}</span>
+    <a class="headerlink" href="#TdlpackGridDef.to_int_dict"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="TdlpackGridDef.to_int_dict-76"><a href="#TdlpackGridDef.to_int_dict-76"><span class="linenos">76</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_int_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+</span><span id="TdlpackGridDef.to_int_dict-77"><a href="#TdlpackGridDef.to_int_dict-77"><span class="linenos">77</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return scaled integer values keyed by attribute name.&quot;&quot;&quot;</span>
+</span><span id="TdlpackGridDef.to_int_dict-78"><a href="#TdlpackGridDef.to_int_dict-78"><span class="linenos">78</span></a>        <span class="k">return</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaled_value</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">IS2_INDEX</span><span class="p">}</span>
 </span></pre></div>
 
 
@@ -3974,7 +3974,7 @@ west longitude is positive.</p>
                     <div class="attr variable">
             <span class="name">GRIDS</span>        =
 <input id="GRIDS-view-value" class="view-value-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-            <label class="view-value-button pdoc-button" for="GRIDS-view-value"></label><span class="default_value">mappingproxy({&#39;nbmak&#39;: TdlpackGridDefinition(mapProjection=5, nx=1649, ny=1105, latitudeLowerLeft=40.5301, longitudeLowerLeft=178.5713, standardLatitude=60.0, orientationLongitude=150.0, gridLength=2976.560059), &#39;nbmco&#39;: TdlpackGridDefinition(mapProjection=3, nx=2345, ny=1597, latitudeLowerLeft=19.229, longitudeLowerLeft=126.2766, standardLatitude=25.0, orientationLongitude=95.0, gridLength=2539.702881), &#39;nbmhi&#39;: TdlpackGridDefinition(mapProjection=7, nx=625, ny=561, latitudeLowerLeft=14.3515, longitudeLowerLeft=164.9695, standardLatitude=20.0, orientationLongitude=160.0, gridLength=2500.0), &#39;nbmoc&#39;: TdlpackGridDefinition(mapProjection=7, nx=2517, ny=1817, latitudeLowerLeft=-30.4192, longitudeLowerLeft=230.0942, standardLatitude=20.0, orientationLongitude=360.0, gridLength=10000.0), &#39;nbmpr&#39;: TdlpackGridDefinition(mapProjection=7, nx=353, ny=257, latitudeLowerLeft=16.828, longitudeLowerLeft=68.1954, standardLatitude=20.0, orientationLongitude=65.0, gridLength=1250.0), &#39;nbmswp&#39;: TdlpackGridDefinition(mapProjection=7, nx=3683, ny=1903, latitudeLowerLeft=-26.0, longitudeLowerLeft=230.0, standardLatitude=-5.0, orientationLongitude=360.0, gridLength=2500.0), &#39;gfs23&#39;: TdlpackGridDefinition(mapProjection=5, nx=593, ny=337, latitudeLowerLeft=2.832, longitudeLowerLeft=150.0003, standardLatitude=60.0, orientationLongitude=105.0, gridLength=23812.5), &#39;gfs47&#39;: TdlpackGridDefinition(mapProjection=5, nx=297, ny=169, latitudeLowerLeft=2.832, longitudeLowerLeft=150.0003, standardLatitude=60.0, orientationLongitude=105.0, gridLength=47625.0), &#39;gfs95&#39;: TdlpackGridDefinition(mapProjection=5, nx=149, ny=85, latitudeLowerLeft=2.832, longitudeLowerLeft=150.0003, standardLatitude=60.0, orientationLongitude=105.0, gridLength=95250.0), &#39;nam151&#39;: TdlpackGridDefinition(mapProjection=5, nx=425, ny=281, latitudeLowerLeft=0.7279, longitudeLowerLeft=150.3583, standardLatitude=60.0, orientationLongitude=110.0, gridLength=33812.0), &#39;nam221&#39;: TdlpackGridDefinition(mapProjection=3, nx=349, ny=198, latitudeLowerLeft=9.5803, longitudeLowerLeft=150.7806, standardLatitude=50.0, orientationLongitude=107.0, gridLength=32463.410156)})</span>
+            <label class="view-value-button pdoc-button" for="GRIDS-view-value"></label><span class="default_value">mappingproxy({&#39;nbmak&#39;: TdlpackGridDef(mapProjection=5, nx=1649, ny=1105, latitudeLowerLeft=40.5301, longitudeLowerLeft=178.5713, standardLatitude=60.0, orientationLongitude=150.0, gridLength=2976.560059), &#39;nbmco&#39;: TdlpackGridDef(mapProjection=3, nx=2345, ny=1597, latitudeLowerLeft=19.229, longitudeLowerLeft=126.2766, standardLatitude=25.0, orientationLongitude=95.0, gridLength=2539.702881), &#39;nbmhi&#39;: TdlpackGridDef(mapProjection=7, nx=625, ny=561, latitudeLowerLeft=14.3515, longitudeLowerLeft=164.9695, standardLatitude=20.0, orientationLongitude=160.0, gridLength=2500.0), &#39;nbmoc&#39;: TdlpackGridDef(mapProjection=7, nx=2517, ny=1817, latitudeLowerLeft=-30.4192, longitudeLowerLeft=230.0942, standardLatitude=20.0, orientationLongitude=360.0, gridLength=10000.0), &#39;nbmpr&#39;: TdlpackGridDef(mapProjection=7, nx=353, ny=257, latitudeLowerLeft=16.828, longitudeLowerLeft=68.1954, standardLatitude=20.0, orientationLongitude=65.0, gridLength=1250.0), &#39;nbmswp&#39;: TdlpackGridDef(mapProjection=7, nx=3683, ny=1903, latitudeLowerLeft=-26.0, longitudeLowerLeft=230.0, standardLatitude=-5.0, orientationLongitude=360.0, gridLength=2500.0), &#39;gfs23&#39;: TdlpackGridDef(mapProjection=5, nx=593, ny=337, latitudeLowerLeft=2.832, longitudeLowerLeft=150.0003, standardLatitude=60.0, orientationLongitude=105.0, gridLength=23812.5), &#39;gfs47&#39;: TdlpackGridDef(mapProjection=5, nx=297, ny=169, latitudeLowerLeft=2.832, longitudeLowerLeft=150.0003, standardLatitude=60.0, orientationLongitude=105.0, gridLength=47625.0), &#39;gfs95&#39;: TdlpackGridDef(mapProjection=5, nx=149, ny=85, latitudeLowerLeft=2.832, longitudeLowerLeft=150.0003, standardLatitude=60.0, orientationLongitude=105.0, gridLength=95250.0), &#39;nam151&#39;: TdlpackGridDef(mapProjection=5, nx=425, ny=281, latitudeLowerLeft=0.7279, longitudeLowerLeft=150.3583, standardLatitude=60.0, orientationLongitude=110.0, gridLength=33812.0), &#39;nam221&#39;: TdlpackGridDef(mapProjection=3, nx=349, ny=198, latitudeLowerLeft=9.5803, longitudeLowerLeft=150.7806, standardLatitude=50.0, orientationLongitude=107.0, gridLength=32463.410156)})</span>
 
         
     </div>
@@ -3988,7 +3988,7 @@ west longitude is positive.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_grid</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="o">*</span>,</span><span class="param">	<span class="n">lon_format</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;mos2k&#39;</span><span class="p">,</span> <span class="s1">&#39;standard&#39;</span><span class="p">,</span> <span class="s1">&#39;0_360&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mos2k&#39;</span></span><span class="return-annotation">) -> <span class="n"><a href="#TdlpackGridDefinition">TdlpackGridDefinition</a></span>:</span></span>
+        <span class="name">get_grid</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="o">*</span>,</span><span class="param">	<span class="n">lon_format</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;mos2k&#39;</span><span class="p">,</span> <span class="s1">&#39;standard&#39;</span><span class="p">,</span> <span class="s1">&#39;0_360&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mos2k&#39;</span></span><span class="return-annotation">) -> <span class="n"><a href="#TdlpackGridDef">TdlpackGridDef</a></span>:</span></span>
 
                 <label class="view-source-button" for="get_grid-view-source"><span>View Source</span></label>
 
@@ -3998,7 +3998,7 @@ west longitude is positive.</p>
 </span><span id="get_grid-219"><a href="#get_grid-219"><span class="linenos">219</span></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="get_grid-220"><a href="#get_grid-220"><span class="linenos">220</span></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="get_grid-221"><a href="#get_grid-221"><span class="linenos">221</span></a>    <span class="n">lon_format</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;mos2k&quot;</span><span class="p">,</span> <span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="s2">&quot;0_360&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mos2k&quot;</span><span class="p">,</span>
-</span><span id="get_grid-222"><a href="#get_grid-222"><span class="linenos">222</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TdlpackGridDefinition</span><span class="p">:</span>
+</span><span id="get_grid-222"><a href="#get_grid-222"><span class="linenos">222</span></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TdlpackGridDef</span><span class="p">:</span>
 </span><span id="get_grid-223"><a href="#get_grid-223"><span class="linenos">223</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="get_grid-224"><a href="#get_grid-224"><span class="linenos">224</span></a><span class="sd">    Return a grid definition by name.</span>
 </span><span id="get_grid-225"><a href="#get_grid-225"><span class="linenos">225</span></a>
@@ -4020,7 +4020,7 @@ west longitude is positive.</p>
 </span><span id="get_grid-241"><a href="#get_grid-241"><span class="linenos">241</span></a>
 </span><span id="get_grid-242"><a href="#get_grid-242"><span class="linenos">242</span></a><span class="sd">    Returns</span>
 </span><span id="get_grid-243"><a href="#get_grid-243"><span class="linenos">243</span></a><span class="sd">    -------</span>
-</span><span id="get_grid-244"><a href="#get_grid-244"><span class="linenos">244</span></a><span class="sd">    TdlpackGridDefinition</span>
+</span><span id="get_grid-244"><a href="#get_grid-244"><span class="linenos">244</span></a><span class="sd">    TdlpackGridDef</span>
 </span><span id="get_grid-245"><a href="#get_grid-245"><span class="linenos">245</span></a><span class="sd">        Grid definition using the requested longitude convention.</span>
 </span><span id="get_grid-246"><a href="#get_grid-246"><span class="linenos">246</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="get_grid-247"><a href="#get_grid-247"><span class="linenos">247</span></a>    <span class="k">try</span><span class="p">:</span>
@@ -4075,7 +4075,7 @@ Longitude convention to return:</p>
 <h6 id="returns">Returns</h6>
 
 <ul>
-<li><strong>TdlpackGridDefinition</strong>: Grid definition using the requested longitude convention.</li>
+<li><strong>TdlpackGridDef</strong>: Grid definition using the requested longitude convention.</li>
 </ul>
 </div>
 
