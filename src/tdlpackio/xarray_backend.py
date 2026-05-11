@@ -522,8 +522,6 @@ def make_variables(index, name_scheme, filters, f):
         if len(record_shapes[0]) == 1:
             # station records; check if the multiple station id records are identical
             station_id_records = index.linked_station_id_record.unique()
-            # HOLD if 0 in station_id_records:
-            # HOLD     raise ValueError("TDLPACK file has a mix of station and gridded records; cannot read.")
             station_id_records = list(station_id_records)
             first_stations = tuple(f[int(station_id_records[0])].stations)
             seen = dict.fromkeys(first_stations)
@@ -532,7 +530,7 @@ def make_variables(index, name_scheme, filters, f):
                 stations = tuple(f[int(station_record)].stations)
                 if stations != first_stations:
                     if one_station_list:
-                        logger.warning("Station lists on file are not identical; loading of data will be less efficient")
+                        logger.warning("station lists on file are not identical; loading of data will be less efficient")
                     one_station_list = False
                 seen.update(dict.fromkeys(stations))
             station = pd.Series(seen.keys(), name="station")
