@@ -665,7 +665,7 @@ class DateTime(Validator):
 @dataclass(init=False)
 class RequiredTdlpackMeta:
     # Tdlpack metadata required as coord or in encoding
-    date: datetime.datetime = DateTime()
+    refDate: datetime.datetime = DateTime()
 
     ccc: int = Int(min=0, max=999)
     fff: int = Int(min=0, max=999)
@@ -680,7 +680,7 @@ class RequiredTdlpackMeta:
     #    rr: int = Int(min=0, max=99)
     o: int = Int(min=0, max=9)
     #    hh: int = Int(min=0, max=99)
-    lead: datetime.timedelta = TimeDelta()
+    leadTime: datetime.timedelta = TimeDelta()
 
     thresh: int = Numeric()
     i: int = Int(min=0, max=9)
@@ -709,7 +709,7 @@ class RequiredTdlpackMeta:
 
         id3 = self.t * 100_000_000
         id3 += self.o * 100_000
-        id3 += int(pd.Timedelta(self.lead).total_seconds() / 3600)
+        id3 += int(pd.Timedelta(self.leadTime).total_seconds() / 3600)
 
         return [id1, id2, id3, 0]
 
@@ -747,6 +747,18 @@ class TdlpackDataset:
         else:
             raise ValueError("data does not have 'x' and 'y' or 'station' dims for writing to tdlp grid or station formats")
 
+        # rename coordinates to tdlp_name attribute value
+        for coord in self._obj.coords:
+            if "tdlpackio_name" in self._obj[coord].attrs:
+                if self._obj[coord].attrs["tdlpackio_name"] not in self._obj.coords:
+                    self._obj = self._obj.rename({coord: self._obj[coord].attrs["tdlpackio_name"]})
+
+        # make date and lead into dimensions if they are not
+        if "leadTime" not in self._obj.dims:
+            self._obj = self._obj.expand_dims("leadTime")
+        if "refDate" not in self._obj.dims:
+            self._obj = self._obj.expand_dims("refDate")
+
         possible_multi_var_keys = [
             "ccc",
             "fff",
@@ -773,7 +785,7 @@ class TdlpackDataset:
         keys = list(meta.__dataclass_fields__.keys())
         coord_meta = list()
         const_meta = list()
-        tdlpid = tdlpackio.TdlpackID()
+        tdlpid = TdlpId()
         for key in keys:
             if f"tdlpackio_{key}" in da.encoding:
                 meta[key] = da.encoding[f"tdlpackio_{key}"]
@@ -790,7 +802,7 @@ class TdlpackDataset:
                         meta[key] = coord
                         break
             if not found:
-                raise ValueError(f"to_tdlpack requres metadata for {key} be in encoding or coordinate")
+                raise ValueError(f"to_tdlpack requires metadata for {key} be in encoding or coordinate")
 
         filepath = Path(file)
         if mode == "w-":
@@ -817,8 +829,9 @@ class TdlpackDataset:
             f.write(stations)
         else:
             template_rec = tdlpackio.TdlpackRecord(type="grid")
-            template_rec.is2 = da.encoding["tdlpackio_is2"]  # this loads the grid metadata
-        template_rec.primary_missing_value = 9999.0
+            # This loads the grid metadata...
+            template_rec.is2 = da.encoding["tdlpackio_is2"].astype(np.int32)
+        template_rec.primaryMissingValue = 9999.0
 
         for t in prodicized:
             for var in self._obj.data_vars:
@@ -836,7 +849,11 @@ class TdlpackDataset:
                 # build out a tdlpack DataRecord with appropriate metadata
                 idlist = [tdlpid.word1, tdlpid.word2, tdlpid.word3, tdlpid.word4]
                 if var_constants is None:
-                    plain = "NO VARIABLE MATCH"
+                    # look for variable name text from encoding key "tdlpackio_name"
+                    if "tdlpackio_name" in da.encoding:
+                        name = da.encoding["tdlpackio_name"]
+                    else:
+                        name = "NO VARIABLE MATCH"
                     # let dec_scale allow for min_unique values in the space between the max and min
                     datamax = np.nanmax(data)
                     datamin = np.nanmin(data)
@@ -847,12 +864,13 @@ class TdlpackDataset:
                         range_place = np.floor(log10range)
                         dec_scale = int(np.ceil(np.log10(min_unique)) - range_place)
                 else:
-                    plain = var_constants.loc[tdlpid.cccfff]["plain"]
+                    name = var_constants.loc[tdlpid.cccfff]["plain"]  # Still need plain here
                     dec_scale = var_constants.loc[tdlpid.cccfff]["iscale"]
-                date = da.date.data.squeeze()[()]
-                rec = make_record(template_rec, idlist, data, plain, date)
-                rec.pack(dec_scale=dec_scale)
-                logger.debug(f"Writing {date}, {idlist} with dec_scale: {dec_scale}")
+                date = da.refDate.data.squeeze()[()]
+                rec = make_record(template_rec, idlist, data, name, date)
+                rec.decScaleFactor = dec_scale
+                rec.pack()
+                logger.debug(f"Writing {date}, {idlist} with decimal scale factor: {dec_scale}")
                 f.write(rec)
 
         f.close()
@@ -881,23 +899,197 @@ class TdlpDataarray:
         ds.tdlpackio.to_tdlpack(file, mode=mode, compute=compute, **kwargs)
 
 
-def make_record(template, rec_id, data, plain, date):
+def make_record(template, rec_id, data, name, date):
     """ """
     rec = copy(template)
     rec.data = data
     rec.id = rec_id
-    rec.is1[8:12] = rec.id
+    # rec.is1[8:12] = rec.id
+    rec.is1[8] = rec.id.word1
+    rec.is1[9] = rec.id.word2
+    rec.is1[10] = rec.id.word3
+    rec.is1[11] = rec.id.word4
     rec.is1[12] = rec.is1[10] % 1000
-    rec.reference_date = pd.to_datetime(date)
-    rec.is1[2] = int(rec.reference_date.strftime("%Y"))
-    rec.is1[3] = int(rec.reference_date.strftime("%m"))
-    rec.is1[4] = int(rec.reference_date.strftime("%d"))
-    rec.is1[5] = int(rec.reference_date.strftime("%H"))
-    rec.is1[7] = int(rec.reference_date.strftime("%Y%m%d%H"))
+    rec.refDate = pd.to_datetime(date)
+    rec.is1[2] = int(rec.refDate.strftime("%Y"))
+    rec.is1[3] = int(rec.refDate.strftime("%m"))
+    rec.is1[4] = int(rec.refDate.strftime("%d"))
+    rec.is1[5] = int(rec.refDate.strftime("%H"))
+    rec.is1[7] = int(rec.refDate.strftime("%Y%m%d%H"))
 
     rec.is4[2] = len(data)
-    rec.number_of_values = rec.is4[2]
+    rec.numberOfPackedValues = rec.is4[2]
 
-    rec.plain = plain
+    rec.name = name
 
     return rec
+
+
+@dataclass
+class TdlpId:
+    word1: int = 0
+    word2: int = 0
+    word3: int = 0
+    word4: int = 0
+
+    # word1
+    @property
+    def ccc(self):
+        return self.word1 // 1_000_000
+
+    @ccc.setter
+    def ccc(self, value):
+        self.word1 = self.word1 - self.ccc * 1_000_000 + value * 1_000_000
+
+    @property
+    def fff(self):
+        return self.word1 % 1_000_000 // 1000
+
+    @fff.setter
+    def fff(self, value):
+        self.word1 = self.word1 - self.fff * 1000 + value * 1000
+
+    @property
+    def b(self):
+        return self.word1 % 1000 // 100
+
+    @b.setter
+    def b(self, value):
+        self.word1 = self.word1 - self.b * 100 + value * 100
+
+    @property
+    def dd(self):
+        return self.word1 % 100
+
+    @dd.setter
+    def dd(self, value):
+        self.word1 = self.word1 - self.dd + value
+
+    # word2
+    @property
+    def v(self):
+        return self.word2 // 100_000_000
+
+    @v.setter
+    def v(self, value):
+        self.word2 = self.word2 - self.v * 100_000_000 + value * 100_000_000
+
+    @property
+    def llll(self):
+        return self.word2 % 100_000_000 // 10_000
+
+    @llll.setter
+    def llll(self, value):
+        self.word2 = self.word2 - self.llll * 10_000 + value * 10_000
+
+    @property
+    def uuuu(self):
+        return self.word2 % 10_000
+
+    @uuuu.setter
+    def uuuu(self, value):
+        self.word2 = self.word2 - self.uuuu + value
+
+    # word3
+    @property
+    def rr(self):
+        return self.word3 % 100_000_000 // 1_000_000
+
+    @rr.setter
+    def rr(self, value):
+        self.word3 = self.word3 - self.rr * 1_000_000 + value * 1_000_000
+
+    @property
+    def ttt(self):
+        return self.word3 % 1_000
+
+    @ttt.setter
+    def ttt(self, value):
+        self.word3 = self.word3 - self.ttt + value
+
+    @property
+    def leadTime(self):
+        return datetime.timedelta(hours=self.ttt)
+
+    @leadTime.setter
+    def leadTime(self, value):
+        self.ttt = int(pd.Timedelta(value).total_seconds() / 3600)
+
+    # word4
+    @property
+    def w(self):
+        return self.word4 // 1_000_000_000
+
+    @property
+    def xxxx(self):
+        return self.word4 % 1_000_000_000 // 100_000
+
+    @property
+    def yy(self):
+        return self.word4 % 100_000 // 1_000
+
+    @property
+    def wxxxxyy(self):
+        return self.word4 // 1_000
+
+    @wxxxxyy.setter
+    def wxxxxyy(self, value):
+        self.word4 = self.word4 - self.wxxxxyy * 1_000 + value * 1_000
+
+    @property
+    def isg(self):
+        return self.word4 % 1000
+
+    @isg.setter
+    def isg(self, value):
+        self.word4 = self.word4 - self.isg + value
+
+    @property
+    def i(self):
+        return self.word4 % 1000 // 100
+
+    @i.setter
+    def i(self, value):
+        self.word4 = self.word4 - self.i * 100 + value * 100
+
+    @property
+    def s(self):
+        return self.word4 % 100 // 10
+
+    @s.setter
+    def s(self, value):
+        self.word4 = self.word4 - self.s * 10 + value * 10
+
+    @property
+    def g(self):
+        return self.word4 % 10
+
+    @g.setter
+    def g(self, value):
+        self.word4 = self.word4 - self.g + value
+
+    @property
+    def thresh(self):
+        return f"{self.w}.{self.xxxx:04}E{self.yy:02}"
+
+    @thresh.setter
+    def thresh(self, value):
+        if value == 0:
+            self.wxxxxyy = 0
+            return
+        n = np.log10(np.abs(value)).astype("int")
+        n = n + 1 if n > 0 else n
+        xxxx = (np.abs(value) / 10.0**n * 10000).round(decimals=0).astype("int")
+        wxxxx = xxxx + 50000 if value < 0 else xxxx
+        wxxxxyy = wxxxx * 100 + abs(n) if n >= 0 else wxxxx * 100 + abs(n) + 50
+        self.wxxxxyy = wxxxxyy
+
+    def __setitem__(self, key, value):
+        setattr(self, key, value)
+
+    def __getitem__(self, key):
+        return getattr(self, key)
+
+    def update(self, **kwargs):
+        for k, v in kwargs.items():
+            self[k] = v

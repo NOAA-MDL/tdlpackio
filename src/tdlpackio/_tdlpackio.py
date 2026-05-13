@@ -1132,7 +1132,7 @@ class TdlpackID:
 
     __slots__ = ("_id", "_rec")
 
-    def __init__(self, id, linked_rec=None):
+    def __init__(self, id=[0, 0, 0, 0], linked_rec=None):
         """
         Initialize TDLPACK variable ID
 
@@ -1160,6 +1160,12 @@ class TdlpackID:
 
     def __repr__(self):
         return repr(utils.unparse_id(self._id))
+
+    def __setitem__(self, key, value):
+        self._id[key] = value
+
+    def __getitem__(self, key):
+        return self._id[key]
 
     @classmethod
     def from_string(cls, idstr):
