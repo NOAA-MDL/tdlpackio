@@ -953,6 +953,13 @@ class _TdlpackRecord:
         del self._data
         self._data = self._ondiskarray
 
+    def to_dict(self):
+        """Return a dictionary of values for station data"""
+        if self.type == "vector":
+            return {sta: float(val) for sta, val in zip(self.stations, self.data)}
+        else:
+            return {}
+
     def __getitem__(self, item):
         """"""
         if self.type == "grid":
