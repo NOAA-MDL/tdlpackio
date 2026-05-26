@@ -98,6 +98,16 @@ _GRIDS: dict[str, TdlpackGridDef] = {
         orientationLongitude=95.0,
         gridLength=2539.702881,
     ),
+    "nbmgu": TdlpackGridDef(
+        mapProjection=7,
+        nx=193,
+        ny=193,
+        latitudeLowerLeft=12.3499,
+        longitudeLowerLeft=216.3130,
+        standardLatitude=20.0,
+        orientationLongitude=360.0,
+        gridLength=2500.0,
+    ),
     "nbmhi": TdlpackGridDef(
         mapProjection=7,
         nx=625,
