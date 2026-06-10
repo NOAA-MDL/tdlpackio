@@ -143,6 +143,7 @@ class open:
             elif self.filetype == "sequential":
                 self._filehandle = builtins.open(path, mode=mode)
                 iret, self._lun = tdlpacklib.open_tdlpack_file(self.name, self.mode, self._ifiletype, ra_template=ra_template)
+            self._station_id_record_hashes = []
 
         # Add self to file data store
         _open_file_store[self.name] = self
@@ -504,8 +505,22 @@ class open:
                 nreplace,
                 ncheck,
             )
+            self._station_id_record_hashes.append(hash(record))
 
         elif issubclass(record.__class__, _TdlpackRecord):
+            # When writing a vector record to a sequential file, we need to make sure a station call letter
+            # record exists and is valid for the data record.
+            if self.filetype == "sequential" and record.type == "vector":
+                if record._source is not None:
+                    if hash(_open_file_store[record._source][record._linked_station_id_record]) not in self._station_id_record_hashes:
+                        if self.records > 0:
+                            self.write(TdlpackTrailerRecord())
+                        # Write the appropriate station call letter record
+                        self.write(_open_file_store[record._source][record._linked_station_id_record])
+
+            if not hasattr(record, "_ipack"):
+                record.pack()
+
             iret, self.bytes_written, self.records_written = tdlpacklib.write_tdlpack_record(
                 self.name,
                 self._lun,
@@ -698,6 +713,7 @@ class TdlpackRecord:
 
             @dataclass(init=False, repr=False)
             class Record(_TdlpackRecord, *bases):
+                __hash__ = _TdlpackRecord.__hash__
                 pass
 
             _record_class_store[rectype] = Record
@@ -773,6 +789,17 @@ class _TdlpackRecord:
             d = datetime.datetime.fromtimestamp(0, tz=datetime.timezone.utc)
             self.is1[2:7] = d.timetuple()[:5]
             self.is1[7] = np.int32(d.strftime(templates.DATE_FORMAT))
+
+    def __hash__(self):
+        """"""
+        return hash(
+            (
+                self.is0.tobytes(),
+                self.is1.tobytes(),
+                None if self.is2 is None else self.is2.tobytes(),
+                self.is4.tobytes(),
+            )
+        )
 
     def __repr__(self):
         """"""
@@ -915,7 +942,7 @@ class _TdlpackRecord:
                     iret, ioctet, self._ipack = tdlpacklib.pack_1d(
                         self.is0,
                         self.is1,
-                        self.is2,
+                        np.zeros((ND7), dtype=np.int32),  # self.is2 is None when vector.
                         self.is4,
                         np.asfortranarray(self.data, dtype=np.float32),
                     )
@@ -1087,6 +1114,9 @@ class TdlpackStationRecord:
         if stations_in is not None:
             self.stations = stations_in
 
+    def __hash__(self):
+        return hash(tuple(self.stations))
+
     def __str__(self):
         return f"{self._recnum}:d=0000000000:STATION CALL LETTER RECORD:{self.numberOfStations}"
 
@@ -1117,6 +1147,9 @@ class TdlpackTrailerRecord:
         self._recnum = -1
         self._type = "trailer"
         self.id = TdlpackID([0, 0, 0, 0], self)
+
+    def __hash__(self):
+        return hash((""))
 
     def __str__(self):
         """"""
