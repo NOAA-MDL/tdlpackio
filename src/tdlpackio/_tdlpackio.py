@@ -51,6 +51,7 @@ from dataclasses import dataclass, field, InitVar
 from typing import ClassVar, Iterable, Literal, Optional
 import builtins
 import collections
+import copy
 import datetime
 import hashlib
 import numpy as np
@@ -790,6 +791,31 @@ class _TdlpackRecord:
             self.is1[2:7] = d.timetuple()[:5]
             self.is1[7] = np.int32(d.strftime(templates.DATE_FORMAT))
 
+        if self._source is None:
+            self._data = None
+
+    def __copy__(self):
+        """Shallow copy"""
+        new = TdlpackRecord(
+            self.is0,
+            self.is1,
+            self.is2,
+            self.is4,
+        )
+        return new
+
+    def __deepcopy__(self, memo):
+        """Deep copy"""
+        new = TdlpackRecord(
+            np.copy(self.is0),
+            np.copy(self.is1),
+            copy.deepcopy(self.is2),
+            np.copy(self.is4),
+        )
+        memo[id(self)] = new
+        new.data = np.copy(self.data)
+        return new
+
     def __hash__(self):
         """"""
         return hash(
@@ -918,11 +944,41 @@ class _TdlpackRecord:
             _latlon_store[self._sha1_latlon] = (lats.T, -1.0 * lons.T)
             return _latlon_store[self._sha1_latlon]
 
+    def copy(self, deep: bool = True):
+        """Returns a copy of this TdlpackRecord.
+
+        When `deep=True`, a copy is made of each of the TDLPACK section arrays and
+        the data are unpacked from the source object and copied into the new
+        object. Otherwise, a shallow copy of each array is performed and no data
+        are copied.
+
+        Parameters
+        ----------
+        deep : bool, default: True
+            Whether each TDLPACK section array and data are copied onto
+            the new object. Default is True.
+
+        Returns
+        -------
+        object : TdlpackRecord
+            New TdlpackRecord object.
+        """
+        return copy.deepcopy(self) if deep else copy.copy(self)
+
     def pack(self):
         """Pack TDLPACK section information and data values"""
         # Make sure TDLPACK sections are well-formed.
-        if self.is0[0] == 0:
-            self.is0[0] = TDLP_HEADER
+        self.is0[0] = TDLP_HEADER
+        if self.type == "grid":
+            if self.nx == 0 or self.ny == 0:
+                raise ValueError(f"For type='grid', nx and ny must be greater than 0 (got nx={self.nx}, ny={self.ny}).")
+
+        # For gridded records, create the data of missings. There is
+        # no good way to do this for vector records.
+        if self.type == "grid":
+            if self.data is None:
+                self.primaryMissingValue = 9999.0
+                self.data = np.zeros(self.shape, dtype=np.float32) + self.primaryMissingValue
 
         if isinstance(self._data, TdlpackRecordOnDiskArray):
             # No data read yet, so get packed message from file
