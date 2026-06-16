@@ -318,51 +318,6 @@ def write_tdlpack_record(path,
     return iret, c_ntotby, c_ntotrc
 
 
-def write_tdlpack_record(path,
-                         int lun,
-                         int ftype,
-                         cnp.int32_t[::1] ipack,
-                         int ntotby,
-                         int ntotrc,
-                         nreplace=None,
-                         ncheck=None):
-
-    cdef char *c_path = NULL
-    cdef int32_t c_nreplace
-    cdef int32_t c_ncheck
-    cdef int32_t *c_nreplace_ptr = NULL
-    cdef int32_t *c_ncheck_ptr = NULL
-    cdef int32_t c_ntotby = ntotby
-    cdef int32_t c_ntotrc = ntotrc
-    cdef int32_t iret = 0
-    cdef int32_t nd5 = ipack.shape[0]
-
-    if nreplace is not None:
-        c_nreplace = nreplace
-        c_nreplace_ptr = &c_nreplace
-
-    if ncheck is not None:
-        c_ncheck = ncheck
-        c_ncheck_ptr = &c_ncheck
-
-    c_path = <char *>PyUnicode_AsUTF8(path)
-
-    tdlp_write_tdlpack_record(
-        c_path,
-        <int32_t *>&lun,
-        <int32_t *>&ftype,
-        &nd5,
-        &ipack[0],
-        &c_ntotby,
-        &c_ntotrc,
-        &iret,
-        c_nreplace_ptr,
-        c_ncheck_ptr,
-    )
-
-    return iret, c_ntotby, c_ntotrc
-
-
 def write_trailer_record(int lun,
                          int ftype,
                          int ntotby,
