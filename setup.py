@@ -55,6 +55,7 @@ def get_package_info(name, static=False, required=True, include_file=None):
             pkg_libdir = os.path.dirname(libpath)
             incfile = find_include_file(include_file, root=pkg_dir)
             pkg_incdir = os.path.dirname(incfile)
+            libname_to_use = libname
     else:
         # No env vars set, now find everything.
         libnames = pkgname_to_libname[name] if name in pkgname_to_libname.keys() else [name]
