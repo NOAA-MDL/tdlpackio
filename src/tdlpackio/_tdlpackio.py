@@ -76,8 +76,8 @@ MINPK = 21
 NCHAR = 8
 ND5 = 5242880  # Accommodates a 20MB record
 ND7 = 54
-PMISS = 9999.0
-SMISS = 9997.0
+PRIMARY_MISSING_VALUE = 9999.0
+SECONDARY_MISSING_VALUE = 9997.0
 
 _latlon_store = dict()
 _open_file_store = dict()
@@ -977,8 +977,17 @@ class _TdlpackRecord:
         # no good way to do this for vector records.
         if self.type == "grid":
             if self.data is None:
-                self.primaryMissingValue = 9999.0
+                self.primaryMissingValue = PRIMARY_MISSING_VALUE
                 self.data = np.zeros(self.shape, dtype=np.float32) + self.primaryMissingValue
+
+        # Handle potential NaN values
+        if np.any(np.isnan(self.data)):
+            self.primaryMissingValue == PRIMARY_MISSING_VALUE
+            self.data = np.where(
+                np.isnan(self.data),
+                self.primaryMissingValue,
+                self.data,
+            )
 
         if isinstance(self._data, TdlpackRecordOnDiskArray):
             # No data read yet, so get packed message from file

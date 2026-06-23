@@ -135,7 +135,7 @@ def open_tdlpack_file(path,
     c_path = <char *>PyUnicode_AsUTF8(path)
     c_mode = <char *>PyUnicode_AsUTF8(mode)
 
-    lun = 0 
+    lun = 0
     iret = 0
     if ra_template is not None:
         c_ra_template = <char *>PyUnicode_AsUTF8(ra_template)
@@ -273,6 +273,64 @@ def pack_2d(cnp.int32_t[::1] is0,
     return iret, ioctet, ipack_arr[:ioctet // TDLP_NBYPWD]
 
 
+def write_station_record(path,
+                         int lun,
+                         int ftype,
+                         list[str] stations,
+                         int ntotby,
+                         int ntotrc,
+                         nreplace=None,
+                         ncheck=None):
+    """
+    """
+    cdef char *c_path = NULL
+    cdef int32_t c_nreplace
+    cdef int32_t c_ncheck
+    cdef int32_t *c_nreplace_ptr = NULL
+    cdef int32_t *c_ncheck_ptr = NULL
+    cdef int32_t c_ntotby
+    cdef int32_t c_ntotrc
+    cdef int32_t iret
+    cdef int i
+
+    if nreplace is not None:
+        c_nreplace = nreplace
+        c_nreplace_ptr = &c_nreplace
+    if ncheck is not None:
+        c_ncheck = ncheck
+        c_ncheck_ptr = &c_ncheck
+
+    cdef int nsta = len(stations)
+    cdef int32_t nd5 = nsta * 2
+    cdef int32_t[:] ipack = np.empty(nd5, dtype=np.int32)
+    for i in range(nsta):
+        sbytes = stations[i].encode('utf-8')
+        ipack[i * 2] = int.from_bytes(sbytes[:4], 'little', signed=False)
+        ipack[i * 2 + 1] = int.from_bytes(sbytes[4:], 'little', signed=False)
+
+    c_ntotby = ntotby
+    c_ntotrc = ntotrc
+    iret = 0
+    c_path = <char *>PyUnicode_AsUTF8(path)
+
+    tdlp_write_station_record(
+        c_path,
+        <int32_t *>&lun,
+        <int32_t *>&ftype,
+        <int32_t *>&nsta,
+        &nd5,
+        <int32_t *>&ipack[0],
+        &c_ntotby,
+        &c_ntotrc,
+        &iret,
+        c_nreplace_ptr,
+        c_ncheck_ptr,
+    )
+
+    del ipack
+    return iret, c_ntotby, c_ntotrc
+
+
 def write_tdlpack_record(path,
                          int lun,
                          int ftype,
@@ -329,7 +387,7 @@ def write_trailer_record(int lun,
     c_ntotby = ntotby
     c_ntotrc = ntotrc
     iret = 0
-    
+
     tdlp_write_trailer_record(
         <int32_t *>&lun,
         <int32_t *>&ftype,

@@ -291,7 +291,7 @@ class OnDiskArray:
             if isinstance(it, int):
                 array_field = array_field[(slice(None, None, None),) * i + (0,)]
         f.close()
-        array_field[array_field == 9999.0] = np.nan
+        array_field[array_field == tdlpackio.PRIMARY_MISSING_VALUE] = np.nan
         return array_field
 
 
@@ -831,7 +831,7 @@ class TdlpackDataset:
             template_rec = tdlpackio.TdlpackRecord(type="grid")
             # This loads the grid metadata...
             template_rec.is2 = da.encoding["tdlpackio_is2"].astype(np.int32)
-        template_rec.primaryMissingValue = 9999.0
+        template_rec.primaryMissingValue = tdlpackio.PRIMARY_MISSING_VALUE
 
         for t in prodicized:
             for var in self._obj.data_vars:
