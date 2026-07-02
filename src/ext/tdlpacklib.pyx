@@ -408,24 +408,28 @@ def gridij_to_latlon(int nx,
                      float xlatll,
                      float xlonll):
 
+    cdef int32_t c_nx = nx
+    cdef int32_t c_ny = ny
+    cdef int32_t c_mproj = mproj
     cdef int32_t iret = 0
 
-    cdef cnp.ndarray[cnp.float32_t, ndim=2] lats_arr = np.empty((nx, ny), dtype=np.float32)
-    cdef cnp.ndarray[cnp.float32_t, ndim=2] lons_arr = np.empty((nx, ny), dtype=np.float32)
+    # Python-facing shape: (ny, nx)
+    cdef cnp.ndarray[cnp.float32_t, ndim=2, mode="c"] lats_arr = np.empty((ny, nx), dtype=np.float32)
+    cdef cnp.ndarray[cnp.float32_t, ndim=2, mode="c"] lons_arr = np.empty((ny, nx), dtype=np.float32)
 
     cdef float[:, ::1] lats = lats_arr
     cdef float[:, ::1] lons = lons_arr
 
     with nogil:
         tdlp_gridij_to_latlon(
-            <int32_t *>&nx,
-            <int32_t *>&ny,
-            <int32_t *>&mproj,
-            <float *>&xmeshl,
-            <float *>&orient,
-            <float *>&xlat,
-            <float *>&xlatll,
-            <float *>&xlonll,
+            &c_nx,
+            &c_ny,
+            &c_mproj,
+            &xmeshl,
+            &orient,
+            &xlat,
+            &xlatll,
+            &xlonll,
             &lats[0, 0],
             &lons[0, 0],
             &iret,

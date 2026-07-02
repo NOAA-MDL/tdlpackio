@@ -941,7 +941,7 @@ class _TdlpackRecord:
                 self.latitudeLowerLeft,
                 self.longitudeLowerLeft,
             )
-            _latlon_store[self._sha1_latlon] = (lats.T, -1.0 * lons.T)
+            _latlon_store[self._sha1_latlon] = (lats, -1.0 * lons)
             return _latlon_store[self._sha1_latlon]
 
     def copy(self, deep: bool = True):
