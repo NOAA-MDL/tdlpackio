@@ -89,3 +89,4 @@ ignore = [
     "F405", # Ignore undefined, or defined from star imports
     "F811", # Ignore redefinition
 ]
+select = ["E4", "E7", "E9", "F"] # preserve ruff < 0.16.0 rules
