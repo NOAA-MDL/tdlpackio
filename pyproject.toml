@@ -2,12 +2,13 @@
 requires = [
   "cython>3",
   "numpy",
-  "setuptools>=61.0",
+  "scikit-build-core>=1.0",
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "tdlpackio"
+dynamic = ["version"]
 description = "Python interface for reading and writing TDLPACK data"
 authors = [
   {name = "Eric Engle", email = "eric.engle@noaa.gov"},
@@ -48,7 +49,12 @@ classifiers = [
 dependencies = [
   "numpy",
 ] 
-dynamic = ["version"]
+
+[[tool.dynamic-metadata]]
+provider = "scikit_build_core.metadata.regex"
+field = "version"
+input = "VERSION"
+regex = '^(?P<value>\S+)\s*$'
 
 [project.optional-dependencies]
 xarray = ["xarray"]
@@ -63,13 +69,44 @@ lstdlp = "tdlpackio:lstdlp._lstdlp_main"
 Documentation = "https://noaa-mdl.github.io/tdlpackio"
 Respository = "https://github.com/NOAA-MDL/tdlpackio"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
-packages = ["tdlpackio"]
-zip-safe = false
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+cmake.version = ">=3.18"
+wheel.packages = ["src/tdlpackio"]
+logging.level = "INFO"
 
-[tool.setuptools.dynamic]
-version = {attr = "tdlpackio.__config__.tdlpackio_version"}
+# Include only the files and directories explicitly selected below.
+sdist.inclusion-mode = "explicit"
+
+# Equivalent to the include and graft directives from MANIFEST.in.
+sdist.include = [
+  "MANIFEST.in",
+  "setup.py",
+  "pyproject.toml",
+  "README.md",
+  "LICENSE",
+  "VERSION",
+  "create_docs.sh",
+  "requirements.txt",
+
+  # Files required by the CMake source build.
+  "CMakeLists.txt",
+  "cmake/**",
+
+  # Equivalent to the MANIFEST.in graft directives.
+  "docs/**",
+  "src/ext/**",
+  "src/tdlpackio/**",
+]
+
+# Equivalent to the prune and global-exclude directives from MANIFEST.in.
+sdist.exclude = [
+  "tests/**",
+  "*.py[cod]",
+  "*.c",
+  "*.so",
+  "*.DS_Store",
+]
 
 [tool.ruff]
 line-length = 150
